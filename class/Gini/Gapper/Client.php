@@ -105,7 +105,7 @@ class Client
     {
         if (!$this->username) return;
         try {
-            $data = (array)$this->getRPC()->user->getInfo([
+            $data = $this->getRPC()->user->getInfo([
                 'username'=> $this->username
             ]);
         }
@@ -122,7 +122,7 @@ class Client
             self::unsetSession($key);
             if (!self::hasSession($key)) {
                 // groups: [group->id,...]
-                $groups = (array)$this->getRPC()->user->getGroupIDs($this->username);
+                $groups = $this->getRPC()->user->getGroupIDs($this->username);
                 switch (count($groups)) {
                     case 0:
                         self::setSession($key, '');
@@ -148,7 +148,7 @@ class Client
             }
 
             $id = self::getSession($key);
-            $data = (array) $this->getRPC()->group->getUserGroupInfo($this->username, $id);
+            $data = $this->getRPC()->group->getUserGroupInfo($this->username, $id);
             return $data;
         }
         catch (\Gini\RPC\Exception $e) {
