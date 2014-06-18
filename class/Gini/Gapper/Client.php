@@ -29,7 +29,10 @@ class Client
                 $client_id = \Gini\Config::get($type . '.client_id');
                 $client_secret = \Gini\Config::get($type . '.client_secret');
                 $rpc = \Gini\IoC::construct('\Gini\RPC', $api, $type);
-                $rpc->$type->authorize($client_id, $client_secret);
+                $bool = $rpc->$type->authorize($client_id, $client_secret);
+                if (!$bool) {
+                    throw new \Exception('Your APP was not registed in gapper server!');
+                }
             } catch (\Gini\RPC\Exception $e) {
             }
 
@@ -61,20 +64,8 @@ class Client
         unset($_SESSION[self::$sessionKey][$key]);
     }
 
-    public $client_id;
-    public $client_secret;
     public function __construct($mustLogin=true)
     {
-        self::prepareSession();
-        $client_id = \Gini\Config::get('app.client_id');
-        $client_secret = \Gini\Config::get('app.client_secret');
-        // 验证app是否已经在gapper-server进行了register
-        $bool = !!$this->getRPC()->authorize($client_id, $client_secret);
-        if (!$bool) {
-            throw new \Exception('Your APP was not registed in gapper server!');
-        }
-        $this->client_id = $client_id;
-        $this->client_secret = $client_secret;
         if ($mustLogin) {
             $this->login();
         }
@@ -151,7 +142,7 @@ class Client
                             $url = \Gini\Config::get('gapper.choose_group_url');
                             \Gini\CGI::redirect($url, [
                                 'redirect_url'=> URL('', $_GET)
-                                ,'client_id'=> $this->client_id
+                                ,'client_id'=> \Gini\Config::get('gapper.client_id')
                             ]);
                         }
                         break;
