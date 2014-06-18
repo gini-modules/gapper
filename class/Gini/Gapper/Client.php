@@ -148,7 +148,7 @@ class Client
             }
 
             $id = self::getSession($key);
-            $data = $this->getRPC()->group->getUserGroupInfo($this->username, $id);
+            $data = $this->getRPC()->group->getInfo($id);
             return $data;
         }
         catch (\Gini\RPC\Exception $e) {
