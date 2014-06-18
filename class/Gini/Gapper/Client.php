@@ -123,7 +123,7 @@ class Client
             if (!self::hasSession($key)) {
                 // groups: [group->id,...]
                 $groups = $this->getRPC()->user->getGroupIDs($this->username);
-                switch (count($groups)) {
+                if (is_array($groups)) switch (count($groups)) {
                     case 0:
                         self::setSession($key, '');
                         break;
