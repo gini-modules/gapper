@@ -1,0 +1,168 @@
+<?php
+/**
+* @file Client.php
+* @brief APP <--> Gapper Client <--> Gapper Server
+* @author Hongjie Zhu
+* @version 0.1.0
+* @date 2014-06-18
+ */
+
+/**
+ *
+ * $client = \Gini\IoC::construct('\Gini\Gapper\Client', true); (default)
+ * $client = \Gini\IoC::construct('\Gini\Gapper\Client', false);
+ * $username = $client->username;
+ * $userdata = $client->getUserInfo();
+ * $groupdata = $client->getGroupInfo();
+ *
+ */
+namespace Gini\Gapper;
+
+class Client
+{
+    private static $_RPC = [];
+    private function getRPC($type='gapper')
+    {
+        if (!self::$_RPC[$type]) {
+            try {
+                $api = \Gini\Config::get($type . '.url');
+                $client_id = \Gini\Config::get($type . '.client_id');
+                $client_secret = \Gini\Config::get($type . '.client_secret');
+                $rpc = \Gini\IoC::construct('\Gini\RPC', $api, $type);
+                $rpc->$type->authorize($client_id, $client_secret);
+            } catch (\Gini\RPC\Exception $e) {
+            }
+
+            self::$_RPC[$type] = $rpc;
+        }
+
+        return self::$_RPC[$type];
+    }
+
+    private static $sessionKey = 'gapper.client';
+    private static function prepareSession()
+    {
+        $_SESSION[self::$sessionKey] = $_SESSION[self::$sessionKey] ?: [];
+    }
+    private static function hasSession($key)
+    {
+        return isset($_SESSION[self::$sessionKey][$key]);
+    }
+    private static function getSession($key)
+    {
+        return $_SESSION[self::$sessionKey][$key];
+    }
+    private static function setSession($key, $value)
+    {
+        $_SESSION[self::$sessionKey][$key] = $value;
+    }
+    private static function unsetSession($key)
+    {
+        unset($_SESSION[self::$sessionKey][$key]);
+    }
+
+    public $client_id;
+    public $client_secret;
+    public function __construct($mustLogin=true)
+    {
+        self::prepareSession();
+        $client_id = \Gini\Config::get('app.client_id');
+        $client_secret = \Gini\Config::get('app.client_secret');
+        // 验证app是否已经在gapper-server进行了register
+        $bool = !!$this->getRPC()->authorize($client_id, $client_secret);
+        if (!$bool) {
+            throw new \Exception('Your APP was not registed in gapper server!');
+        }
+        $this->client_id = $client_id;
+        $this->client_secret = $client_secret;
+        if ($mustLogin) {
+            $this->login();
+        }
+    }
+
+    public function login()
+    {
+        $isLoggedIn = \Gini\Auth::isLoggedIn();
+        if (!$isLoggedIn) {
+            self::prepareSession();
+            $key = 'isLogging';
+            if (!self::getSession($key)) {
+                self::setSession($key, time());
+                $oauthSSO = 'gapper/'.uniqid();
+                $oauth = \Gini\IoC::construct('\Gini\OAuth\Client', $oauthSSO);
+                $username = $oauth->getUserName();
+                \Gini\Auth::login($username);
+            }
+            self::unsetSession($key);
+        }
+        return !!\Gini\Auth::userName();
+    }
+
+    public function __get($name)
+    {
+        switch ($name) {
+        case 'username':
+            $result = \Gini\Auth::userName();
+            break;
+        default:
+            $result = null;
+        }
+        return $result;
+    }
+
+    public function getUserInfo()
+    {
+        if (!$this->username) return;
+        try {
+            $data = (array)$this->getRPC()->user->getInfo([
+                'username'=> $this->username
+            ]);
+        }
+        catch (\Gini\RPC\Exception $e) {
+        }
+        return $data;
+    }
+
+    public function getGroupInfo()
+    {
+        if (!$this->username) return;
+        $key = 'groupid';
+        try {
+            self::unsetSession($key);
+            if (!self::hasSession($key)) {
+                // groups: [group->id,...]
+                $groups = (array)$this->getRPC()->user->getGroupIDs([
+                    'username'=> $this->username
+                ]);
+                switch (count($groups)) {
+                    case 0:
+                        self::setSession($key, '');
+                        break;
+                    case 1:
+                        self::setSession($key, array_pop($groups));
+                        break;
+                    default:
+                        $groudID = $_GET['gapper-group'];
+                        if ($groudID && in_array($groudID, $groups)) {
+                            self::setSession($key, $groudID);
+                        }
+                        else {
+                            // redirect to choose group
+                            $url = \Gini\Config::get('gapper.choose_group_url');
+                            \Gini\CGI::redirect($url, [
+                                'redirect_url'=> URL('', $_GET)
+                                ,'client_id'=> $this->client_id
+                            ]);
+                        }
+                        break;
+                }
+            }
+
+            $id = self::getSession($key);
+            $data = (array) $this->getRPC()->group->getUserGroupInfo($this->username, $id);
+            return $data;
+        }
+        catch (\Gini\RPC\Exception $e) {
+        }
+    }
+}
