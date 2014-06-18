@@ -64,7 +64,7 @@ class Client
         unset($_SESSION[self::$sessionKey][$key]);
     }
 
-    public function __construct($mustLogin=true)
+    public function __construct($mustLogin=false)
     {
         if ($mustLogin) {
             $this->login();
@@ -122,9 +122,7 @@ class Client
             self::unsetSession($key);
             if (!self::hasSession($key)) {
                 // groups: [group->id,...]
-                $groups = (array)$this->getRPC()->user->getGroupIDs([
-                    'username'=> $this->username
-                ]);
+                $groups = (array)$this->getRPC()->user->getGroupIDs($this->username);
                 switch (count($groups)) {
                     case 0:
                         self::setSession($key, '');
