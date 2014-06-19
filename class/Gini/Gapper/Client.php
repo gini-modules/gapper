@@ -11,7 +11,7 @@
  *
  * $client = \Gini\IoC::construct('\Gini\Gapper\Client', true); (default)
  * $client = \Gini\IoC::construct('\Gini\Gapper\Client', false);
- * $username = $client->username;
+ * $username = $client->getCurrentUserName();
  * $userdata = $client->getUserInfo();
  * $groupdata = $client->getGroupInfo();
  *
@@ -89,24 +89,17 @@ class Client
         return !!\Gini\Auth::userName();
     }
 
-    public function __get($name)
+    public function getCurrentUserName()
     {
-        switch ($name) {
-        case 'username':
-            $result = \Gini\Auth::userName();
-            break;
-        default:
-            $result = null;
-        }
-        return $result;
+        return \Gini\Auth::userName();
     }
 
     public function getUserInfo()
     {
-        if (!$this->username) return;
+        if (!$this->getCurrentUserName()) return;
         try {
             $data = $this->getRPC()->user->getInfo([
-                'username'=> $this->username
+                'username'=> $this->getCurrentUserName()
             ]);
         }
         catch (\Gini\RPC\Exception $e) {
@@ -116,13 +109,13 @@ class Client
 
     public function getGroupInfo()
     {
-        if (!$this->username) return;
+        if (!$this->getCurrentUserName()) return;
         $key = 'groupid';
         try {
             self::unsetSession($key);
             if (!self::hasSession($key)) {
                 // groups: [group->id,...]
-                $groups = $this->getRPC()->user->getGroupIDs($this->username);
+                $groups = $this->getRPC()->user->getGroupIDs($this->getCurrentUserName());
                 if (is_array($groups)) switch (count($groups)) {
                     case 0:
                         self::setSession($key, '');
