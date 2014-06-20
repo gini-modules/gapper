@@ -1,6 +1,7 @@
 ._*
 *.*~
 .DS_Store
+tags
 /vendor/
 /report/
 /build/
