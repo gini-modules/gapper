@@ -97,6 +97,8 @@ class Client
     public static function logout()
     {
         \Gini\Auth::logout();
+        $url = \Gini\Config::get('gapper.logout_url');
+        \Gini\CGI::redirect($url);
     }
 
     public function getCurrentUserName()
