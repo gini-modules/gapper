@@ -67,26 +67,38 @@ class Client
     public function __construct($mustLogin=false)
     {
         if ($mustLogin) {
-            $this->login();
+            self::login();
         }
     }
 
-    public function login()
+    public static function login()
     {
         $isLoggedIn = \Gini\Auth::isLoggedIn();
         if (!$isLoggedIn) {
             self::prepareSession();
             $key = 'isLogging';
-            if (!self::getSession($key)) {
-                self::setSession($key, time());
+            if (!self::hasSession($key)) {
                 $oauthSSO = 'gapper/'.uniqid();
-                $oauth = \Gini\IoC::construct('\Gini\OAuth\Client', $oauthSSO);
-                $username = $oauth->getUserName();
-                \Gini\Auth::login($username);
+                self::setSession($key, $oauthSSO);
             }
+            else {
+                $oauthSSO = self::getSession($key);
+            }
+            //var_dump($oauthSSO);die;
+            $oauth = \Gini\IoC::construct('\Gini\OAuth\Client', $oauthSSO);
+            $username = $oauth->getUserName();
+            //var_dump($username);die;
+            \Gini\Auth::login($username);
             self::unsetSession($key);
         }
         return !!\Gini\Auth::userName();
+    }
+
+    public static function logout()
+    {
+        \Gini\Auth::logout();
+        $url = \Gini\Config::get('gapper.logout_url');
+        \Gini\CGI::redirect($url);
     }
 
     public function getCurrentUserName()

@@ -7,6 +7,16 @@ template: page.jade
 
     $client = \Gini\IoC::construct('\Gini\Gapper\Client');
 
+### 静态方法
+
+* login: 登录
+
+        \Gini\Gapper\Client::login();
+
+* logout: 登出
+
+        \Gini\Gapper\Client::logout();
+
 ### 方法
 
 * getCurrentUserName: 获取当前登录的用户名，为gapper server的username，可能为空
