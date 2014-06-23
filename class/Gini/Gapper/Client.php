@@ -29,7 +29,7 @@ class Client
                 $client_id = \Gini\Config::get($type . '.client_id');
                 $client_secret = \Gini\Config::get($type . '.client_secret');
                 $rpc = \Gini\IoC::construct('\Gini\RPC', $api, $type);
-                $bool = $rpc->$type->authorize($client_id, $client_secret);
+                $bool = $rpc->authorize($client_id, $client_secret);
                 if (!$bool) {
                     throw new \Exception('Your APP was not registed in gapper server!');
                 }
@@ -124,7 +124,6 @@ class Client
         if (!$this->getCurrentUserName()) return;
         $key = 'groupid';
         try {
-            self::unsetSession($key);
             if (!self::hasSession($key)) {
                 // groups: [group->id,...]
                 $groups = $this->getRPC()->user->getGroupIDs($this->getCurrentUserName());
