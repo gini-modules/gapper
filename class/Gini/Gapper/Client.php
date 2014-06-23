@@ -31,7 +31,7 @@ class Client
                 $rpc = \Gini\IoC::construct('\Gini\RPC', $api, $type);
                 $bool = $rpc->authorize($client_id, $client_secret);
                 if (!$bool) {
-                    throw new \Exception('Your APP was not registed in gapper server!');
+                    throw new \Exception('Your APP was not registered in gapper server!');
                 }
             } catch (\Gini\RPC\Exception $e) {
             }
