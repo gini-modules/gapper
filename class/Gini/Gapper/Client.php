@@ -124,7 +124,8 @@ class Client
         if (!$this->getCurrentUserName()) return;
         $key = 'groupid';
         try {
-            if (!self::hasSession($key)) {
+            $groupID = $_GET['gapper-group'];
+            if ($groupID || !self::hasSession($key)) {
                 // groups: [group->id,...]
                 $groups = $this->getRPC()->user->getGroupIDs($this->getCurrentUserName());
                 if (is_array($groups)) switch (count($groups)) {
@@ -135,9 +136,8 @@ class Client
                         self::setSession($key, array_pop($groups));
                         break;
                     default:
-                        $groudID = $_GET['gapper-group'];
-                        if ($groudID && in_array($groudID, $groups)) {
-                            self::setSession($key, $groudID);
+                        if ($groupID && in_array($groupID, $groups)) {
+                            self::setSession($key, $groupID);
                         }
                         else {
                             // redirect to choose group
