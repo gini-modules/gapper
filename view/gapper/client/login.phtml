@@ -1,0 +1,33 @@
+<?php 
+$id = uniqid();
+$id = "gapper-login-{$id}";
+$fid = "gapper-login-form-{$id}";
+?>
+<ul id="<?=H($id)?>">
+<?php foreach ($sources as $source=>$info) {?>
+    <li data-gapper-auth-source="<?=H($source)?>">
+        <dl>
+            <dt><img src="<?=H($info['icon'])?>"/></dt>
+            <dd><?=H($info['name'])?></dd>
+        </dl>
+    </li>
+<?php }?>
+</ul>
+
+<div id="<?=H($fid)?>"></div>
+
+<script>
+require(['jquery'], function($) {
+    var id = <?=J($id)?>;
+    var $ele = $('#'+id);
+    $ele.on('click', 'li', function(evt) {
+        var $that = $(this);
+        var source = $that.attr('data-gapper-auth-source');
+        var url = 'ajax/' + source + '/getForm';
+        $.get(url, function(data) {
+            var fid = <?=J($fid)?>;
+            $('#'+fid).html(data);
+        });
+    });
+});
+</script>

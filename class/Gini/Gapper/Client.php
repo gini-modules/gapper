@@ -21,7 +21,7 @@ namespace Gini\Gapper;
 class Client
 {
     private static $_RPC = [];
-    private function getRPC($type='gapper')
+    private static function getRPC($type='gapper')
     {
         if (!self::$_RPC[$type]) {
             try {
@@ -73,6 +73,32 @@ class Client
 
     public static function login()
     {
+        return self::loginByToken();
+    }
+
+    public static function loginByToken()
+    {
+        // 已经登录成功，直接返回
+        if (\Gini\Auth::isLoggedIn()) return true;
+
+        // 通过token登录成功
+        $token = $_GET['login-token'];
+        if ($token) {
+            $client_id = \Gini\Config::get('gapper.client_id');
+            $user = self::getRPC()->user->authorizeByToken($token, $client_id);
+            if ($user && $user['username']) {
+                \Gini\Auth::login(\Gini\Auth::makeUserName($user['username']));
+                if (\Gini\Auth::isLoggedIn()) return true;
+            }
+        }
+
+        // 展示登录界面，让用户提交信息登录
+        $url = 'gapper/client/login?redirect='.$_SERVER['REQUEST_URI'];
+        \Gini\CGI::redirect($url);
+    }
+
+    public static function loginByOAuth()
+    {
         $isLoggedIn = \Gini\Auth::isLoggedIn();
         if (!$isLoggedIn) {
             self::prepareSession();
@@ -110,7 +136,7 @@ class Client
     {
         if (!$this->getCurrentUserName()) return;
         try {
-            $data = $this->getRPC()->user->getInfo([
+            $data = self::getRPC()->user->getInfo([
                 'username'=> $this->getCurrentUserName()
             ]);
         }
@@ -127,7 +153,7 @@ class Client
             $groupID = $_GET['gapper-group'];
             if ($groupID || !self::hasSession($key)) {
                 // groups: [group->id,...]
-                $groups = $this->getRPC()->user->getGroupIDs($this->getCurrentUserName());
+                $groups = self::getRPC()->user->getGroupIDs($this->getCurrentUserName());
                 if (is_array($groups)) switch (count($groups)) {
                     case 0:
                         self::setSession($key, '');
@@ -152,7 +178,7 @@ class Client
             }
 
             $id = self::getSession($key);
-            $data = $this->getRPC()->group->getInfo($id);
+            $data = self::getRPC()->group->getInfo($id);
             return $data;
         }
         catch (\Gini\RPC\Exception $e) {
