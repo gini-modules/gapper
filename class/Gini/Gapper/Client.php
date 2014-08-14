@@ -20,6 +20,9 @@ namespace Gini\Gapper;
 
 class Client
 {
+    const STEP_LOGIN = 0;
+    const STEP_GROUP = 1;
+
     private static $_RPC = [];
     private static function getRPC($type='gapper')
     {
@@ -57,10 +60,12 @@ class Client
     }
     private static function setSession($key, $value)
     {
+        self::prepareSession();
         $_SESSION[self::$sessionKey][$key] = $value;
     }
     private static function unsetSession($key)
     {
+        self::prepareSession();
         unset($_SESSION[self::$sessionKey][$key]);
     }
 
@@ -71,6 +76,72 @@ class Client
         }
     }
 
+    public static function getLoginStep()
+    {
+        if (!\Gini\Auth::isLoggedIn()) return self::STEP_LOGIN;
+
+        $key = 'isLoggedIn';
+        $isLoggedIn = self::getSession($key);
+        if (!$isLoggedIn) return self::STEP_GROUP;
+    }
+
+    public static function chooseGroup($gid)
+    {
+        $_GET['gapper-group'] = $gid;
+        return self::isLoggedIn();
+    }
+
+    public static function isLoggedIn()
+    {
+        if (!\Gini\Auth::isLoggedIn()) return false;
+
+        $key = 'isLoggedIn';
+        $isLoggedIn = self::getSession($key);
+        if ($isLoggedIn) return true;
+
+        $client_id = \Gini\Config::get('gapper.client_id');
+        if (!$client_id) return false;
+
+        $app = self::getRPC()->app->getInfo($client_id);
+        if (!$app['id']) return false;
+
+        $username = \Gini\Auth::userName();
+        if ($app['type'] == 'user') {
+            $apps = self::getRPC()->user->getApps($username);
+            if (is_array($apps) && in_array($client_id, array_keys($apps))) {
+                // 当前用户已经添加了该app
+                self::setSession($key, 1);
+                return true;
+            }
+        }
+        elseif ($app['type'] == 'group') {
+            $groups = self::getRPC()->user->getGroups($username);
+            if (!is_array($groups)) return false;
+            $group = (int)$_GET['gapper-group'];
+
+            if (in_array($group, array_keys($groups))) {
+                $group = $groups[$group];
+            }
+            elseif (count($groups)==1) {
+                $group = array_pop($groups);
+            }
+            else {
+                $group = null;
+            }
+
+            if ($group) {
+                $apps = self::getRPC()->group->getApps((int)$group['id']);
+                if (is_array($apps) && in_array($client_id, array_keys($apps))) {
+                    // 当前组已经添加了该app
+                    self::setSession($key, 1);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public static function login()
     {
         return self::loginByToken();
@@ -79,7 +150,7 @@ class Client
     public static function loginByToken()
     {
         // 已经登录成功，直接返回
-        if (\Gini\Auth::isLoggedIn()) return true;
+        if (self::isLoggedIn()) return true;
 
         // 通过token登录成功
         $token = $_GET['gapper-token'];
@@ -88,7 +159,7 @@ class Client
             $user = self::getRPC()->user->authorizeByToken($token, $client_id);
             if ($user && $user['username']) {
                 \Gini\Auth::login(\Gini\Auth::makeUserName($user['username']));
-                if (\Gini\Auth::isLoggedIn()) return true;
+                if (self::isLoggedIn()) return true;
             }
         }
 
@@ -101,7 +172,6 @@ class Client
     {
         $isLoggedIn = \Gini\Auth::isLoggedIn();
         if (!$isLoggedIn) {
-            self::prepareSession();
             $key = 'isLogging';
             if (!self::hasSession($key)) {
                 $oauthSSO = 'gapper/'.uniqid();
@@ -122,8 +192,9 @@ class Client
 
     public static function logout()
     {
+        self::unsetSession('isLoggedIn');
         \Gini\Auth::logout();
-        $url = \Gini\Config::get('gapper.logout_url');
+        $url = 'gapper/client/login';
         \Gini\CGI::redirect($url);
     }
 
