@@ -25,7 +25,7 @@ class Client extends \Gini\Controller\CGI\Gapper
 
     public function actionGo($client_id)
     {
-        if (!\Gini\Auth::isLoggedIn()) return $this->_showNothing();
+        if (!\Gini\Gapper\Client::isLoggedIn()) return $this->_showNothing();
 
         $redirect = $_GET['redirect'];
 
@@ -58,20 +58,12 @@ class Client extends \Gini\Controller\CGI\Gapper
     public function actionLogin()
     {
         $redirect = $_GET['redirect'];
-        if (\Gini\Auth::isLoggedIn()) {
+        if (\Gini\Gapper\Client::isLoggedIn()) {
             $redirect = $this->_checkUrl('/', $redirect) ? $redirect : '/';
             return $this->redirect($redirect);
         }
 
-        $sources = (array)\Gini\Config::get('gapperauth');
-
-        $data = [];
-        foreach ($sources as $source=>$info) {
-            $key = strtolower("GapperAuth" . str_replace('-', '', $source));
-            $data[$key] = $info;
-        }
-
-        $this->view->body = VV('gapper/client/login', ['sources'=>$data]);
+        $this->view->body = VV('gapper/client/login');
     }
 }
 

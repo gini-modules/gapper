@@ -17,20 +17,35 @@ define('gapper/client/login', ['jquery', 'bootbox'], function ($) {
     var classLi = 'gapper-client-checkbox-li';
     $('body').on('click', '.'+classBox+' .'+classLi, function() {
         var $that = $(this);
-        var source = $that.attr('data-gapper-auth-source');
-        var url = 'ajax/'+source+'/getForm';
-        $.get(url, function(data) {
-            dialog && dialog.modal && dialog.modal('hide');
-            dialog = bootbox.dialog({
-                message: data
-                ,backdrop: 'static'
-                ,closeButton: true
-                ,className: classDialog
+        if ($that.attr('data-gapper-auth-source')) {
+            var source = $that.attr('data-gapper-auth-source');
+            var url = 'ajax/'+source+'/getForm';
+            $.get(url, function(data) {
+                dialog && dialog.modal && dialog.modal('hide');
+                dialog = bootbox.dialog({
+                    message: data
+                    ,backdrop: 'static'
+                    ,closeButton: true
+                    ,className: classDialog
+                });
+                dialog.on('hide.bs.modal', function() {
+                    showLogin();
+                });
             });
-            dialog.on('hide.bs.modal', function() {
-                showLogin();
+        }
+        if ($that.attr('data-gapper-client-group')) {
+            var url = 'ajax/gapper/client/choose';
+            $.post(url, {
+                id: $that.attr('data-gapper-client-group')
+            }, function(data) {
+                if (true===data) {
+                    window.location.reload();
+                }
+                else {
+                    bootbox.alert(data);
+                }
             });
-        });
+        }
     });
 
     var classForm = '.gapper-auth-login-form';
