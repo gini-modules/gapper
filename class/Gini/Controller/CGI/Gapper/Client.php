@@ -25,17 +25,23 @@ class Client extends \Gini\Controller\CGI\Gapper
 
     public function actionGo($client_id)
     {
+        if (!\Gini\Auth::isLoggedIn()) return $this->_showNothing();
+
         $redirect = $_GET['redirect'];
 
-        if (!$client_id || !\Gini\Auth::isLoggedIn()) {
+        if (!$client_id) {
             return $this->_showNothing();
         }
         $app = $this->_getRPC()->app->getInfo($client_id);
         if (!$app['id']) {
             return $this->_showNothing();
         }
-        $token = $this->_getRPC()->user->getLoginToken($client_id);
-        $username = \Gini\Auth::userName();
+        $user = (object)$this->_getRPC()->user->getInfo(\Gini\Auth::userName());
+        if (!$user->id) {
+            return $this->_showNothing();
+        }
+        $token = $this->_getRPC()->user->getLoginToken($user->id, $client_id);
+        $username = $user->username;
         $url = $app['url'];
         if (!$username || !$token) {
             return $this->_showNothing();
@@ -44,7 +50,7 @@ class Client extends \Gini\Controller\CGI\Gapper
             $url = $redirect;
         }
 
-        $url = \Gini\URI::url($url, 'login-token='.$token);
+        $url = \Gini\URI::url($url, 'gapper-token='.$token);
 
         return $this->redirect($url);
     }

@@ -82,7 +82,7 @@ class Client
         if (\Gini\Auth::isLoggedIn()) return true;
 
         // 通过token登录成功
-        $token = $_GET['login-token'];
+        $token = $_GET['gapper-token'];
         if ($token) {
             $client_id = \Gini\Config::get('gapper.client_id');
             $user = self::getRPC()->user->authorizeByToken($token, $client_id);
