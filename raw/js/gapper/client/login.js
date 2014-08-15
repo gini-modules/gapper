@@ -1,4 +1,4 @@
-define('gapper/client/login', ['jquery', 'gapper/client/utils/bootbox'], function ($) {
+define('gapper/client/login', ['jquery', 'bootbox'], function ($) {
     var dialog;
     var classDialog = 'gapper-client-dialog';
     var showLogin = function() {
