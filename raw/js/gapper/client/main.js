@@ -28,3 +28,4 @@ require(['jquery', 'bootbox'], function($) {
     }
     bootbox.setDefaults(defaults);
 });
+

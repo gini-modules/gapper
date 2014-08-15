@@ -10,11 +10,12 @@
     <?php $addCSS('bootstrap', 'board');?>
     <?php $addCSS('font-awesome', 'board');?>
     <?php $addCSS('bootswatch', 'board');?>
+    <?php $addCSS('gapper-client-login', 'board');?>
     <?=_G('HEADCSS')?>
     <?=_G('HEADJS')?>
 </head>
 
-<body class="<?= $layout_class ?>">
+<body data-require="gapper/client/autologin" class="<?= $layout_class ?>">
     <?=$body?>
 </body>
 </html>
