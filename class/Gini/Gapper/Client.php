@@ -134,6 +134,7 @@ class Client
                 if (is_array($apps) && in_array($client_id, array_keys($apps))) {
                     // 当前组已经添加了该app
                     self::setSession($key, 1);
+                    self::setSession('groupid', (int)$group['id']);
                     return true;
                 }
             }
@@ -193,6 +194,7 @@ class Client
     public static function logout()
     {
         self::unsetSession('isLoggedIn');
+        self::unsetSession('groupid');
         \Gini\Auth::logout();
         $url = 'gapper/client/login';
         \Gini\CGI::redirect($url);
@@ -200,7 +202,9 @@ class Client
 
     public function getCurrentUserName()
     {
-        return \Gini\Auth::userName();
+        if (self::isLoggedIn()) {
+            return \Gini\Auth::userName();
+        }
     }
 
     public function getUserInfo()
@@ -220,6 +224,12 @@ class Client
     {
         if (!$this->getCurrentUserName()) return;
         $key = 'groupid';
+        if (self::hasSession($key)) {
+            $id = self::getSession($key);
+            $data = self::getRPC()->group->getInfo($id);
+            return $data;
+        }
+        /*
         try {
             $groupID = $_GET['gapper-group'];
             if ($groupID || !self::hasSession($key)) {
@@ -254,5 +264,6 @@ class Client
         }
         catch (\Gini\RPC\Exception $e) {
         }
+        */
     }
 }
