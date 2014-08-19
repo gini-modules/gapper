@@ -1,13 +1,11 @@
-<style>
-.gapper-client-dialog .modal-dialog {
-    width: 325px;
-}
-</style>
-<ul class="gapper-client-checkbox list-unstyled list-inline text-center">
+<div class="modal-header"><?=H(T('Please select login type:'))?></div>
+<ul class="modal-body gapper-client-checkbox list-unstyled list-inline text-center">
 <?php foreach ($sources as $source=>$info) {?>
-    <li class="gapper-client-checkbox-li" data-gapper-auth-source="<?=H($source)?>"><dl>
-        <dt><img src="<?=H($info['icon'])?>" /></dt>
-        <dd><?=H($info['name'])?></dd>
-    </dl></li>
+    <li class="gapper-client-checkbox-li" data-gapper-auth-source="<?=H($source)?>">
+        <div class="app-icon app-icon-hoverable">
+            <div class="app-icon-image"><img src="<?=H($info['icon'])?>" /></div>
+            <div class="app-icon-title"><?=H($info['name'])?></div>
+        </div>
+    </li>
 <?php }?>
 </ul>

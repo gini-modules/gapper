@@ -1,0 +1,296 @@
+@import "inc/bootstrap/variables";
+@import "inc/bootstrap/mixins";
+
+// @import url("//fonts.googleapis.com/css?family=Lato|Russo+One");
+
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Lato Regular'), local('Lato-Regular'), 
+      url(../fonts/lato-regular-webfont.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Lato Bold'), local('Lato-Bold'), 
+      url(../fonts/lato-bold-webfont.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Lato';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Lato Italic'), local('Lato-Italic'), 
+      url(../fonts/lato-italic-webfont.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Lato';
+  font-style: italic;
+  font-weight: 700;
+  src: local('Lato Bold Italic'), local('Lato-BoldItalic'), 
+      url(../fonts/lato-bolditalic-webfont.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Russo One';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Russo One'), local('RussoOne-Regular'), 
+       url(../fonts/russoone-regular-webfont.woff) format('woff');
+}
+
+@headerBackgroundColor: #123;
+@headerShadowColor: #68a;
+@headerColor: #fff;
+@headerGlossyColor: #293947;
+@lockColor: #123;
+
+@hoverColor: #fff;
+@hoverBackgroundColor: #3c9;
+
+@dashboardSidebarBackgroundColor: #123;
+@dashboardSidebarColor: #678;
+@dashboardSidebarBorderColor: #678;
+
+@activeDashboardSidebarBackgroundColor: #3c9;
+@activeDashboardSidebarColor: #fff;
+@activeDashboardSidebarBorderColor: #397;
+
+@hoverDashboardSidebarBackgroundColor: #234;
+@hoverDashboardSidebarColor: #678;
+@hoverDashboardSidebarBorderColor: #678;
+
+@dashboardBoardBackgroundColor: #fff;
+@dashboardBoardColor: #666;
+
+@hoverDashboardBoardBackgroundColor: #eee;
+@hoverDashboardBoardColor: #333;
+
+@activeDashboardBoardBackgroundColor: #3c9;
+@activeDashboardBoardColor: #fff;
+
+@dragoverDashboardBoardBackgroundColor: rgba(51, 204, 153, 0.3);
+
+@progressBarColor: #46B8DA;
+
+html,
+body {
+    height: 100%;
+    /* The html and body elements cannot have any padding or margin. */
+    background-color: #123;
+}
+
+body, h1, h2, h3, h4, h5, h6 {
+    font-family: 'Lato', 'Microsoft Yahei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.btn {
+    border-width: 0 0 2px;
+}
+
+.btn-default {
+    background-color: #eee;
+}
+
+.panel {
+    border-width: 2px 2px 3px 2px;
+    border-radius: 8px;
+    box-shadow: none;
+}
+
+.modal-footer {
+    padding: 9px 10px 10px;
+}
+
+.input-group-unity {
+
+    position: relative;
+    display: block;
+    overflow:auto;
+    _height:1%;
+
+    .form-control {
+        z-index: 0;
+    }
+    
+    .form-control:last-child {
+        padding-left: 35px;
+        border-radius: 4px;
+    }
+
+    .form-control.last-child {
+        padding-left: 35px;
+        border-radius: 4px;
+    }
+    
+    .input-group-addon {
+        position:absolute; 
+        left:0; 
+        top:4px;
+        z-index: 1;
+        border-width: 0;
+        background-color: transparent;
+    }
+
+    .input-group-btn {
+        position:absolute; 
+        left:0; 
+        top:0;
+        width:auto;
+        z-index: 1;
+
+        .btn {
+            background-color: transparent;
+            border-width: 0;
+            color: #ccc;
+        }
+    }
+    
+    .form-control:first-child {
+        padding-right: 35px;
+        border-radius: 4px;
+    }
+    
+    .input-group-addon:last-child {
+        left: auto;
+        right:0; 
+    }
+
+    .input-group-btn:last-child {
+        left: auto;
+        right:0; 
+    }
+
+}
+
+.popover {
+    background-color:#f7f7f7;
+    // border-width:0;
+    // box-shadow: 0px 1px 2px rgba(0,0,0,.5);
+    border-width: 1px 1px 3px;
+    box-shadow: none;
+
+    &.bottom .arrow {
+       // border-color:transparent;
+    }
+
+    &.bottom .arrow:after {
+        border-bottom-color: #f7f7f7;
+    }
+}
+
+.dropdown-menu {
+
+    > li > a:hover {
+        color: @hoverColor;
+        background-color: @hoverBackgroundColor;
+    }
+
+}
+
+// @-moz-document url-prefix()
+
+// 消息中心
+.icons-popover {
+    max-width: none;
+    width:560px; 
+    
+    .icons {
+        margin-bottom: 5px;
+    }
+
+    .member-icon {
+        
+        &.joined {
+            opacity: .5;
+            
+            &:hover {
+                color: @dashboardBoardColor;
+                cursor: default;
+
+                > a {
+                    color: @dashboardBoardColor;
+                }
+
+            }
+        }
+    }
+
+}
+
+@dashboardBoardBackgroundColor: #fff;
+@dashboardBoardColor: #666;
+
+@hoverDashboardBoardBackgroundColor: #eee;
+@hoverDashboardBoardColor: #333;
+
+.app-icon {
+    width: 128px;
+    height: 128px;
+    padding: 20px;
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    color: @dashboardBoardColor;
+
+    .app-icon-image {
+        display:block;
+        width: 70px;
+        height: 70px;
+        margin:0 auto;
+        border-radius:50%;
+        text-align:center;
+        background-color:#fff;
+        position: relative;
+
+        .app-icon-text {
+            position: absolute;
+            border: 3px solid #ddd;
+            color: #fff;
+            background-color: #666;
+            width: 70px;
+            height: 70px;
+            line-height: 64px;
+            font-weight: bold;
+            border-radius:50%;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        img {
+            display:block;
+            width: 70px;
+            height: 70px;
+            border-radius:50%;
+            // border: 2px solid #666;
+        }
+        
+    }
+
+    .app-icon-title {
+        display:block;
+        margin:5px 0 10px;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+
+}
+
+.app-icon-hoverable {
+    cursor: pointer;
+    &:hover {
+        background-color: @hoverDashboardBoardBackgroundColor;
+        color: @hoverDashboardBoardColor;
+
+        .app-icon-text {
+            border-color: #ccc;
+        }
+    }
+}

@@ -1,19 +1,15 @@
-<style>
-.gapper-client-dialog .modal-dialog {
-    width: 325px;
-}
-</style>
-<ul class="gapper-client-checkbox list-unstyled list-inline text-center">
+<div class="modal-header"><?=H(T('Please select group:'))?></div>
+<ul class="modal-body gapper-client-checkbox list-unstyled list-inline text-center">
 <?php foreach ($groups as $gid=>$group) {?>
-    <li class="gapper-client-checkbox-li" data-gapper-client-group="<?=H($gid)?>"><dl>
-        <dt>
+    <li class="gapper-client-checkbox-li" data-gapper-client-group="<?=H($gid)?>"><div class="app-icon app-icon-hoverable">
+        <div class="app-icon-image">
             <?php if ($group['icon']) {?>
             <img src="<?=H($group['icon'])?>" />
             <?php } else {?>
-            <div class="group-icon-text"><?= H($group['abbr'])?></div>
+            <div class="group-icon-text app-icon-text"><?= H($group['abbr'])?></div>
             <?php }?>
-        </dt>
-        <dd><?=H($group['title'])?></dd>
-    </dl></li>
+        </div>
+        <div class="app-icon-title"><?=H($group['title'])?></div>
+    </div></li>
 <?php }?>
 </ul>
