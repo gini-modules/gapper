@@ -69,11 +69,8 @@ class Client
         unset($_SESSION[self::$sessionKey][$key]);
     }
 
-    public function __construct($mustLogin=false)
+    public function __construct()
     {
-        if ($mustLogin) {
-            self::login();
-        }
     }
 
     public static function getLoginStep()
