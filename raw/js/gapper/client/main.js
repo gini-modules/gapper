@@ -12,6 +12,7 @@ require([
     ,'bootstrap'
     ,'gapper/client/utils/retina'
     ,'gapper/client/utils/require'
+    ,'gapper/client/utils/data'
 ]);
 
 
