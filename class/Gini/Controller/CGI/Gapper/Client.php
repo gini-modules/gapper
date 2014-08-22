@@ -63,7 +63,7 @@ class Client extends \Gini\Controller\CGI\Gapper
             return $this->redirect($redirect);
         }
 
-        $view = \Gini\Config::get('site.login_view') ?: 'gapper/client/login' ;
+        $view = \Gini\Config::get('gapper.login_view') ?: 'gapper/client/login' ;
         $this->view->body = VV($view);
     }
 }
