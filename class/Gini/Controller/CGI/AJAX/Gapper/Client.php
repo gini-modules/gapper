@@ -46,7 +46,7 @@ class Client extends \Gini\Controller\CGI
             return $this->_showJSON((string)V('gapper/client/checkauth', $data));
         }
         elseif ($current===\Gini\Gapper\Client::STEP_GROUP) {
-            $data['groups'] = self::getRPC()->user->getGroups(\Gini\Auth::userName());
+            $data['groups'] = self::getRPC()->user->getGroups(\Gini\Gapper\Client::getUserName());
             return $this->_showJSON((string)V('gapper/client/checkgroup', $data));
         }
 

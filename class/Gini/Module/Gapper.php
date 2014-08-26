@@ -6,6 +6,7 @@ namespace Gini\Module
     {
         public static function setup()
         {
+            /*
             date_default_timezone_set(\Gini\Config::get('system.timezone') ?: 'Asia/Shanghai');
 
             _G('HEADCSS', '<GINI-HEADCSS>');
@@ -18,6 +19,7 @@ namespace Gini\Module
                 \Gini\Config::set('system.locale', $_SESSION['locale']);
             }
             \Gini\I18N::setup();
+             */
         }
     }
 
