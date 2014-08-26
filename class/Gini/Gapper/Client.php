@@ -187,6 +187,7 @@ class Client
         \Gini\CGI::redirect($url);
     }
 
+    /*
     // 暂时保留一下API，待APP升级结束，再进行删除
     public static function isLoggedIn()
     {
@@ -198,6 +199,7 @@ class Client
     {
         return self::goLogin();
     }
+     */
 
     /*
     public static function getLoginStep()

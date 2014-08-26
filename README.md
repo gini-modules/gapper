@@ -1,7 +1,4 @@
 ### 登录API
-* \Gini\Gapper\Client::isLoggedIn，判断用户是否登录
-    * 如果当前访问的app为user类型，且用户已经输入了正确的用户名密码，则返回true
-    * 如果当前访问的app为group类型，且用户输入了正确的用户名密码 + 用户在gapper-server的组只有一个关联了该app，则返回true
 * \Gini\Gapper\Client::getLoginStep
     * \Gini\Gapper\Client::STEP\_LOGIN：尚未登录
     * \Gini\Gapper\Client::STEP\_GROUP：登录成功，未选择组
