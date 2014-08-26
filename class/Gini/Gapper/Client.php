@@ -22,6 +22,7 @@ class Client
 {
     const STEP_LOGIN = 0;
     const STEP_GROUP = 1;
+    const STEP_DONE = 2;
 
     private static $_RPC = [];
     private static function getRPC($type='gapper')
@@ -69,10 +70,138 @@ class Client
         unset($_SESSION[self::$sessionKey][$key]);
     }
 
-    public function __construct()
+    public static function getLoginStep()
     {
+        // 错误的client信息，用户无法登陆
+        $client_id = \Gini\Config::get('gapper.client_id');
+        if (!$client_id) return self::STEP_LOGIN;
+        $app = self::getRPC()->app->getInfo($client_id);
+        if (!$app['id']) return self::STEP_LOGIN;
+
+        $username = self::getUserName();
+        if (!$username) return self::STEP_LOGIN;
+
+        if ($app['type']==='group' && empty(self::getGroupInfo())) {
+            return self::STEP_GROUP;
+        }
+
+        return self::STEP_DONE;
     }
 
+    public static function loginByUserName($username)
+    {
+        list($name, $backend) = explode('|', $username, 2);
+        $backend = $backend ?: 'gapper';
+        return self::setUserName($name.'|'.$backend);
+    }
+
+    public static function loginByToken($token)
+    {
+        $client_id = \Gini\Config::get('gapper.client_id');
+        $user = self::getRPC()->user->authorizeByToken($token, $client_id);
+        if ($user && $user['username']) {
+            return self::loginByUserName($user['username']);
+        }
+        return false;
+    }
+
+    private static $keyUserName = 'username';
+
+    private static function setUserName($username)
+    {
+        // 错误的client信息，用户无法登陆
+        $client_id = \Gini\Config::get('gapper.client_id');
+        if (!$client_id) return false;
+        $app = self::getRPC()->app->getInfo($client_id);
+        if (!$app['id']) return false;
+        self::setSession(self::$keyUserName, $username);
+
+        return true;
+    }
+
+    public static function getUserName()
+    {
+        if (self::hasSession(self::$keyUserName)) {
+            $username = self::getSession(self::$keyUserName);
+        }
+        return $username;
+    }
+
+    public static function getUserInfo()
+    {
+        if (!self::getUserName()) return;
+        try {
+            $data = self::getRPC()->user->getInfo([
+                'username'=> self::getUserName()
+            ]);
+        }
+        catch (\Gini\RPC\Exception $e) {
+        }
+        return $data;
+    }
+
+    private static $keyGroupID = 'groupid';
+
+    public static function chooseGroup($groupID)
+    {
+        $client_id = \Gini\Config::get('gapper.client_id');
+        if (!$client_id) return false;
+        $app = self::getRPC()->app->getInfo($client_id);
+        if (!$app['id']) return false;
+
+        $username = self::getUserName();
+        if (!$username) return false;
+
+        $groups = self::getRPC()->user->getGroups($username);
+        if (!is_array($groups) || !in_array($groupID, array_keys($groups))) {
+            return false;
+        }
+
+        $apps = self::getRPC()->group->getApps((int)$groupID);
+        if (is_array($apps) && in_array($client_id, array_keys($apps))) {
+            self::setSession(self::$keyGroupID, $groupID);
+            return true;
+        }
+        return false;
+    }
+
+    public static function getGroupInfo()
+    {
+        if (self::hasSession(self::$keyGroupID)) {
+            $groupID = self::getSession(self::$keyGroupID);
+            $data = self::getRPC()->group->getInfo((int)$groupID);
+            return $data;
+        }
+    }
+
+    public static function logout()
+    {
+        self::unsetSession(self::$keyGroupID);
+        self::unsetSession(self::$keyUserName);
+        return true;
+    }
+
+    public static function goLogin()
+    {
+        $url = \Gini\URI::url('gapper/client/login', ['redirect'=> $_SERVER['REQUEST_URI']]);
+        \Gini\CGI::redirect($url);
+    }
+
+    /*
+    // 暂时保留一下API，待APP升级结束，再进行删除
+    public static function isLoggedIn()
+    {
+        return self::getLoginStep()===self::STEP_DONE;
+    }
+
+    // 暂时保留一下API，待APP升级结束，再进行删除
+    public static function login()
+    {
+        return self::goLogin();
+    }
+     */
+
+    /*
     public static function getLoginStep()
     {
         if (!\Gini\Auth::isLoggedIn()) return self::STEP_LOGIN;
@@ -226,41 +355,6 @@ class Client
             $data = self::getRPC()->group->getInfo($id);
             return $data;
         }
-        /*
-        try {
-            $groupID = $_GET['gapper-group'];
-            if ($groupID || !self::hasSession($key)) {
-                // groups: [group->id,...]
-                $groups = self::getRPC()->user->getGroupIDs($this->getCurrentUserName());
-                if (is_array($groups)) switch (count($groups)) {
-                    case 0:
-                        self::setSession($key, '');
-                        break;
-                    case 1:
-                        self::setSession($key, array_pop($groups));
-                        break;
-                    default:
-                        if ($groupID && in_array($groupID, $groups)) {
-                            self::setSession($key, $groupID);
-                        }
-                        else {
-                            // redirect to choose group
-                            $url = \Gini\Config::get('gapper.choose_group_url');
-                            \Gini\CGI::redirect($url, [
-                                'redirect_url'=> URL('', $_GET)
-                                ,'client_id'=> \Gini\Config::get('gapper.client_id')
-                            ]);
-                        }
-                        break;
-                }
-            }
-
-            $id = self::getSession($key);
-            $data = self::getRPC()->group->getInfo($id);
-            return $data;
-        }
-        catch (\Gini\RPC\Exception $e) {
-        }
-        */
     }
+     */
 }

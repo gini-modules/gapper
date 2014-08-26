@@ -25,7 +25,7 @@ class Client extends \Gini\Controller\CGI\Gapper
 
     public function actionGo($client_id)
     {
-        if (!\Gini\Gapper\Client::isLoggedIn()) return $this->_showNothing();
+        if (\Gini\Gapper\Client::getLoginStep()!==\Gini\Gapper\Client::STEP_DONE) return $this->_showNothing();
 
         $redirect = $_GET['redirect'];
 
@@ -36,16 +36,15 @@ class Client extends \Gini\Controller\CGI\Gapper
         if (!$app['id']) {
             return $this->_showNothing();
         }
-        $user = (object)$this->_getRPC()->user->getInfo(\Gini\Auth::userName());
-        if (!$user->id) {
+        $user = \Gini\Gapper\Client::getUserInfo();
+        if (!$user['id']) {
             return $this->_showNothing();
         }
-        $token = $this->_getRPC()->user->getLoginToken($user->id, $client_id);
-        $username = $user->username;
+        $token = $this->_getRPC()->user->getLoginToken($user['id'], $client_id);
+        if (!$token) {
+            return $this->_showNothing();
+        }
         $url = $app['url'];
-        if (!$username || !$token) {
-            return $this->_showNothing();
-        }
         if ($this->_checkUrl($url, $redirect)) {
             $url = $redirect;
         }
@@ -58,7 +57,7 @@ class Client extends \Gini\Controller\CGI\Gapper
     public function actionLogin()
     {
         $redirect = $_GET['redirect'];
-        if (\Gini\Gapper\Client::isLoggedIn()) {
+        if (\Gini\Gapper\Client::getLoginStep()===\Gini\Gapper\Client::STEP_DONE) {
             $redirect = $this->_checkUrl('/', $redirect) ? $redirect : '/';
             return $this->redirect($redirect);
         }
