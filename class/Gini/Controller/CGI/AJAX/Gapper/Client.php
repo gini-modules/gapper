@@ -37,10 +37,11 @@ class Client extends \Gini\Controller\CGI
 
         $data = [];
         if ($current===\Gini\Gapper\Client::STEP_LOGIN) {
-            $sources = (array)\Gini\Config::get('gapperauth');
+            $sources = (array)\Gini\Config::get('gapper.auth');
             $data['sources'] = [];
             foreach ($sources as $source=>$info) {
-                $key = strtolower("GapperAuth" . str_replace('-', '', $source));
+                $key = strtolower(implode('/', ['Gapper', 'Auth', $source]));
+                $key = strtr($key, ['-'=>'/', '_'=>'/']);
                 $data['sources'][$key] = $info;
             }
             return $this->_showJSON((string)V('gapper/client/checkauth', $data));
