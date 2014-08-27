@@ -39,11 +39,11 @@
     /gapper/client/go/CLINET_ID?redirect=http://****/***
 
 ### 用户验证模块的约定[gapper-auth-example](https://github.com/pihizi/gini-gapper-auth-example)
-* 注入/ajax/gapperauthEXAMPLE的subpath，并提供以下功能
-    * /ajax/gapperauthEXAMPLE/getForm: 获取登录用的表单
+* 注入/ajax/gapper/auth/EXAMPLE的subpath，并提供以下功能
+    * /ajax/gapper/auth/EXAMPLE/getForm: 获取登录用的表单
 
             <div class="modal-header"><?=H(T('LOGIN'))?></div>
-            <form class="modal-body form gapper-auth-login-form" method="POST" action="ajax/gapperauthexample/login"><dl class="dl-horizontal">
+            <form class="modal-body form gapper-auth-login-form" method="POST" action="ajax/gapper/auth/EXAMPLE/login"><dl class="dl-horizontal">
                 <dt class="text-center">
                     <div class="app-icon">
                         <div class="text-center app-icon-image"><img src="<?=H($info->icon)?>" /></div>
@@ -57,17 +57,5 @@
                 </dd>
             </dl></form>
 
-    * /ajax/gapperauthEXAMPLE/login: 登录表单的提交地址，该地址在getForm的form action中指定
+    * /ajax/gapper/auth/EXAMPLE/login: 登录表单的提交地址，该地址在getForm的form action中指定
 
-### TODO
-* GapperClient取消对Auth库的依赖
-* login和logout的封装，取消跳转功能，仅返回成功/失败。
-* 弱化/隐藏isLoggedIn，各APP对login的判断逻辑从getLoginStep开始，根据需要进行login和chooseGroup (同步的，前端js代码也要修改)
-    * getLoginStep的返回值
-        * STEP_LOGIN: 等待登录
-        * STEP_GROUP: 需要选择分组
-        * STEP_DONE: 登录成功
-    * login支持两种方式
-        * loginByUserName($username)
-        * loginByToken($token)
-* getUserInfo和getGroupInfo方法静态化
