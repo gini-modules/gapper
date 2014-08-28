@@ -59,3 +59,29 @@
 
     * /ajax/gapper/auth/EXAMPLE/login: 登录表单的提交地址，该地址在getForm的form action中指定
 
+### 配置文件范例
+
+* gapper.yml
+
+        ---
+        # RPC 
+        client_id: ******
+        client_secret: ******
+        url: http://****/***
+
+        # login ui
+        login_view: gapper/client/login
+        ...
+
+* site.yml
+
+        ---
+        title: SITE-TITLE
+        ...
+
+* system.yml
+
+        ---
+        timezone: Asia/Shanghai
+        locale: en_US
+        ...
