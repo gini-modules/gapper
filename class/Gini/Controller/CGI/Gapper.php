@@ -8,6 +8,9 @@ namespace Gini\Controller\CGI
         private static $_JSVars = [];
         private static $_CSSes = [];
 
+        const STRING_HEAD_CSS = 'GapperClientHeadCSS';
+        const STRING_HEAD_JS = 'GapperClientHeadJS';
+
         public static function setJSVar($var, $value)
         {
             self::$_JSVars[$var] = $value;
@@ -31,8 +34,8 @@ namespace Gini\Controller\CGI
             $headcss = V('gapper/client/headcss', ['csses'=>self::$_CSSes]);
             $headjs = V('gapper/client/headjs', ['vars'=>self::$_JSVars]);
 
-            $content = str_replace(_G('HEADCSS'), $headcss, $content);
-            $content = str_replace(_G('HEADJS'), $headjs, $content);
+            $content = str_replace(self::STRING_HEAD_CSS, $headcss, $content);
+            $content = str_replace(self::STRING_HEAD_JS, $headjs, $content);
 
             $response = \Gini\IoC::construct('\Gini\CGI\Response\HTML', $content);
 
