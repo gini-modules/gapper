@@ -5,7 +5,7 @@ namespace Gini\Controller\CGI\Gapper;
 class Client extends \Gini\Controller\CGI\Gapper
 {
 
-    use \Gini\Module\RPCTrait;
+    use \Gini\Module\Gapper\Client\RPCTrait;
 
     private function _showNothing()
     {

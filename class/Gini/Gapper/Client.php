@@ -21,7 +21,7 @@ namespace Gini\Gapper;
 class Client
 {
 
-    use \Gini\Module\RPCTrait;
+    use \Gini\Module\Gapper\Client\RPCTrait;
 
     const STEP_LOGIN = 0;
     const STEP_GROUP = 1;
