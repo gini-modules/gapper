@@ -11,8 +11,8 @@
     <?php $addCSS('font-awesome', 'board');?>
     <?php $addCSS('bootswatch', 'board');?>
     <?php $addCSS('gapper-client-login', 'board');?>
-    <?=_G('HEADCSS')?>
-    <?=_G('HEADJS')?>
+    <?=\Gini\Controller\CGI\Gapper::STRING_HEAD_CSS?>
+    <?=\Gini\Controller\CGI\Gapper::STRING_HEAD_JS?>
 </head>
 
 <body data-require="gapper/client/autologin" class="<?= $layout_class ?>">

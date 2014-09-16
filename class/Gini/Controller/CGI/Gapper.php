@@ -4,30 +4,12 @@ namespace Gini\Controller\CGI
 {
     class Gapper extends \Gini\Controller\CGI\Layout
     {
-        private static $_RPC = [];
-        public static function getRPC($type='gapper')
-        {
-            if (!self::$_RPC[$type]) {
-                try {
-                    $api = \Gini\Config::get($type . '.url');
-                    $client_id = \Gini\Config::get($type . '.client_id');
-                    $client_secret = \Gini\Config::get($type . '.client_secret');
-                    $rpc = \Gini\IoC::construct('\Gini\RPC', $api, $type);
-                    $bool = $rpc->authorize($client_id, $client_secret);
-                    if (!$bool) {
-                        throw new \Exception('Your APP was not registered in gapper server!');
-                    }
-                } catch (\Gini\RPC\Exception $e) {
-                }
-
-                self::$_RPC[$type] = $rpc;
-            }
-
-            return self::$_RPC[$type];
-        }
 
         private static $_JSVars = [];
         private static $_CSSes = [];
+
+        const STRING_HEAD_CSS = 'GapperClientHeadCSS';
+        const STRING_HEAD_JS = 'GapperClientHeadJS';
 
         public static function setJSVar($var, $value)
         {
@@ -52,8 +34,8 @@ namespace Gini\Controller\CGI
             $headcss = V('gapper/client/headcss', ['csses'=>self::$_CSSes]);
             $headjs = V('gapper/client/headjs', ['vars'=>self::$_JSVars]);
 
-            $content = str_replace(_G('HEADCSS'), $headcss, $content);
-            $content = str_replace(_G('HEADJS'), $headjs, $content);
+            $content = str_replace(self::STRING_HEAD_CSS, $headcss, $content);
+            $content = str_replace(self::STRING_HEAD_JS, $headjs, $content);
 
             $response = \Gini\IoC::construct('\Gini\CGI\Response\HTML', $content);
 

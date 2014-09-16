@@ -4,27 +4,8 @@ namespace Gini\Controller\CGI\AJAX\Gapper;
 
 class Client extends \Gini\Controller\CGI
 {
-    private static $_RPC = [];
-    public static function getRPC($type='gapper')
-    {
-        if (!self::$_RPC[$type]) {
-            try {
-                $api = \Gini\Config::get($type . '.url');
-                $client_id = \Gini\Config::get($type . '.client_id');
-                $client_secret = \Gini\Config::get($type . '.client_secret');
-                $rpc = \Gini\IoC::construct('\Gini\RPC', $api, $type);
-                $bool = $rpc->authorize($client_id, $client_secret);
-                if (!$bool) {
-                    throw new \Exception('Your APP was not registered in gapper server!');
-                }
-            } catch (\Gini\RPC\Exception $e) {
-            }
 
-            self::$_RPC[$type] = $rpc;
-        }
-
-        return self::$_RPC[$type];
-    }
+    use \Gini\Module\Gapper\Client\RPCTrait;
 
     private function _showJSON($data)
     {
