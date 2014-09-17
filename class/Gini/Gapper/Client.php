@@ -155,6 +155,14 @@ class Client
         }
     }
 
+    public static function getGroupID()
+    {
+        if (self::hasSession(self::$keyGroupID)) {
+            $groupID = self::getSession(self::$keyGroupID);
+            return $groupID;
+        }
+    }
+
     public static function logout()
     {
         self::unsetSession(self::$keyGroupID);
