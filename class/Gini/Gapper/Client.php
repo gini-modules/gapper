@@ -121,6 +121,31 @@ class Client
         return $data;
     }
 
+    public static function getGroups()
+    {
+        $client_id = \Gini\Config::get('gapper.client_id');
+        if (!$client_id) return false;
+
+        $app = self::getRPC()->app->getInfo($client_id);
+        if (!$app['id']) return false;
+
+        $username = self::getUserName();
+        if (!$username) return false;
+
+        $groups = self::getRPC()->user->getGroups($username);
+        if (empty($groups)) return false;
+
+        $result = [];
+        foreach ($groups as $k=>$g) {
+            $apps = self::getRPC()->group->getApps((int)$g['id']);
+            if (is_array($apps) && in_array($client_id, array_keys($apps))) {
+                $result[$k] = $g;
+            }
+        }
+
+        return $result;
+    }
+
     private static $keyGroupID = 'groupid';
 
     public static function chooseGroup($groupID)
