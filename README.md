@@ -20,7 +20,16 @@
     * gapper.yml中添加配置
         
             # VIEWNAME: view/VIEWNAME.phtml
+            # 登录谈层背景页面自定义
             login_view: VIEWNAME
+            # VIEWNAME: view/401.phtml
+            # 登录的用户没有权限访问APP时，会提示401错误
+            # 允许各个APP自定义401错误内容
+            login_error_401: VIEWNAME
+
+    * 允许加载自定义脚本
+            # 在login_view页面
+            <div data-require="requirejs规范的模块名"></div>
 
 * app独立开发登录页面
     * 通过\Gini\Gapper\Client::isLoggedIn()判断用户是否登录，如未登录则展示自定义view

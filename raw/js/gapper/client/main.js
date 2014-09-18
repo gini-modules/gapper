@@ -1,6 +1,9 @@
 require.config({
     baseUrl: 'assets/js',
     urlArgs: '_t=' + TIMESTAMP,
+    paths: {
+        jquery: (document.all && !window.atob) ? 'jquery-1.11.1' : 'jquery'
+    },
     shim: {
         'bootstrap': ['jquery'],
         'bootbox': ['bootstrap']

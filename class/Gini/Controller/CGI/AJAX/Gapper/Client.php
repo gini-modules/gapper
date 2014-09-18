@@ -34,7 +34,8 @@ class Client extends \Gini\Controller\CGI
                 return $this->_showJSON((string)V('gapper/client/checkgroup', $data));
             }
             \Gini\Gapper\Client::logout();
-            return $this->_showJSON((string)V('error/401', $data));
+            $view = \Gini\Config::get('gapper.login_error_401') ?: 'error/401' ;
+            return $this->_showJSON((string)V($view));
         }
 
     }
