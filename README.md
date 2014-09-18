@@ -27,11 +27,6 @@
             # 允许各个APP自定义401错误内容
             login_error_401: VIEWNAME
 
-    * 支持自定义样式
-
-            # 在login_view页面
-            <?$addCSS('CSS_FILE_NAME_WITHOUT_BACKEND')?>
-
     * 允许加载自定义脚本
             # 在login_view页面
             <div data-require="requirejs规范的模块名"></div>
