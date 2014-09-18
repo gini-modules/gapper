@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gapper 0.1.0\n"
 "Report-Msgid-Bugs-To: l10n@geneegroup.com\n"
-"POT-Creation-Date: 2014-09-18 05:52+0000\n"
-"PO-Revision-Date: 2014-09-18 05:52+0000\n"
+"POT-Creation-Date: 2014-09-18 09:27+0000\n"
+"PO-Revision-Date: 2014-09-18 09:27+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: zh_CN\n"
@@ -22,9 +22,9 @@ msgid "Access Denied!"
 msgstr "您无权访问该页面!"
 
 #: view/gapper/client/checkauth.phtml:1
-msgid "Please select login type:"
-msgstr "请选择登录方式:"
+msgid "Please choose login type:"
+msgstr "请选择登陆方式:"
 
 #: view/gapper/client/checkgroup.phtml:1
-msgid "Please select group:"
+msgid "Please choose group:"
 msgstr "请选择组:"
