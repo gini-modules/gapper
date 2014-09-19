@@ -21,6 +21,23 @@ class Client extends \Gini\Controller\CGI\Gapper
         return true;
     }
 
+    public function actionGoHome()
+    {
+        $client_id = \Gini\Config::get('gapper.client_id');
+        if (!$client_id) return $this->_showNothing();
+
+        $user = \Gini\Gapper\Client::getUserInfo();
+        if (!$user['id']) return $this->_showNothing();
+
+        $token = self::getRPC()->user->getLoginToken((int)$user['id'], $client_id);
+        if (!$token) return $this->_showNothing();
+
+        $url = \Gini\Config::get('gapper.server_home') ?: 'http://gapper.in' ;
+        $url = \Gini\URI::url($url, 'gapper-token='.$token);
+
+        return $this->redirect($url);
+    }
+
     public function actionGo($client_id)
     {
         if (\Gini\Gapper\Client::getLoginStep()!==\Gini\Gapper\Client::STEP_DONE) return $this->_showNothing();
@@ -38,7 +55,7 @@ class Client extends \Gini\Controller\CGI\Gapper
         if (!$user['id']) {
             return $this->_showNothing();
         }
-        $token = self::getRPC()->user->getLoginToken($user['id'], $client_id);
+        $token = self::getRPC()->user->getLoginToken((int)$user['id'], $client_id);
         if (!$token) {
             return $this->_showNothing();
         }
