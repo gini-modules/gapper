@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gapper 0.1.0\n"
 "Report-Msgid-Bugs-To: l10n@geneegroup.com\n"
-"POT-Creation-Date: 2014-09-22 04:34+0000\n"
-"PO-Revision-Date: 2014-09-22 04:34+0000\n"
+"POT-Creation-Date: 2014-09-22 09:32+0000\n"
+"PO-Revision-Date: 2014-09-22 09:32+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: zh_CN\n"
@@ -17,7 +17,7 @@ msgstr ""
 
 #: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:37
 #: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:60
-msgid "Normal"
+msgid "Gapper"
 msgstr ""
 
 #: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:86
@@ -30,23 +30,23 @@ msgstr "登录失败! 请重试."
 msgid "Access Denied!"
 msgstr "您无权访问该页面!"
 
-#: view/gapper/auth/normal/login.phtml:1
+#: view/gapper/auth/gapper/login.phtml:1
 msgid "LOGIN"
 msgstr "登录"
 
-#: view/gapper/auth/normal/login.phtml:11
+#: view/gapper/auth/gapper/login.phtml:11
 msgid "Email:"
 msgstr ""
 
-#: view/gapper/auth/normal/login.phtml:12
+#: view/gapper/auth/gapper/login.phtml:12
 msgid "Email"
 msgstr ""
 
-#: view/gapper/auth/normal/login.phtml:15
+#: view/gapper/auth/gapper/login.phtml:15
 msgid "Password:"
 msgstr "密码:"
 
-#: view/gapper/auth/normal/login.phtml:16
+#: view/gapper/auth/gapper/login.phtml:16
 msgid "Password"
 msgstr "密码"
 

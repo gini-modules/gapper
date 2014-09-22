@@ -33,8 +33,8 @@ class Client extends \Gini\Controller\CGI
             }
 
             $data['sources']['gapper/client'] = [
-                'icon'=> '/assets/img/gapper-auth-normal/logo.png',
-                'name'=> T('Normal')
+                'icon'=> '/assets/img/gapper-auth-gapper/logo.png',
+                'name'=> T('Gapper')
             ];
 
 
@@ -56,11 +56,11 @@ class Client extends \Gini\Controller\CGI
     public function actionGetForm()
     {
         $info = (object)[
-            'icon'=> '/assets/img/gapper-auth-normal/logo.png',
-            'name'=> T('Normal')
+            'icon'=> '/assets/img/gapper-auth-gapper/logo.png',
+            'name'=> T('Gapper')
         ];
 
-        return $this->_showHTML('gapper/auth/normal/login', [
+        return $this->_showHTML('gapper/auth/gapper/login', [
             'info'=> $info
         ]);
     }
