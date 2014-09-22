@@ -5,7 +5,6 @@
     "version": "0.1.0",
     "dependencies": {
         "gini": ">=0.5.0",
-        "cache": "*",
-        "gapper-auth-normal": "*"
+        "cache": "*"
     }
 }
