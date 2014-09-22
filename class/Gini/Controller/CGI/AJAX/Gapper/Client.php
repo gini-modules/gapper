@@ -12,6 +12,11 @@ class Client extends \Gini\Controller\CGI
         return \Gini\IoC::construct('\Gini\CGI\Response\JSON', $data);
     }
 
+    private function _showHTML($view, array $data=[])
+    {
+        return \Gini\IoC::construct('\Gini\CGI\Response\HTML', V($view, $data));
+    }
+
     public function actionGetSources()
     {
         $current = \Gini\Gapper\Client::getLoginStep();
@@ -19,12 +24,20 @@ class Client extends \Gini\Controller\CGI
         $data = [];
         if ($current===\Gini\Gapper\Client::STEP_LOGIN) {
             $sources = (array)\Gini\Config::get('gapper.auth');
+
             $data['sources'] = [];
             foreach ($sources as $source=>$info) {
                 $key = strtolower(implode('/', ['Gapper', 'Auth', $source]));
                 $key = strtr($key, ['-'=>'/', '_'=>'/']);
                 $data['sources'][$key] = $info;
             }
+
+            $data['sources']['gapper/client'] = [
+                'icon'=> '/assets/img/gapper-auth-normal/logo.png',
+                'name'=> T('Normal')
+            ];
+
+
             return $this->_showJSON((string)V('gapper/client/checkauth', $data));
         }
         elseif ($current===\Gini\Gapper\Client::STEP_GROUP) {
@@ -38,6 +51,39 @@ class Client extends \Gini\Controller\CGI
             return $this->_showJSON((string)V($view));
         }
 
+    }
+
+    public function actionGetForm()
+    {
+        $info = (object)[
+            'icon'=> '/assets/img/gapper-auth-normal/logo.png',
+            'name'=> T('Normal')
+        ];
+
+        return $this->_showHTML('gapper/auth/normal/login', [
+            'info'=> $info
+        ]);
+    }
+
+    public function actionLogin()
+    {
+        if (\Gini\Gapper\Client::getLoginStep()===\Gini\Gapper\Client::STEP_DONE) {
+            return $this->_showJSON(true);
+        }
+
+        $form = $this->form('post');
+        $username = $form['username'];
+        $password = $form['password'];
+        $bool = self::getRPC()->user->verify($username, $password);
+
+        if ($bool) {
+            $result = \Gini\Gapper\Client::loginByUserName($username);
+            if ($result) {
+                return $this->_showJSON(true);
+            }
+        }
+
+        return $this->_showJSON(T('Login failed! Please try again.'));
     }
 
     public function actionChoose()

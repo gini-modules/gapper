@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gapper 0.1.0\n"
 "Report-Msgid-Bugs-To: l10n@geneegroup.com\n"
-"POT-Creation-Date: 2014-09-18 09:27+0000\n"
-"PO-Revision-Date: 2014-09-18 09:27+0000\n"
+"POT-Creation-Date: 2014-09-22 04:34+0000\n"
+"PO-Revision-Date: 2014-09-22 04:34+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: zh_CN\n"
@@ -15,16 +15,45 @@ msgstr ""
 "Content-Type: text/plain; charset=ASCII\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:47
-#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:52
+#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:37
 #: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:60
+msgid "Normal"
+msgstr ""
+
+#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:86
+msgid "Login failed! Please try again."
+msgstr "登录失败! 请重试."
+
+#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:93
+#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:98
+#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:106
 msgid "Access Denied!"
 msgstr "您无权访问该页面!"
 
+#: view/gapper/auth/normal/login.phtml:1
+msgid "LOGIN"
+msgstr "登录"
+
+#: view/gapper/auth/normal/login.phtml:11
+msgid "Email:"
+msgstr ""
+
+#: view/gapper/auth/normal/login.phtml:12
+msgid "Email"
+msgstr ""
+
+#: view/gapper/auth/normal/login.phtml:15
+msgid "Password:"
+msgstr "密码:"
+
+#: view/gapper/auth/normal/login.phtml:16
+msgid "Password"
+msgstr "密码"
+
 #: view/gapper/client/checkauth.phtml:1
 msgid "Please choose login type:"
-msgstr "请选择登陆方式:"
+msgstr "请选择登录方式:"
 
 #: view/gapper/client/checkgroup.phtml:1
 msgid "Please choose group:"
-msgstr "请选择组:"
+msgstr "请选择分组:"
