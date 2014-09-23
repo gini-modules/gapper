@@ -32,7 +32,12 @@ class Client extends \Gini\Controller\CGI\Gapper
         $token = self::getRPC()->user->getLoginToken((int)$user['id'], $client_id);
         if (!$token) return $this->_showNothing();
 
-        $url = \Gini\Config::get('gapper.server_home') ?: 'http://gapper.in' ;
+        $url = \Gini\Config::get('gapper.server_home') ?: 'http://gapper.in/';
+
+        $group_id = \Gini\Gapper\Client::getGroupID();
+        if ($group_id) {
+            $url .= '/dashboard/group/' . $group_id;
+        }
         $url = \Gini\URI::url($url, 'gapper-token='.$token);
 
         return $this->redirect($url);
