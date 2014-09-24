@@ -5,7 +5,7 @@ define('gapper/client/login', ['jquery', 'bootbox'], function ($) {
         var url = 'ajax/gapper/client/getSources';
         $.get(url, function(data) {
             dialog = $(data);
-            dialog.modal('show');
+            dialog.modal({show:true, backdrop: 'static'});
         });
     };
 
@@ -19,7 +19,7 @@ define('gapper/client/login', ['jquery', 'bootbox'], function ($) {
             $.get(url, function(data) {
                 dialog && dialog.modal && dialog.modal('hide');
                 dialog = $(data);
-                dialog.modal('show');
+                dialog.modal({show:true, backdrop: 'static'});
                 dialog.on('hide.bs.modal', function() {
                     showLogin();
                 });
