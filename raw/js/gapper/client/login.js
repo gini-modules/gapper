@@ -4,12 +4,8 @@ define('gapper/client/login', ['jquery', 'bootbox'], function ($) {
     var showLogin = function() {
         var url = 'ajax/gapper/client/getSources';
         $.get(url, function(data) {
-            dialog = bootbox.dialog({
-                message: data
-                ,backdrop: 'static'
-                ,closeButton: false
-                ,className: classDialog
-            });
+            dialog = $(data);
+            dialog.modal('show');
         });
     };
 
@@ -22,12 +18,8 @@ define('gapper/client/login', ['jquery', 'bootbox'], function ($) {
             var url = 'ajax/'+source+'/getForm';
             $.get(url, function(data) {
                 dialog && dialog.modal && dialog.modal('hide');
-                dialog = bootbox.dialog({
-                    message: data
-                    ,backdrop: 'static'
-                    ,closeButton: true
-                    ,className: classDialog
-                });
+                dialog = $(data);
+                dialog.modal('show');
                 dialog.on('hide.bs.modal', function() {
                     showLogin();
                 });

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gapper 0.1.0\n"
 "Report-Msgid-Bugs-To: l10n@geneegroup.com\n"
-"POT-Creation-Date: 2014-09-22 09:32+0000\n"
-"PO-Revision-Date: 2014-09-22 09:32+0000\n"
+"POT-Creation-Date: 2014-09-24 07:47+0000\n"
+"PO-Revision-Date: 2014-09-24 07:47+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: zh_CN\n"
@@ -30,30 +30,30 @@ msgstr "登录失败! 请重试."
 msgid "Access Denied!"
 msgstr "您无权访问该页面!"
 
-#: view/gapper/auth/gapper/login.phtml:1
+#: view/gapper/auth/gapper/login.phtml:6
 msgid "LOGIN"
 msgstr "登录"
 
-#: view/gapper/auth/gapper/login.phtml:11
+#: view/gapper/auth/gapper/login.phtml:17
 msgid "Email:"
 msgstr ""
 
-#: view/gapper/auth/gapper/login.phtml:12
+#: view/gapper/auth/gapper/login.phtml:18
 msgid "Email"
 msgstr ""
 
-#: view/gapper/auth/gapper/login.phtml:15
+#: view/gapper/auth/gapper/login.phtml:21
 msgid "Password:"
 msgstr "密码:"
 
-#: view/gapper/auth/gapper/login.phtml:16
+#: view/gapper/auth/gapper/login.phtml:22
 msgid "Password"
 msgstr "密码"
 
-#: view/gapper/client/checkauth.phtml:1
-msgid "Please choose login type:"
+#: view/gapper/client/checkauth.phtml:5
+msgid "Please Choose Your Authentication Method"
 msgstr "请选择登录方式:"
 
-#: view/gapper/client/checkgroup.phtml:1
-msgid "Please choose group:"
+#: view/gapper/client/checkgroup.phtml:5
+msgid "Please Choose Your Group"
 msgstr "请选择分组:"

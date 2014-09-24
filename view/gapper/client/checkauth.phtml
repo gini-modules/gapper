@@ -1,11 +1,19 @@
-<div class="modal-header"><?=H(T('Please choose login type:'))?></div>
-<ul class="modal-body gapper-client-checkbox list-unstyled list-inline text-center">
-<?php foreach ($sources as $source=>$info) {?>
-    <li class="gapper-client-checkbox-li" data-gapper-auth-source="<?=H($source)?>">
-        <div class="app-icon app-icon-hoverable">
-            <div class="app-icon-image"><img src="<?=H($info['icon'])?>" /></div>
-            <div class="app-icon-title"><?=H($info['name'])?></div>
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><?=H(T('Please Choose Your Authentication Method'))?></h4>
+            </div>
+            <ul class="modal-body gapper-client-checkbox list-unstyled list-inline text-center">
+            <?php foreach ($sources as $source=>$info) {?>
+                <li class="gapper-client-checkbox-li" data-gapper-auth-source="<?=H($source)?>">
+                    <div class="app-icon app-icon-hoverable">
+                        <div class="app-icon-image"><img src="<?=H($info['icon'])?>" /></div>
+                        <div class="app-icon-title"><?=H($info['name'])?></div>
+                    </div>
+                </li>
+            <?php }?>
+            </ul>
         </div>
-    </li>
-<?php }?>
-</ul>
+    </div>
+</div>
