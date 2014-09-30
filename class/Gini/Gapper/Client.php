@@ -26,6 +26,8 @@ class Client
     const STEP_LOGIN = 0;
     const STEP_GROUP = 1;
     const STEP_DONE = 2;
+    const STEP_USER_401 = 3;
+    const STEP_GROUP_401 = 4;
 
     private static $sessionKey = 'gapper.client';
     private static function prepareSession()
@@ -63,7 +65,19 @@ class Client
         if (!$username) return self::STEP_LOGIN;
 
         if ($app['type']==='group' && empty(self::getGroupInfo())) {
-            return self::STEP_GROUP;
+            $groups = self::getGroups();
+            if (!empty($groups) && is_array($groups)) {
+                return self::STEP_GROUP;
+            }
+            else {
+                return self::STEP_GROUP_401;
+            }
+        }
+        else if ($app['type']==='user') {
+            $apps = (array) self::getRPC()->user->getApps(self::getUserName());
+            if (!in_array($client_id, $apps)) {
+                return self::STEP_USER_401;
+            }
         }
 
         return self::STEP_DONE;
@@ -78,8 +92,7 @@ class Client
 
     public static function loginByToken($token)
     {
-        $client_id = \Gini\Config::get('gapper.client_id');
-        $user = self::getRPC()->user->authorizeByToken($token, $client_id);
+        $user = self::getRPC()->user->authorizeByToken($token);
         if ($user && $user['username']) {
             return self::loginByUserName($user['username']);
         }
