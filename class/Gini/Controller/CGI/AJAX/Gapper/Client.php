@@ -22,7 +22,8 @@ class Client extends \Gini\Controller\CGI
         $current = \Gini\Gapper\Client::getLoginStep();
 
         $data = [];
-        if ($current===\Gini\Gapper\Client::STEP_LOGIN) {
+        switch ($current) {
+        case \Gini\Gapper\Client::STEP_LOGIN:
             $sources = (array)\Gini\Config::get('gapper.auth');
 
             $data['sources'] = [];
@@ -39,18 +40,23 @@ class Client extends \Gini\Controller\CGI
 
 
             return $this->_showJSON((string)V('gapper/client/checkauth', $data));
-        }
-        elseif ($current===\Gini\Gapper\Client::STEP_GROUP) {
+            break;
+        case \Gini\Gapper\Client::STEP_GROUP:
             $groups = \Gini\Gapper\Client::getGroups();
-            if (!empty($groups) && is_array($groups)) {
-                $data['groups'] = $groups;
-                return $this->_showJSON((string)V('gapper/client/checkgroup', $data));
-            }
+            $data['groups'] = $groups;
+            return $this->_showJSON((string)V('gapper/client/checkgroup', $data));
+            break;
+        case \Gini\Gapper\Client::STEP_USER_401:
+            \Gini\Gapper\Client::logout();
+            $view = \Gini\Config::get('gapper.views')['client/error/401-user'] ?: 'gapper/client/error/401-user';
+            return $this->_showJSON((string)V($view));
+            break;
+        case \Gini\Gapper\Client::STEP_GROUP_401:
             \Gini\Gapper\Client::logout();
             $view = \Gini\Config::get('gapper.views')['client/error/401-group'] ?: 'gapper/client/error/401-group';
             return $this->_showJSON((string)V($view));
+            break;
         }
-
     }
 
     public function actionGetForm()
