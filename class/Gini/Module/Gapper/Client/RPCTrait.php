@@ -9,9 +9,10 @@ namespace Gini\Module\Gapper\Client
         {
             if (!self::$_RPCs[$type]) {
                 try {
-                    $api = \Gini\Config::get($type . '.url');
-                    $client_id = \Gini\Config::get($type . '.client_id');
-                    $client_secret = \Gini\Config::get($type . '.client_secret');
+                    $config = (array)\Gini\Config::get($type . '.rpc');
+                    $api = $config['url'];
+                    $client_id = $config['client_id'];
+                    $client_secret = $config['client_secret'];
                     $rpc = \Gini\IoC::construct('\Gini\RPC', $api, $type);
                     $bool = $rpc->authorize($client_id, $client_secret);
                     if (!$bool) {

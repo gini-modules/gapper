@@ -56,7 +56,8 @@ class Client
     public static function getLoginStep()
     {
         // 错误的client信息，用户无法登陆
-        $client_id = \Gini\Config::get('gapper.client_id');
+        $config = \Gini\Config::get('gapper.rpc');
+        $client_id = $config['client_id'];
         if (!$client_id) return self::STEP_LOGIN;
         $app = self::getRPC()->app->getInfo($client_id);
         if (!$app['id']) return self::STEP_LOGIN;
@@ -104,7 +105,8 @@ class Client
     private static function setUserName($username)
     {
         // 错误的client信息，用户无法登陆
-        $client_id = \Gini\Config::get('gapper.client_id');
+        $config = \Gini\Config::get('gapper.rpc');
+        $client_id = $config['client_id'];
         if (!$client_id) return false;
         $app = self::getRPC()->app->getInfo($client_id);
         if (!$app['id']) return false;
@@ -136,7 +138,8 @@ class Client
 
     public static function getGroups()
     {
-        $client_id = \Gini\Config::get('gapper.client_id');
+        $config = \Gini\Config::get('gapper.rpc');
+        $client_id = $config['client_id'];
         if (!$client_id) return false;
 
         $app = self::getRPC()->app->getInfo($client_id);
@@ -163,7 +166,8 @@ class Client
 
     public static function chooseGroup($groupID)
     {
-        $client_id = \Gini\Config::get('gapper.client_id');
+        $config = (array)\Gini\Config::get('gapper.rpc');
+        $client_id = $config['client_id'];
         if (!$client_id) return false;
         $app = self::getRPC()->app->getInfo($client_id);
         if (!$app['id']) return false;
@@ -214,174 +218,4 @@ class Client
         \Gini\CGI::redirect($url);
     }
 
-    /*
-    // 暂时保留一下API，待APP升级结束，再进行删除
-    public static function isLoggedIn()
-    {
-        return self::getLoginStep()===self::STEP_DONE;
-    }
-
-    // 暂时保留一下API，待APP升级结束，再进行删除
-    public static function login()
-    {
-        return self::goLogin();
-    }
-     */
-
-    /*
-    public static function getLoginStep()
-    {
-        if (!\Gini\Auth::isLoggedIn()) return self::STEP_LOGIN;
-
-        $key = 'isLoggedIn';
-        $isLoggedIn = self::getSession($key);
-        if (!$isLoggedIn) return self::STEP_GROUP;
-    }
-
-    public static function chooseGroup($gid)
-    {
-        $_GET['gapper-group'] = $gid;
-        return self::isLoggedIn();
-    }
-
-    public static function isLoggedIn()
-    {
-        if (!\Gini\Auth::isLoggedIn()) return false;
-
-        $key = 'isLoggedIn';
-        $isLoggedIn = self::getSession($key);
-        if ($isLoggedIn) return true;
-
-        $client_id = \Gini\Config::get('gapper.client_id');
-        if (!$client_id) return false;
-
-        $app = self::getRPC()->app->getInfo($client_id);
-        if (!$app['id']) return false;
-
-        $username = \Gini\Auth::userName();
-        if ($app['type'] == 'user') {
-            $apps = self::getRPC()->user->getApps($username);
-            if (is_array($apps) && in_array($client_id, array_keys($apps))) {
-                // 当前用户已经添加了该app
-                self::setSession($key, 1);
-                return true;
-            }
-        }
-        elseif ($app['type'] == 'group') {
-            $groups = self::getRPC()->user->getGroups($username);
-            if (!is_array($groups)) return false;
-            $group = (int)$_GET['gapper-group'];
-
-            if (in_array($group, array_keys($groups))) {
-                $group = $groups[$group];
-            }
-            elseif (count($groups)==1) {
-                $group = array_pop($groups);
-            }
-            else {
-                $group = null;
-            }
-
-            if ($group) {
-                $apps = self::getRPC()->group->getApps((int)$group['id']);
-                if (is_array($apps) && in_array($client_id, array_keys($apps))) {
-                    // 当前组已经添加了该app
-                    self::setSession($key, 1);
-                    self::setSession('groupid', (int)$group['id']);
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    public static function login()
-    {
-        return self::loginByToken();
-    }
-
-    public static function loginByToken()
-    {
-        // 已经登录成功，直接返回
-        if (self::isLoggedIn()) return true;
-
-        // 通过token登录成功
-        $token = $_GET['gapper-token'];
-        if ($token) {
-            $client_id = \Gini\Config::get('gapper.client_id');
-            $user = self::getRPC()->user->authorizeByToken($token, $client_id);
-            if ($user && $user['username']) {
-                \Gini\Auth::login(\Gini\Auth::makeUserName($user['username']));
-                if (self::isLoggedIn()) return true;
-            }
-        }
-
-        // 展示登录界面，让用户提交信息登录
-        $url = 'gapper/client/login?redirect='.$_SERVER['REQUEST_URI'];
-        \Gini\CGI::redirect($url);
-    }
-
-    public static function loginByOAuth()
-    {
-        $isLoggedIn = \Gini\Auth::isLoggedIn();
-        if (!$isLoggedIn) {
-            $key = 'isLogging';
-            if (!self::hasSession($key)) {
-                $oauthSSO = 'gapper/'.uniqid();
-                self::setSession($key, $oauthSSO);
-            }
-            else {
-                $oauthSSO = self::getSession($key);
-            }
-            //var_dump($oauthSSO);die;
-            $oauth = \Gini\IoC::construct('\Gini\OAuth\Client', $oauthSSO);
-            $username = $oauth->getUserName();
-            //var_dump($username);die;
-            \Gini\Auth::login($username);
-            self::unsetSession($key);
-        }
-        return !!\Gini\Auth::userName();
-    }
-
-    public static function logout()
-    {
-        self::unsetSession('isLoggedIn');
-        self::unsetSession('groupid');
-        \Gini\Auth::logout();
-        $url = 'gapper/client/login';
-        \Gini\CGI::redirect($url);
-    }
-
-    public function getCurrentUserName()
-    {
-        if (self::isLoggedIn()) {
-            return \Gini\Auth::userName();
-        }
-    }
-
-    public function getUserInfo()
-    {
-        if (!$this->getCurrentUserName()) return;
-        try {
-            $data = self::getRPC()->user->getInfo([
-                'username'=> $this->getCurrentUserName()
-            ]);
-        }
-        catch (\Gini\RPC\Exception $e) {
-        }
-        return $data;
-    }
-
-    public function getGroupInfo()
-    {
-        if (!$this->getCurrentUserName()) return;
-        $key = 'groupid';
-        if (self::hasSession($key)) {
-            $id = self::getSession($key);
-            $data = self::getRPC()->group->getInfo($id);
-            return $data;
-        }
-    }
-     */
 }
