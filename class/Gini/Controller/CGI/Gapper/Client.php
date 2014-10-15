@@ -23,7 +23,8 @@ class Client extends \Gini\Controller\CGI\Gapper
 
     public function actionGoHome()
     {
-        $client_id = \Gini\Config::get('gapper.client_id');
+        $config = (array)\Gini\Config::get('gapper.rpc');
+        $client_id = $config['client_id'];
         if (!$client_id) return $this->_showNothing();
 
         $user = \Gini\Gapper\Client::getUserInfo();

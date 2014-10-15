@@ -82,7 +82,7 @@
         login_view: gapper/client/login
         ...
 
-* site.yml
+* app.yml
 
         ---
         title: SITE-TITLE
