@@ -2,11 +2,17 @@ define('gapper/client/login', ['jquery', 'bootbox'], function ($) {
     var dialog;
     var classDialog = 'gapper-client-dialog';
     var isWaitingLogin = false;
+    var clearDialog = function() {
+        if (!dialog || !dialog.length) return;
+        dialog.prev('.modal-backdrop').remove();
+        dialog.remove();
+    };
     var showLogin = function() {
         if (isWaitingLogin) return false;
         isWaiting = true;
         var url = 'ajax/gapper/client/getSources';
         $.get(url, function(data) {
+            clearDialog();
             dialog = $(data);
             dialog.modal({show:true, backdrop: 'static'});
             setTimeout(function() {
@@ -26,7 +32,7 @@ define('gapper/client/login', ['jquery', 'bootbox'], function ($) {
             var source = $that.attr('data-gapper-auth-source');
             var url = 'ajax/'+source+'/getForm';
             $.get(url, function(data) {
-                dialog && dialog.modal && dialog.modal('hide');
+                clearDialog();
                 dialog = $(data);
                 dialog.modal({show:true, backdrop: 'static'});
                 dialog.on('hide.bs.modal', function() {
