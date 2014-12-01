@@ -8,11 +8,11 @@
             <?php foreach ($groups as $gid=>$group) {?>
                 <li class="gapper-client-checkbox-li" data-gapper-client-group="<?=H($gid)?>"><div class="app-icon app-icon-hoverable">
                     <div class="app-icon-image">
-                        <?php if ($group['icon']) {?>
-                        <img src="<?=H($group['icon'])?>" />
-                        <?php } else {?>
+                    <?php if ($group['icon']) {?>
+                        <img src="<?= H(\Gini\ImageCache::makeURL($group['icon'], 72))?>" data-retina-src="<?= H(\Gini\ImageCache::makeURL($group['icon'], 144))?>" />
+                    <?php } else {?>
                         <div class="group-icon-text app-icon-text"><?= H($group['abbr'])?></div>
-                        <?php }?>
+                    <?php }?>
                     </div>
                     <div class="app-icon-title"><?=H($group['abbr'])?></div>
                 </div></li>
