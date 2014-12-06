@@ -29,7 +29,7 @@ namespace Gini\Controller\CGI
 
         public function __postAction($action, &$params, $response)
         {
-            $content = (string)$this->view;
+            $content = (string) $this->view;
 
             $headcss = V('gapper/client/headcss', ['csses'=>self::$_CSSes]);
             $headjs = V('gapper/client/headjs', ['vars'=>self::$_JSVars]);
@@ -44,9 +44,10 @@ namespace Gini\Controller\CGI
     }
 }
 
-namespace 
+namespace
 {
-    function VV($path, $vars=null) {
+    function VV($path, $vars=null)
+    {
         $vars = is_array($vars) ? $vars : [];
         if (isset($vars['setJSVar']) || isset($vars['addCSS'])) {
             throw new Exception('setJSVar,addCSS已经被占用，请尝试其他变量名');
@@ -54,11 +55,11 @@ namespace
 
         $view = V($path, $vars);
 
-        $view->setJSVar = function($var, $value) {
+        $view->setJSVar = function ($var, $value) {
             \Gini\Controller\CGI\Gapper\Client::setJSVar($var, $value);
         };
 
-        $view->addCSS = function($css) {
+        $view->addCSS = function ($css) {
             \Gini\Controller\CGI\Gapper\Client::addCSS($css);
         };
 

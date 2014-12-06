@@ -53,6 +53,21 @@ class Client
         unset($_SESSION[self::$sessionKey][$key]);
     }
 
+    public static function init()
+    {
+        $gapperToken = $_GET['gapper-token'];
+        if ($gapperToken) {
+            \Gini\Gapper\Client::logout();
+            \Gini\Gapper\Client::loginByToken($gapperToken);
+        }
+
+        $gapperGroup = $_GET['gapper-group'];
+        if ($gapperGroup &&
+\Gini\Gapper\Client::getLoginStep()===\Gini\Gapper\Client::STEP_GROUP) {
+            \Gini\Gapper\Client::chooseGroup($gapperGroup);
+        }
+    }
+
     public static function getLoginStep()
     {
         // 错误的client信息，用户无法登陆
@@ -69,12 +84,10 @@ class Client
             $groups = self::getGroups();
             if (!empty($groups) && is_array($groups)) {
                 return self::STEP_GROUP;
-            }
-            else {
+            } else {
                 return self::STEP_GROUP_401;
             }
-        }
-        else if ($app['type']==='user') {
+        } elseif ($app['type']==='user') {
             $apps = (array) self::getRPC()->user->getApps(self::getUserName());
             if (!in_array($client_id, $apps)) {
                 return self::STEP_USER_401;
@@ -88,6 +101,7 @@ class Client
     {
         list($name, $backend) = explode('|', $username, 2);
         $backend = $backend ?: 'gapper';
+
         return self::setUserName($name.'|'.$backend);
     }
 
@@ -97,6 +111,7 @@ class Client
         if ($user && $user['username']) {
             return self::loginByUserName($user['username']);
         }
+
         return false;
     }
 
@@ -120,6 +135,7 @@ class Client
         if (self::hasSession(self::$keyUserName)) {
             $username = self::getSession(self::$keyUserName);
         }
+
         return $username;
     }
 
@@ -130,9 +146,9 @@ class Client
             $data = self::getRPC()->user->getInfo([
                 'username'=> self::getUserName()
             ]);
+        } catch (\Gini\RPC\Exception $e) {
         }
-        catch (\Gini\RPC\Exception $e) {
-        }
+
         return $data;
     }
 
@@ -153,7 +169,7 @@ class Client
 
         $result = [];
         foreach ($groups as $k=>$g) {
-            $apps = self::getRPC()->group->getApps((int)$g['id']);
+            $apps = self::getRPC()->group->getApps((int) $g['id']);
             if (is_array($apps) && in_array($client_id, array_keys($apps))) {
                 $result[$k] = $g;
             }
@@ -166,7 +182,7 @@ class Client
 
     public static function chooseGroup($groupID)
     {
-        $config = (array)\Gini\Config::get('gapper.rpc');
+        $config = (array) \Gini\Config::get('gapper.rpc');
         $client_id = $config['client_id'];
         if (!$client_id) return false;
         $app = self::getRPC()->app->getInfo($client_id);
@@ -180,11 +196,13 @@ class Client
             return false;
         }
 
-        $apps = self::getRPC()->group->getApps((int)$groupID);
+        $apps = self::getRPC()->group->getApps((int) $groupID);
         if (is_array($apps) && in_array($client_id, array_keys($apps))) {
             self::setSession(self::$keyGroupID, $groupID);
+
             return true;
         }
+
         return false;
     }
 
@@ -192,7 +210,8 @@ class Client
     {
         if (self::hasSession(self::$keyGroupID)) {
             $groupID = self::getSession(self::$keyGroupID);
-            $data = self::getRPC()->group->getInfo((int)$groupID);
+            $data = self::getRPC()->group->getInfo((int) $groupID);
+
             return $data;
         }
     }
@@ -201,6 +220,7 @@ class Client
     {
         if (self::hasSession(self::$keyGroupID)) {
             $groupID = self::getSession(self::$keyGroupID);
+
             return $groupID;
         }
     }
@@ -209,6 +229,7 @@ class Client
     {
         self::unsetSession(self::$keyGroupID);
         self::unsetSession(self::$keyUserName);
+
         return true;
     }
 

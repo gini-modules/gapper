@@ -24,7 +24,7 @@ class Client extends \Gini\Controller\CGI
         $data = [];
         switch ($current) {
         case \Gini\Gapper\Client::STEP_LOGIN:
-            $sources = (array)\Gini\Config::get('gapper.auth');
+            $sources = (array) \Gini\Config::get('gapper.auth');
 
             $data['sources'] = [];
             foreach ($sources as $source=>$info) {
@@ -38,30 +38,32 @@ class Client extends \Gini\Controller\CGI
                 'name'=> T('Gapper')
             ];
 
-
-            return $this->_showJSON((string)V('gapper/client/checkauth', $data));
+            return $this->_showJSON((string) V('gapper/client/checkauth', $data));
             break;
         case \Gini\Gapper\Client::STEP_GROUP:
             $groups = \Gini\Gapper\Client::getGroups();
             $data['groups'] = $groups;
-            return $this->_showJSON((string)V('gapper/client/checkgroup', $data));
+
+            return $this->_showJSON((string) V('gapper/client/checkgroup', $data));
             break;
         case \Gini\Gapper\Client::STEP_USER_401:
             \Gini\Gapper\Client::logout();
             $view = \Gini\Config::get('gapper.views')['client/error/401-user'] ?: 'gapper/client/error/401-user';
-            return $this->_showJSON((string)V($view));
+
+            return $this->_showJSON((string) V($view));
             break;
         case \Gini\Gapper\Client::STEP_GROUP_401:
             \Gini\Gapper\Client::logout();
             $view = \Gini\Config::get('gapper.views')['client/error/401-group'] ?: 'gapper/client/error/401-group';
-            return $this->_showJSON((string)V($view));
+
+            return $this->_showJSON((string) V($view));
             break;
         }
     }
 
     public function actionGetForm()
     {
-        $info = (object)[
+        $info = (object) [
             'icon'=> '/assets/img/gapper-auth-gapper/logo.png',
             'name'=> T('Gapper')
         ];
@@ -108,9 +110,8 @@ class Client extends \Gini\Controller\CGI
         if ($bool) {
             return $this->_showJSON(true);
         }
-        
+
         return $this->_showJSON(T('Access Denied!'));
     }
 
 }
-

@@ -2,7 +2,7 @@
 
 namespace Gini\Module
 {
-    class Gapper 
+    class Gapper
     {
         public static function setup()
         {

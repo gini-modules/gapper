@@ -9,7 +9,7 @@ namespace Gini\Module\Gapper\Client
         {
             if (!self::$_RPCs[$type]) {
                 try {
-                    $config = (array)\Gini\Config::get($type . '.rpc');
+                    $config = (array) \Gini\Config::get($type . '.rpc');
                     $api = $config['url'];
                     $client_id = $config['client_id'];
                     $client_secret = $config['client_secret'];
@@ -23,8 +23,8 @@ namespace Gini\Module\Gapper\Client
                     \Gini\Logger::of('gapper')->error('Gapper::getRPC error: {message}', ['message' => $e->getMessage()]);
                 }
             }
+
             return self::$_RPCs[$type];
         }
     }
 }
-

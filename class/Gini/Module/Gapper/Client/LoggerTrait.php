@@ -10,6 +10,7 @@ namespace Gini\Module\Gapper\Client
         {
             $this->traitVarIdent = get_class($this);
             $this->traitVarMethod = $method;
+
             return $this;
         }
         private function debug($msg, array $context=[])
@@ -42,4 +43,3 @@ namespace Gini\Module\Gapper\Client
         }
     }
 }
-
