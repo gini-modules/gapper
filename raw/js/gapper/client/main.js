@@ -3,10 +3,6 @@ require.config({
     urlArgs: '_t=' + TIMESTAMP,
     paths: {
         jquery: (document.all && !window.atob) ? 'jquery-1.11.1' : 'jquery'
-    },
-    shim: {
-        'bootstrap': ['jquery'],
-        'bootbox': ['bootstrap']
     }
 });
 
@@ -20,7 +16,7 @@ require([
 
 
 // 
-require(['jquery', 'bootbox'], function($) {
+require(['jquery', 'bootbox'], function($, bootbox) {
     var defaults = {};
     var $meta = $('meta[name=gini-locale]');
     if ($meta.length && $meta.attr('content')) {

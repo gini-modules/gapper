@@ -29,8 +29,10 @@ define('gapper/client/utils/retina', ['jquery'], function($) {
                 $(image).load(function() {
                
                     function _replace_image() {
-                        $img.attr('width', $img.width());
-                        $img.attr('height', $img.height());
+                        var tmpW = $img.width();
+                        var tmpH = $img.height();
+                        $img.attr('width', tmpW);
+                        $img.attr('height', tmpH);
                         $img.attr('src', image.src);
                     }
                
