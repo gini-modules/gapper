@@ -38,12 +38,22 @@ class Client extends \Gini\Controller\CGI
                 'name'=> T('Gapper')
             ];
 
+            if (count($data['sources'])==1) {
+                return $this->actionGetForm();
+            }
+
             return $this->_showJSON((string) V('gapper/client/checkauth', $data));
             break;
         case \Gini\Gapper\Client::STEP_GROUP:
             $groups = \Gini\Gapper\Client::getGroups();
-            $data['groups'] = $groups;
+            if ($groups && count($groups)==1) {
+                $bool = \Gini\Gapper\Client::chooseGroup(current($groups)['id']);
+                if ($bool) {
+                    return $this->_showJSON(true);
+                }
+            }
 
+            $data['groups'] = $groups;
             return $this->_showJSON((string) V('gapper/client/checkgroup', $data));
             break;
         case \Gini\Gapper\Client::STEP_USER_401:
@@ -57,6 +67,9 @@ class Client extends \Gini\Controller\CGI
             $view = \Gini\Config::get('gapper.views')['client/error/401-group'] ?: 'gapper/client/error/401-group';
 
             return $this->_showJSON((string) V($view));
+            break;
+        case Gini\Gapper\Client::STEP_DONE:
+            return $this->_showJSON(true);
             break;
         }
     }

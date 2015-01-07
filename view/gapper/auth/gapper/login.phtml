@@ -5,7 +5,7 @@
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                 <h4 class="modal-title"><?=H(T('LOGIN'))?></h4>
             </div>
-            <form class="modal-body form gapper-auth-login-form" method="POST" action="ajax/gapper/client/login"><dl class="dl-horizontal">
+            <form class="modal-body form gapper-auth-form gapper-auth-login-form" method="POST" action="<?=H($info->action ?: 'ajax/gapper/client/login')?>"><dl class="dl-horizontal">
                 <dt class="text-center">
                     <div class="app-icon">
                         <div class="text-center app-icon-image"><img src="<?=H($info->icon)?>" /></div>
@@ -23,6 +23,9 @@
                     </div>
                     <div class="gapper-auth-login-form-li form-group">
                         <input class="form-control btn btn-primary" type="submit" value="<?=H(T('Log In'))?>"/>
+                    </div>
+                    <div class="gapper-auth-login-form-li form-group">
+                        <span>密码找回</span>
                     </div>
                 </dd>
             </dl></form>
