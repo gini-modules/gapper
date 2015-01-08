@@ -1,5 +1,12 @@
 <?php
 
+/**
+* @file Client.php
+* @brief 用户登录
+* @author Hongjie Zhu
+* @version 0.1.0
+* @date 2015-01-08
+ */
 namespace Gini\Controller\CGI\AJAX\Gapper;
 
 class Client extends \Gini\Controller\CGI
@@ -17,6 +24,11 @@ class Client extends \Gini\Controller\CGI
         return \Gini\IoC::construct('\Gini\CGI\Response\HTML', V($view, $data));
     }
 
+    /**
+        * @brief 获取等咯过程中各个阶段的数据
+        *
+        * @return 
+     */
     public function actionGetSources()
     {
         $current = \Gini\Gapper\Client::getLoginStep();
@@ -74,6 +86,11 @@ class Client extends \Gini\Controller\CGI
         }
     }
 
+    /**
+        * @brief 展示登录表单
+        *
+        * @return 
+     */
     public function actionGetForm()
     {
         $info = (object) [
@@ -86,6 +103,11 @@ class Client extends \Gini\Controller\CGI
         ]);
     }
 
+    /**
+        * @brief 登录
+        *
+        * @return 
+     */
     public function actionLogin()
     {
         if (\Gini\Gapper\Client::getLoginStep()===\Gini\Gapper\Client::STEP_DONE) {
@@ -107,6 +129,11 @@ class Client extends \Gini\Controller\CGI
         return $this->_showJSON(T('Login failed! Please try again.'));
     }
 
+    /**
+        * @brief 选择组
+        *
+        * @return 
+     */
     public function actionChoose()
     {
         $current = \Gini\Gapper\Client::getLoginStep();
