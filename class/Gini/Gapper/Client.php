@@ -62,8 +62,7 @@ class Client
         }
 
         $gapperGroup = $_GET['gapper-group'];
-        if ($gapperGroup &&
-\Gini\Gapper\Client::getLoginStep()===\Gini\Gapper\Client::STEP_GROUP) {
+        if ($gapperGroup && \Gini\Gapper\Client::getLoginStep()===\Gini\Gapper\Client::STEP_GROUP) {
             \Gini\Gapper\Client::chooseGroup($gapperGroup);
         }
     }
@@ -80,6 +79,31 @@ class Client
         $username = self::getUserName();
         if (!$username) return self::STEP_LOGIN;
 
+        // 有username但是获取userinfo失败, 直接将用户登出
+        // 可能是因为用户已经被从gapper删除
+        $userInfo = self::getUserInfo();
+        if (empty($userInfo)) {
+            self::logout();
+            return self::STEP_LOGIN;
+        }
+        
+        // 如果用户以groupID的身份登录，但是用户已经被gapper从group中移除
+        // 或者
+        // 如果当前登录的组被从gapper移除
+        // 则直接将用户登出
+        $groupID = self::getGroupID();
+        if ($groupID && empty(self::getRPC()->user->getGroupInfo((int)$userInfo['id'], (int)$groupID))) {
+            self::logout();
+            return self::STEP_LOGIN;
+        }
+
+        // 如果gapper组已经没有添加当前应用，直接登出
+        $groups = self::getGroups();
+        if ($groupID && (empty($groups) || !isset($groups[$groupID]))) {
+            self::logout();
+            return self::STEP_LOGIN;
+        }
+        
         if ($app['type']==='group' && empty(self::getGroupInfo())) {
             $groups = self::getGroups();
             if (!empty($groups) && is_array($groups)) {
