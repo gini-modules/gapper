@@ -14,7 +14,6 @@ require([
     ,'gapper/client/utils/data'
 ]);
 
-
 // 
 require(['jquery', 'bootbox'], function($, bootbox) {
     var defaults = {};

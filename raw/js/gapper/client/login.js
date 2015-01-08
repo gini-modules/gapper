@@ -12,6 +12,9 @@ define('gapper/client/login', ['jquery', 'bootbox'], function ($, bootbox) {
         isWaiting = true;
         var url = 'ajax/gapper/client/getSources';
         $.get(url, function(data) {
+            if (data===true) {
+                return window.location.reload();
+            }
             clearDialog();
             dialog = $(data);
             dialog.modal({show:true, backdrop: 'static'});
@@ -61,7 +64,7 @@ define('gapper/client/login', ['jquery', 'bootbox'], function ($, bootbox) {
         }
     });
 
-    var classForm = '.gapper-auth-login-form';
+    var classForm = '.gapper-auth-form';
     var isWaitingSubmit = false;
     $('body').on('click', classForm+' input[type=submit]', function(evt) {
         evt.preventDefault();
@@ -75,7 +78,23 @@ define('gapper/client/login', ['jquery', 'bootbox'], function ($, bootbox) {
                 window.location.reload();
             }
             else {
-                bootbox.alert(data);
+                var tData = $.isPlainObject(data) ? data : {
+                    type: 'alert'
+                    ,message: data
+                };
+                switch (tData.type) {
+                case 'modal':
+                    clearDialog();
+                    dialog = $(tData.message);
+                    dialog.modal({show:true, backdrop: 'static'});
+                    dialog.on('hide.bs.modal', function() {
+                        showLogin();
+                    });
+                    break;
+                case 'alert':
+                default:
+                    bootbox.alert(data);
+                }
             }
             setTimeout(function() {
                 isWaitingSubmit = false;
