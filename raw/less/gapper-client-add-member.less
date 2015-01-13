@@ -1,0 +1,72 @@
+@dashboardBoardColor: #666;
+@hoverDashboardBoardBackgroundColor: #eee;
+@hoverDashboardBoardColor: #333;
+
+.add-member-icon {
+    width: 128px;
+    height: 128px;
+    padding: 20px;
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    color: @dashboardBoardColor;
+    cursor: pointer;
+
+    .add-member-icon-image {
+        display:block;
+        width: 70px;
+        height: 70px;
+        margin:0 auto;
+        border-radius:50%;
+        text-align:center;
+        background-color:#fff;
+        position: relative;
+
+        .add-member-icon-text {
+            position: absolute;
+            border: 3px solid #ddd;
+            color: #fff;
+            background-color: #666;
+            width: 70px;
+            height: 70px;
+            line-height: 64px;
+            font-weight: bold;
+            border-radius:50%;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        img {
+            display:block;
+            width: 70px;
+            height: 70px;
+            border-radius:50%;
+            border: 2px solid #666;
+        }
+        
+    }
+
+    .add-member-icon-title {
+        display:block;
+        margin:5px 0 10px;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+
+}
+
+.add-member-icon-hoverable {
+    cursor: pointer;
+    &:hover {
+        background-color: @hoverDashboardBoardBackgroundColor;
+        color: @hoverDashboardBoardColor;
+
+        .add-member-icon-text {
+            border-color: #ccc;
+        }
+    }
+}
+
