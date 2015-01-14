@@ -23,23 +23,35 @@ class Client extends \Gini\Controller\CGI\Gapper
 
     public function actionGoHome()
     {
+        $paths = func_get_args();
+
         $config = (array) \Gini\Config::get('gapper.rpc');
         $client_id = $config['client_id'];
         if (!$client_id) return $this->_showNothing();
 
-        $user = \Gini\Gapper\Client::getUserInfo();
-        if (!$user['id']) return $this->_showNothing();
-
-        $token = self::getRPC()->user->getLoginToken((int) $user['id'], $client_id);
-        if (!$token) return $this->_showNothing();
-
         $url = \Gini\Config::get('gapper.server_home') ?: 'http://gapper.in/';
 
-        $group_id = \Gini\Gapper\Client::getGroupID();
-        if ($group_id) {
-            $url .= '/dashboard/group/' . $group_id;
+        if (empty($paths)) {
+            $group_id = \Gini\Gapper\Client::getGroupID();
+            if ($group_id) {
+                $url .= '/dashboard/group/' . $group_id;
+            }
         }
-        $url = \Gini\URI::url($url, 'gapper-token='.$token);
+        else {
+            $url .= '/' . join('/', $paths);
+        }
+
+        $user = \Gini\Gapper\Client::getUserInfo();
+        if ($user['id']) {
+            $token = self::getRPC()->user->getLoginToken((int) $user['id'], $client_id);
+        }
+
+        if ($token) {
+            $url = \Gini\URI::url($url, 'gapper-token='.$token);
+        }
+        else {
+            $url = \Gini\URI::url($url);
+        }
 
         return $this->redirect($url);
     }

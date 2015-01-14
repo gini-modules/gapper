@@ -180,8 +180,7 @@ class Client extends \Gini\Controller\CGI
             $content = (string)V($file, [
                 'icon'=> $info['icon'],
                 'type'=> $info['name'],
-                'group'=> \Gini\Gapper\Client::getGroupID(),
-                'home'=> \Gini\Config::get('gapper.server_home')
+                'group'=> \Gini\Gapper\Client::getGroupID()
             ]);
             if (!$content) continue;
             $data[$key] = $content;
@@ -190,8 +189,7 @@ class Client extends \Gini\Controller\CGI
         if (!empty($data)) {
             return $this->_showHTML('gapper/auth/add-member-types', [
                 'data'=> $data,
-                'group'=> \Gini\Gapper\Client::getGroupID(),
-                'home'=> \Gini\Config::get('gapper.server_home')
+                'group'=> \Gini\Gapper\Client::getGroupID()
             ]);
         }
     }
