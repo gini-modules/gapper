@@ -117,7 +117,7 @@ class Client extends \Gini\Controller\CGI
         $form = $this->form('post');
         $username = $form['username'];
         $password = $form['password'];
-        $bool = self::getRPC()->user->verify($username, $password);
+        $bool = self::getRPC()->gapper->user->verify($username, $password);
 
         if ($bool) {
             $result = \Gini\Gapper\Client::loginByUserName($username);

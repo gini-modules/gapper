@@ -13,8 +13,8 @@ namespace Gini\Module\Gapper\Client
                     $api = $config['url'];
                     $client_id = $config['client_id'];
                     $client_secret = $config['client_secret'];
-                    $rpc = \Gini\IoC::construct('\Gini\RPC', $api, 'gapper');
-                    $bool = $rpc->app->authorize($client_id, $client_secret);
+                    $rpc = \Gini\IoC::construct('\Gini\RPC', $api);
+                    $bool = $rpc->gapper->app->authorize($client_id, $client_secret);
                     if (!$bool) {
                         throw new \Exception('Your app was not registered in gapper server!');
                     }

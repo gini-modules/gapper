@@ -76,7 +76,7 @@ class Client
         }
 
         try {
-            $app = self::getRPC()->app->getInfo($client_id);
+            $app = self::getRPC()->gapper->app->getInfo($client_id);
         } catch (\Gini\RPC\Exception $e) {
             $app = [];
         }
@@ -99,7 +99,7 @@ class Client
             }
         } elseif ($app['type'] === 'user') {
             try {
-                $apps = (array) self::getRPC()->user->getApps(self::getUserName());
+                $apps = (array) self::getRPC()->gapper->user->getApps(self::getUserName());
             } catch (\Gini\RPC\Exception $e) {
                 $apps = [];
             }
@@ -121,7 +121,7 @@ class Client
 
     public static function loginByToken($token)
     {
-        $user = self::getRPC()->user->authorizeByToken($token);
+        $user = self::getRPC()->gapper->user->authorizeByToken($token);
         if ($user && $user['username']) {
             return self::loginByUserName($user['username']);
         }
@@ -139,7 +139,7 @@ class Client
         if (!$client_id) {
             return false;
         }
-        $app = self::getRPC()->app->getInfo($client_id);
+        $app = self::getRPC()->gapper->app->getInfo($client_id);
         if (!$app['id']) {
             return false;
         }
@@ -163,7 +163,7 @@ class Client
             return;
         }
         try {
-            $data = self::getRPC()->user->getInfo([
+            $data = self::getRPC()->gapper->user->getInfo([
                 'username' => self::getUserName(),
             ]);
         } catch (\Gini\RPC\Exception $e) {
@@ -180,7 +180,7 @@ class Client
             return false;
         }
 
-        $app = self::getRPC()->app->getInfo($client_id);
+        $app = self::getRPC()->gapper->app->getInfo($client_id);
         if (!$app['id']) {
             return false;
         }
@@ -190,14 +190,14 @@ class Client
             return false;
         }
 
-        $groups = self::getRPC()->user->getGroups($username);
+        $groups = self::getRPC()->gapper->user->getGroups($username);
         if (empty($groups)) {
             return false;
         }
 
         $result = [];
         foreach ($groups as $k => $g) {
-            $apps = self::getRPC()->group->getApps((int) $g['id']);
+            $apps = self::getRPC()->gapper->group->getApps((int) $g['id']);
             if (is_array($apps) && in_array($client_id, array_keys($apps))) {
                 $result[$k] = $g;
             }
@@ -215,7 +215,7 @@ class Client
         if (!$client_id) {
             return false;
         }
-        $app = self::getRPC()->app->getInfo($client_id);
+        $app = self::getRPC()->gapper->app->getInfo($client_id);
         if (!$app['id']) {
             return false;
         }
@@ -225,12 +225,12 @@ class Client
             return false;
         }
 
-        $groups = self::getRPC()->user->getGroups($username);
+        $groups = self::getRPC()->gapper->user->getGroups($username);
         if (!is_array($groups) || !in_array($groupID, array_keys($groups))) {
             return false;
         }
 
-        $apps = self::getRPC()->group->getApps((int) $groupID);
+        $apps = self::getRPC()->gapper->group->getApps((int) $groupID);
         if (is_array($apps) && in_array($client_id, array_keys($apps))) {
             self::setSession(self::$keyGroupID, $groupID);
 
@@ -244,7 +244,7 @@ class Client
     {
         if (self::hasSession(self::$keyGroupID)) {
             $groupID = self::getSession(self::$keyGroupID);
-            $data = self::getRPC()->group->getInfo((int) $groupID);
+            $data = self::getRPC()->gapper->group->getInfo((int) $groupID);
 
             return $data;
         }

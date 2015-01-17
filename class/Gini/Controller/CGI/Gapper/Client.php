@@ -48,7 +48,7 @@ class Client extends \Gini\Controller\CGI\Gapper
 
         $user = \Gini\Gapper\Client::getUserInfo();
         if ($user['id']) {
-            $token = self::getRPC()->user->getLoginToken((int) $user['id'], $client_id);
+            $token = self::getRPC()->gapper->user->getLoginToken((int) $user['id'], $client_id);
         }
 
         if ($token) {
@@ -71,7 +71,7 @@ class Client extends \Gini\Controller\CGI\Gapper
         if (!$client_id) {
             return $this->_showNothing();
         }
-        $app = self::getRPC()->app->getInfo($client_id);
+        $app = self::getRPC()->gapper->app->getInfo($client_id);
         if (!$app['id']) {
             return $this->_showNothing();
         }
@@ -79,7 +79,7 @@ class Client extends \Gini\Controller\CGI\Gapper
         if (!$user['id']) {
             return $this->_showNothing();
         }
-        $token = self::getRPC()->user->getLoginToken((int) $user['id'], $client_id);
+        $token = self::getRPC()->gapper->user->getLoginToken((int) $user['id'], $client_id);
         if (!$token) {
             return $this->_showNothing();
         }
