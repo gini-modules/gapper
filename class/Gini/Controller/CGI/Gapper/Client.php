@@ -4,7 +4,6 @@ namespace Gini\Controller\CGI\Gapper;
 
 class Client extends \Gini\Controller\CGI\Gapper
 {
-
     use \Gini\Module\Gapper\Client\RPCTrait;
 
     private function _showNothing()
@@ -14,10 +13,15 @@ class Client extends \Gini\Controller\CGI\Gapper
 
     private function _checkUrl($base, $to)
     {
-        if (empty($base) || empty($to)) return false;
+        if (empty($base) || empty($to)) {
+            return false;
+        }
         $base = parse_url($base);
         $to = parse_url($to);
-        if ($base['host']!=$to['host']) return false;
+        if ($base['host'] != $to['host']) {
+            return false;
+        }
+
         return true;
     }
 
@@ -27,18 +31,19 @@ class Client extends \Gini\Controller\CGI\Gapper
 
         $config = (array) \Gini\Config::get('gapper.rpc');
         $client_id = $config['client_id'];
-        if (!$client_id) return $this->_showNothing();
+        if (!$client_id) {
+            return $this->_showNothing();
+        }
 
         $url = \Gini\Config::get('gapper.server_home') ?: 'http://gapper.in/';
 
         if (empty($paths)) {
             $group_id = \Gini\Gapper\Client::getGroupID();
             if ($group_id) {
-                $url .= '/dashboard/group/' . $group_id;
+                $url .= '/dashboard/group/'.$group_id;
             }
-        }
-        else {
-            $url .= '/' . join('/', $paths);
+        } else {
+            $url .= '/'.implode('/', $paths);
         }
 
         $user = \Gini\Gapper\Client::getUserInfo();
@@ -48,8 +53,7 @@ class Client extends \Gini\Controller\CGI\Gapper
 
         if ($token) {
             $url = \Gini\URI::url($url, 'gapper-token='.$token);
-        }
-        else {
+        } else {
             $url = \Gini\URI::url($url);
         }
 
@@ -58,7 +62,9 @@ class Client extends \Gini\Controller\CGI\Gapper
 
     public function actionGo($client_id)
     {
-        if (\Gini\Gapper\Client::getLoginStep()!==\Gini\Gapper\Client::STEP_DONE) return $this->_showNothing();
+        if (\Gini\Gapper\Client::getLoginStep() !== \Gini\Gapper\Client::STEP_DONE) {
+            return $this->_showNothing();
+        }
 
         $redirect = $_GET['redirect'];
 
@@ -90,13 +96,13 @@ class Client extends \Gini\Controller\CGI\Gapper
     public function actionLogin()
     {
         $redirect = $_GET['redirect'];
-        if (\Gini\Gapper\Client::getLoginStep()===\Gini\Gapper\Client::STEP_DONE) {
+        if (\Gini\Gapper\Client::getLoginStep() === \Gini\Gapper\Client::STEP_DONE) {
             $redirect = $this->_checkUrl('/', $redirect) ? $redirect : '/';
 
             return $this->redirect($redirect);
         }
 
-        $view = \Gini\Config::get('gapper.login_view') ?: 'gapper/client/login' ;
+        $view = \Gini\Config::get('gapper.login_view') ?: 'gapper/client/login';
         $this->view->body = VV($view);
     }
 }

@@ -1,17 +1,16 @@
 <?php
 
 /**
-* @file Client.php
-* @brief 用户登录
-* @author Hongjie Zhu
-* @version 0.1.0
-* @date 2015-01-08
+ * @file Client.php
+ * @brief 用户登录
+ * @author Hongjie Zhu
+ * @version 0.1.0
+ * @date 2015-01-08
  */
 namespace Gini\Controller\CGI\AJAX\Gapper;
 
 class Client extends \Gini\Controller\CGI
 {
-
     use \Gini\Module\Gapper\Client\RPCTrait;
 
     private function _showJSON($data)
@@ -19,15 +18,15 @@ class Client extends \Gini\Controller\CGI
         return \Gini\IoC::construct('\Gini\CGI\Response\JSON', $data);
     }
 
-    private function _showHTML($view, array $data=[])
+    private function _showHTML($view, array $data = [])
     {
         return \Gini\IoC::construct('\Gini\CGI\Response\HTML', V($view, $data));
     }
 
     /**
-        * @brief 获取等咯过程中各个阶段的数据
-        *
-        * @return 
+     * @brief 获取等咯过程中各个阶段的数据
+     *
+     * @return
      */
     public function actionGetSources()
     {
@@ -39,18 +38,18 @@ class Client extends \Gini\Controller\CGI
             $sources = (array) \Gini\Config::get('gapper.auth');
 
             $data['sources'] = [];
-            foreach ($sources as $source=>$info) {
+            foreach ($sources as $source => $info) {
                 $key = strtolower(implode('/', ['Gapper', 'Auth', $source]));
-                $key = strtr($key, ['-'=>'/', '_'=>'/']);
+                $key = strtr($key, ['-' => '/', '_' => '/']);
                 $data['sources'][$key] = $info;
             }
 
             $data['sources']['gapper/client'] = [
-                'icon'=> '/assets/img/gapper-auth-gapper/logo.png',
-                'name'=> T('Gapper')
+                'icon' => '/assets/img/gapper-auth-gapper/logo.png',
+                'name' => T('Gapper'),
             ];
 
-            if (count($data['sources'])==1) {
+            if (count($data['sources']) == 1) {
                 return $this->actionGetForm();
             }
 
@@ -58,7 +57,7 @@ class Client extends \Gini\Controller\CGI
             break;
         case \Gini\Gapper\Client::STEP_GROUP:
             $groups = \Gini\Gapper\Client::getGroups();
-            if ($groups && count($groups)==1) {
+            if ($groups && count($groups) == 1) {
                 $bool = \Gini\Gapper\Client::chooseGroup(current($groups)['id']);
                 if ($bool) {
                     return $this->_showJSON(true);
@@ -66,6 +65,7 @@ class Client extends \Gini\Controller\CGI
             }
 
             $data['groups'] = $groups;
+
             return $this->_showJSON((string) V('gapper/client/checkgroup', $data));
             break;
         case \Gini\Gapper\Client::STEP_USER_401:
@@ -87,30 +87,30 @@ class Client extends \Gini\Controller\CGI
     }
 
     /**
-        * @brief 展示登录表单
-        *
-        * @return 
+     * @brief 展示登录表单
+     *
+     * @return
      */
     public function actionGetForm()
     {
         $info = (object) [
-            'icon'=> '/assets/img/gapper-auth-gapper/logo.png',
-            'name'=> T('Gapper')
+            'icon' => '/assets/img/gapper-auth-gapper/logo.png',
+            'name' => T('Gapper')
         ];
 
         return $this->_showHTML('gapper/auth/gapper/login', [
-            'info'=> $info
+            'info' => $info
         ]);
     }
 
     /**
-        * @brief 登录
-        *
-        * @return 
+     * @brief 登录
+     *
+     * @return
      */
     public function actionLogin()
     {
-        if (\Gini\Gapper\Client::getLoginStep()===\Gini\Gapper\Client::STEP_DONE) {
+        if (\Gini\Gapper\Client::getLoginStep() === \Gini\Gapper\Client::STEP_DONE) {
             return $this->_showJSON(true);
         }
 
@@ -130,14 +130,14 @@ class Client extends \Gini\Controller\CGI
     }
 
     /**
-        * @brief 选择组
-        *
-        * @return 
+     * @brief 选择组
+     *
+     * @return
      */
     public function actionChoose()
     {
         $current = \Gini\Gapper\Client::getLoginStep();
-        if ($current!==\Gini\Gapper\Client::STEP_GROUP) {
+        if ($current !== \Gini\Gapper\Client::STEP_GROUP) {
             return $this->_showJSON(T('Access Denied!'));
         }
 
@@ -155,43 +155,45 @@ class Client extends \Gini\Controller\CGI
     }
 
     /**
-        * @brief 获取支持的添加新用户的类型
-        *
-        * @return 
+     * @brief 获取支持的添加新用户的类型
+     *
+     * @return
      */
     public function actionGetAddMemberTypes()
     {
         $current = \Gini\Gapper\Client::getLoginStep();
-        if ($current!==\Gini\Gapper\Client::STEP_DONE) return;
+        if ($current !== \Gini\Gapper\Client::STEP_DONE) {
+            return;
+        }
 
         $sources = (array) \Gini\Config::get('gapper.auth');
         $sources['gapper'] = [
-            'icon'=> '/assets/img/gapper-auth-gapper/logo.png',
-            'name'=> T('Gapper')
+            'icon' => '/assets/img/gapper-auth-gapper/logo.png',
+            'name' => T('Gapper'),
         ];
-
 
         $data = [];
 
-        foreach ($sources as $source=>$info) {
+        foreach ($sources as $source => $info) {
             $key = strtolower(implode('/', ['Gapper', 'Auth', $source]));
-            $key = strtr($key, ['-'=>'/', '_'=>'/']);
-            $file = $key . '/add-member';
-            $content = (string)V($file, [
-                'icon'=> $info['icon'],
-                'type'=> $info['name'],
-                'group'=> \Gini\Gapper\Client::getGroupID()
+            $key = strtr($key, ['-' => '/', '_' => '/']);
+            $file = $key.'/add-member';
+            $content = (string) V($file, [
+                'icon' => $info['icon'],
+                'type' => $info['name'],
+                'group' => \Gini\Gapper\Client::getGroupID()
             ]);
-            if (!$content) continue;
+            if (!$content) {
+                continue;
+            }
             $data[$key] = $content;
         }
 
         if (!empty($data)) {
             return $this->_showHTML('gapper/auth/add-member-types', [
-                'data'=> $data,
-                'group'=> \Gini\Gapper\Client::getGroupID()
+                'data' => $data,
+                'group' => \Gini\Gapper\Client::getGroupID()
             ]);
         }
     }
-
 }

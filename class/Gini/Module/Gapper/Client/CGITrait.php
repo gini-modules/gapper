@@ -5,12 +5,12 @@ namespace Gini\Module\Gapper\Client
     trait CGITrait
     {
         /**
-            * @brief 输出HTML
-            *
-            * @param $view
-            * @param $data
-            *
-            * @return 
+         * @brief 输出HTML
+         *
+         * @param $view
+         * @param $data
+         *
+         * @return
          */
         private function showHTML($view, $data)
         {
@@ -18,11 +18,11 @@ namespace Gini\Module\Gapper\Client
         }
 
         /**
-            * @brief 输出JSON
-            *
-            * @param $data
-            *
-            * @return 
+         * @brief 输出JSON
+         *
+         * @param $data
+         *
+         * @return
          */
         private function showJSON($data)
         {
@@ -30,9 +30,9 @@ namespace Gini\Module\Gapper\Client
         }
 
         /**
-            * @brief 空输出
-            *
-            * @return 
+         * @brief 空输出
+         *
+         * @return
          */
         private function showNothing()
         {
@@ -41,7 +41,7 @@ namespace Gini\Module\Gapper\Client
 
         private function isLogin()
         {
-            return \Gini\Gapper\Client::getLoginStep()===\Gini\Gapper\Client::STEP_DONE;
+            return \Gini\Gapper\Client::getLoginStep() === \Gini\Gapper\Client::STEP_DONE;
         }
 
         private function login()

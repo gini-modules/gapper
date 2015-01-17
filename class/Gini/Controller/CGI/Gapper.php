@@ -4,7 +4,6 @@ namespace Gini\Controller\CGI
 {
     class Gapper extends \Gini\Controller\CGI\Layout
     {
-
         private static $_JSVars = [];
         private static $_CSSes = [];
 
@@ -16,7 +15,7 @@ namespace Gini\Controller\CGI
             self::$_JSVars[$var] = $value;
         }
 
-        public static function addCSS($css, $type='page')
+        public static function addCSS($css, $type = 'page')
         {
             self::$_CSSes[$type] = self::$_CSSes[$type] ?: [];
             array_push(self::$_CSSes[$type], $css);
@@ -31,8 +30,8 @@ namespace Gini\Controller\CGI
         {
             $content = (string) $this->view;
 
-            $headcss = V('gapper/client/headcss', ['csses'=>self::$_CSSes]);
-            $headjs = V('gapper/client/headjs', ['vars'=>self::$_JSVars]);
+            $headcss = V('gapper/client/headcss', ['csses' => self::$_CSSes]);
+            $headjs = V('gapper/client/headjs', ['vars' => self::$_JSVars]);
 
             $content = str_replace(self::STRING_HEAD_CSS, $headcss, $content);
             $content = str_replace(self::STRING_HEAD_JS, $headjs, $content);
@@ -46,7 +45,7 @@ namespace Gini\Controller\CGI
 
 namespace
 {
-    function VV($path, $vars=null)
+    function VV($path, $vars = null)
     {
         $vars = is_array($vars) ? $vars : [];
         if (isset($vars['setJSVar']) || isset($vars['addCSS'])) {

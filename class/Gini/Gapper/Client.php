@@ -1,10 +1,10 @@
 <?php
 /**
-* @file Client.php
-* @brief APP <--> Gapper Client <--> Gapper Server
-* @author Hongjie Zhu
-* @version 0.1.0
-* @date 2014-06-18
+ * @file Client.php
+ * @brief APP <--> Gapper Client <--> Gapper Server
+ * @author Hongjie Zhu
+ * @version 0.1.0
+ * @date 2014-06-18
  */
 
 /**
@@ -20,7 +20,6 @@ namespace Gini\Gapper;
 
 class Client
 {
-
     use \Gini\Module\Gapper\Client\RPCTrait;
 
     const STEP_LOGIN = 0;
@@ -62,7 +61,7 @@ class Client
         }
 
         $gapperGroup = $_GET['gapper-group'];
-        if ($gapperGroup && \Gini\Gapper\Client::getLoginStep()===\Gini\Gapper\Client::STEP_GROUP) {
+        if ($gapperGroup && \Gini\Gapper\Client::getLoginStep() === \Gini\Gapper\Client::STEP_GROUP) {
             \Gini\Gapper\Client::chooseGroup($gapperGroup);
         }
     }
@@ -72,22 +71,38 @@ class Client
         // 错误的client信息，用户无法登陆
         $config = \Gini\Config::get('gapper.rpc');
         $client_id = $config['client_id'];
-        if (!$client_id) return self::STEP_LOGIN;
-        $app = self::getRPC()->app->getInfo($client_id);
-        if (!$app['id']) return self::STEP_LOGIN;
+        if (!$client_id) {
+            return self::STEP_LOGIN;
+        }
+
+        try {
+            $app = self::getRPC()->app->getInfo($client_id);
+        } catch (\Gini\RPC\Exception $e) {
+            $app = [];
+        }
+
+        if (!isset($app['id'])) {
+            return self::STEP_LOGIN;
+        }
 
         $username = self::getUserName();
-        if (!$username) return self::STEP_LOGIN;
+        if (!$username) {
+            return self::STEP_LOGIN;
+        }
 
-        if ($app['type']==='group' && empty(self::getGroupInfo())) {
+        if ($app['type'] === 'group' && empty(self::getGroupInfo())) {
             $groups = self::getGroups();
             if (!empty($groups) && is_array($groups)) {
                 return self::STEP_GROUP;
             } else {
                 return self::STEP_GROUP_401;
             }
-        } elseif ($app['type']==='user') {
-            $apps = (array) self::getRPC()->user->getApps(self::getUserName());
+        } elseif ($app['type'] === 'user') {
+            try {
+                $apps = (array) self::getRPC()->user->getApps(self::getUserName());
+            } catch (\Gini\RPC\Exception $e) {
+                $apps = [];
+            }
             if (!in_array($client_id, $apps)) {
                 return self::STEP_USER_401;
             }
@@ -121,9 +136,13 @@ class Client
         // 错误的client信息，用户无法登陆
         $config = \Gini\Config::get('gapper.rpc');
         $client_id = $config['client_id'];
-        if (!$client_id) return false;
+        if (!$client_id) {
+            return false;
+        }
         $app = self::getRPC()->app->getInfo($client_id);
-        if (!$app['id']) return false;
+        if (!$app['id']) {
+            return false;
+        }
         self::setSession(self::$keyUserName, $username);
 
         return true;
@@ -140,10 +159,12 @@ class Client
 
     public static function getUserInfo()
     {
-        if (!self::getUserName()) return;
+        if (!self::getUserName()) {
+            return;
+        }
         try {
             $data = self::getRPC()->user->getInfo([
-                'username'=> self::getUserName()
+                'username' => self::getUserName(),
             ]);
         } catch (\Gini\RPC\Exception $e) {
         }
@@ -155,19 +176,27 @@ class Client
     {
         $config = \Gini\Config::get('gapper.rpc');
         $client_id = $config['client_id'];
-        if (!$client_id) return false;
+        if (!$client_id) {
+            return false;
+        }
 
         $app = self::getRPC()->app->getInfo($client_id);
-        if (!$app['id']) return false;
+        if (!$app['id']) {
+            return false;
+        }
 
         $username = self::getUserName();
-        if (!$username) return false;
+        if (!$username) {
+            return false;
+        }
 
         $groups = self::getRPC()->user->getGroups($username);
-        if (empty($groups)) return false;
+        if (empty($groups)) {
+            return false;
+        }
 
         $result = [];
-        foreach ($groups as $k=>$g) {
+        foreach ($groups as $k => $g) {
             $apps = self::getRPC()->group->getApps((int) $g['id']);
             if (is_array($apps) && in_array($client_id, array_keys($apps))) {
                 $result[$k] = $g;
@@ -183,12 +212,18 @@ class Client
     {
         $config = (array) \Gini\Config::get('gapper.rpc');
         $client_id = $config['client_id'];
-        if (!$client_id) return false;
+        if (!$client_id) {
+            return false;
+        }
         $app = self::getRPC()->app->getInfo($client_id);
-        if (!$app['id']) return false;
+        if (!$app['id']) {
+            return false;
+        }
 
         $username = self::getUserName();
-        if (!$username) return false;
+        if (!$username) {
+            return false;
+        }
 
         $groups = self::getRPC()->user->getGroups($username);
         if (!is_array($groups) || !in_array($groupID, array_keys($groups))) {
@@ -234,8 +269,7 @@ class Client
 
     public static function goLogin()
     {
-        $url = \Gini\URI::url('gapper/client/login', ['redirect'=> $_SERVER['REQUEST_URI']]);
+        $url = \Gini\URI::url('gapper/client/login', ['redirect' => $_SERVER['REQUEST_URI']]);
         \Gini\CGI::redirect($url);
     }
-
 }
