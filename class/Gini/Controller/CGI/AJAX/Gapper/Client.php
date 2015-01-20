@@ -154,44 +154,4 @@ class Client extends \Gini\Controller\CGI
         return $this->_showJSON(T('Access Denied!'));
     }
 
-    /**
-        * @brief 获取支持的添加新用户的类型
-        *
-        * @return 
-     */
-    public function actionGetAddMemberTypes()
-    {
-        $current = \Gini\Gapper\Client::getLoginStep();
-        if ($current!==\Gini\Gapper\Client::STEP_DONE) return;
-
-        $sources = (array) \Gini\Config::get('gapper.auth');
-        $sources['gapper'] = [
-            'icon'=> '/assets/img/gapper-auth-gapper/logo.png',
-            'name'=> T('Gapper')
-        ];
-
-
-        $data = [];
-
-        foreach ($sources as $source=>$info) {
-            $key = strtolower(implode('/', ['Gapper', 'Auth', $source]));
-            $key = strtr($key, ['-'=>'/', '_'=>'/']);
-            $file = $key . '/add-member';
-            $content = (string)V($file, [
-                'icon'=> $info['icon'],
-                'type'=> $info['name'],
-                'group'=> \Gini\Gapper\Client::getGroupID()
-            ]);
-            if (!$content) continue;
-            $data[$key] = $content;
-        }
-
-        if (!empty($data)) {
-            return $this->_showHTML('gapper/auth/add-member-types', [
-                'data'=> $data,
-                'group'=> \Gini\Gapper\Client::getGroupID()
-            ]);
-        }
-    }
-
 }
