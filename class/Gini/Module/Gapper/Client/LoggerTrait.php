@@ -6,35 +6,35 @@ namespace Gini\Module\Gapper\Client
     {
         private $traitVarMethod;
         private $traitVarIdent;
-        private function log($method='')
+        private function log($method = '')
         {
             $this->traitVarIdent = get_class($this);
             $this->traitVarMethod = $method;
 
             return $this;
         }
-        private function debug($msg, array $context=[])
+        private function debug($msg, array $context = [])
         {
             $ident = $this->traitVarIdent;
             $method = $this->traitVarMethod;
             $msg = $method ? "<{$method}> [DEBUG] {$msg}" : $msg;
             \Gini\Logger::of($ident)->debug($msg, $context);
         }
-        private function info($msg, array $context=[])
+        private function info($msg, array $context = [])
         {
             $ident = $this->traitVarIdent;
             $method = $this->traitVarMethod;
             $msg = $method ? "<{$method}> [INFO] {$msg}" : $msg;
             \Gini\Logger::of($ident)->info($msg, $context);
         }
-        private function warn($msg, array $context=[])
+        private function warn($msg, array $context = [])
         {
             $ident = $this->traitVarIdent;
             $method = $this->traitVarMethod;
             $msg = $method ? "<{$method}> [WARN] {$msg}" : $msg;
             \Gini\Logger::of($ident)->warn($msg, $context);
         }
-        private function error($msg, array $context=[])
+        private function error($msg, array $context = [])
         {
             $ident = $this->traitVarIdent;
             $method = $this->traitVarMethod;

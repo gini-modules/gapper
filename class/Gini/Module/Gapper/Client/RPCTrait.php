@@ -4,27 +4,27 @@ namespace Gini\Module\Gapper\Client
 {
     trait RPCTrait
     {
-        private static $_RPCs = [];
-        private static function getRPC($type='gapper')
+        private static $_RPC;
+        private static function getRPC()
         {
-            if (!self::$_RPCs[$type]) {
+            if (!self::$_RPC) {
                 try {
-                    $config = (array) \Gini\Config::get($type . '.rpc');
+                    $config = (array) \Gini\Config::get('gapper.rpc');
                     $api = $config['url'];
                     $client_id = $config['client_id'];
                     $client_secret = $config['client_secret'];
-                    $rpc = \Gini\IoC::construct('\Gini\RPC', $api, $type);
-                    $bool = $rpc->authorize($client_id, $client_secret);
+                    $rpc = \Gini\IoC::construct('\Gini\RPC', $api);
+                    $bool = $rpc->gapper->app->authorize($client_id, $client_secret);
                     if (!$bool) {
                         throw new \Exception('Your app was not registered in gapper server!');
                     }
-                    self::$_RPCs[$type] = $rpc;
+                    self::$_RPC = $rpc;
                 } catch (\Gini\RPC\Exception $e) {
                     \Gini\Logger::of('gapper')->error('Gapper::getRPC error: {message}', ['message' => $e->getMessage()]);
                 }
             }
 
-            return self::$_RPCs[$type];
+            return self::$_RPC;
         }
     }
 }
