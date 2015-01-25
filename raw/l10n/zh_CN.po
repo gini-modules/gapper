@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gapper 0.1.0\n"
 "Report-Msgid-Bugs-To: l10n@geneegroup.com\n"
-"POT-Creation-Date: 2014-09-30 07:06+0000\n"
+"POT-Creation-Date: 2015-01-25 13:21+0000\n"
 "PO-Revision-Date: 2014-09-24 07:47+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -15,18 +15,18 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:38
-#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:66
+#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:49
+#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:98
 msgid "Gapper"
 msgstr ""
 
-#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:92
+#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:132
 msgid "Login failed! Please try again."
 msgstr "登录失败! 请重试."
 
-#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:99
-#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:104
-#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:112
+#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:144
+#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:149
+#: class/Gini/Controller/CGI/AJAX/Gapper/Client.php:157
 msgid "Access Denied!"
 msgstr "您无权访问该页面!"
 
@@ -51,21 +51,25 @@ msgid "Password"
 msgstr "密码"
 
 #: view/gapper/auth/gapper/login.phtml:25
+msgid "Forgot password?"
+msgstr "忘记密码?"
+
+#: view/gapper/auth/gapper/login.phtml:30
 msgid "Log In"
 msgstr "登录"
 
-#: view/gapper/client/checkauth.phtml:5
-msgid "Please Choose Your Authentication Method"
-msgstr "请选择登录方式:"
+#: view/gapper/client/error/401-user.phtml:5
+#: view/gapper/client/error/401-group.phtml:5
+msgid "Please install the app before use it!"
+msgstr "使用前请先安装该应用!"
 
 #: view/gapper/client/checkgroup.phtml:5
 msgid "Please Choose Your Group"
 msgstr "请选择分组:"
 
-#: view/gapper/client/error/401-group.phtml:5
-#: view/gapper/client/error/401-user.phtml:5
-msgid "Please install the app before use it!"
-msgstr "使用前请先安装该应用!"
+#: view/gapper/client/checkauth.phtml:5
+msgid "Please Choose Your Authentication Method"
+msgstr "请选择登录方式:"
 
 #~ msgid "close"
 #~ msgstr "关闭"
