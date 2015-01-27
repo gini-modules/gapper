@@ -33,7 +33,7 @@ define('gapper/client/login', ['jquery', 'bootbox'], function ($, bootbox) {
         var $that = $(this);
         if ($that.attr('data-gapper-auth-source')) {
             var source = $that.attr('data-gapper-auth-source');
-            var url = 'ajax/'+source+'/getForm';
+            var url = 'ajax/gapper/auth/'+source+'/getForm';
             $.get(url, function(data) {
                 clearDialog();
                 dialog = $(data);

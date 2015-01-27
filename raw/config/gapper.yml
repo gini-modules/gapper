@@ -1,0 +1,6 @@
+---
+auth:
+  gapper:
+    icon: assets/img/gapper-auth-gapper/logo.png
+    name: Gapper
+...
