@@ -30,13 +30,8 @@ class Gapper extends \Gini\Controller\CGI
      */
     public function actionGetForm()
     {
-        $info = (object) [
-            'icon' => '/assets/img/gapper-auth-gapper/logo.png',
-            'name' => T('Gapper')
-        ];
-
         return $this->_showHTML('gapper/auth/gapper/login', [
-            'info' => $info
+            'info' => (object) \Gini\Config::get('gapper.auth')['gapper'],
         ]);
     }
 

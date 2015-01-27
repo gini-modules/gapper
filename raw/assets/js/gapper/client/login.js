@@ -10,7 +10,7 @@ define('gapper/client/login', ['jquery', 'bootbox'], function ($, bootbox) {
     var showLogin = function() {
         if (isWaitingLogin) return false;
         isWaiting = true;
-        var url = 'ajax/gapper/client/getSources';
+        var url = 'ajax/gapper/client/sources';
         $.get(url, function(data) {
             if (data===true) {
                 return window.location.reload();
@@ -47,7 +47,7 @@ define('gapper/client/login', ['jquery', 'bootbox'], function ($, bootbox) {
             });
         }
         if ($that.attr('data-gapper-client-group')) {
-            var url = 'ajax/gapper/client/choose';
+            var url = 'ajax/gapper/auth/gapper/choose';
             $.post(url, {
                 id: $that.attr('data-gapper-client-group')
             }, function(data) {
