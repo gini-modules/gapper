@@ -44,7 +44,7 @@ class Client extends \Gini\Controller\CGI
             }
 
             if (count($sources) == 1) {
-                return $this->actionGetForm();
+                return $this->redirect('ajax/gapper/auth/gapper/get-form');
             }
 
             return $this->_showJSON((string) V('gapper/client/checkauth', ['sources' => $sources]));

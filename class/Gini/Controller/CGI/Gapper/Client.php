@@ -6,11 +6,6 @@ class Client extends \Gini\Controller\CGI\Gapper
 {
     use \Gini\Module\Gapper\Client\RPCTrait;
 
-    private function _showNothing()
-    {
-        return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
-    }
-
     private function _checkUrl($base, $to)
     {
         if (empty($base) || empty($to)) {
@@ -32,7 +27,7 @@ class Client extends \Gini\Controller\CGI\Gapper
         $config = (array) \Gini\Config::get('gapper.rpc');
         $client_id = $config['client_id'];
         if (!$client_id) {
-            return $this->_showNothing();
+            return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
 
         $url = \Gini\Config::get('gapper.server_home') ?: 'http://gapper.in/';
@@ -63,25 +58,25 @@ class Client extends \Gini\Controller\CGI\Gapper
     public function actionGo($client_id)
     {
         if (\Gini\Gapper\Client::getLoginStep() !== \Gini\Gapper\Client::STEP_DONE) {
-            return $this->_showNothing();
+            return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
 
         $redirect = $_GET['redirect'];
 
         if (!$client_id) {
-            return $this->_showNothing();
+            return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
         $app = self::getRPC()->gapper->app->getInfo($client_id);
         if (!$app['id']) {
-            return $this->_showNothing();
+            return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
         $user = \Gini\Gapper\Client::getUserInfo();
         if (!$user['id']) {
-            return $this->_showNothing();
+            return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
         $token = self::getRPC()->gapper->user->getLoginToken((int) $user['id'], $client_id);
         if (!$token) {
-            return $this->_showNothing();
+            return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
         $url = $app['url'];
         if ($this->_checkUrl($url, $redirect)) {
