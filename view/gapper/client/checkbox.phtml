@@ -1,6 +1,6 @@
 <ul class="gapper-client-checkbox list-unstyled list-inline text-center">
 <?php foreach ($sources as $source=>$info) {?>
-    <li class="gapper-client-checkbox-li" data-gapper-auth-source="<?=H($source)?>"><dl>
+    <li class="gapper-client-checkbox-li" data-gapper-auth-source="<?=H($source)?>" title="<?=H($info['name'])?>"><dl>
         <dt><img src="<?=H($info['icon'])?>" /></dt>
         <dd><?=H($info['name'])?></dd>
     </dl></li>

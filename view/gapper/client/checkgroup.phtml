@@ -6,7 +6,7 @@
             </div>
             <ul class="modal-body gapper-client-checkbox list-unstyled list-inline text-center">
             <?php foreach ($groups as $gid=>$group) {?>
-                <li class="gapper-client-checkbox-li" data-gapper-client-group="<?=H($gid)?>"><div class="app-icon app-icon-hoverable">
+                <li class="gapper-client-checkbox-li" data-gapper-client-group="<?=H($gid)?>"><div class="app-icon app-icon-hoverable" title="<?=H($group['abbr'])?>">
                     <div class="app-icon-image">
                     <?php if ($group['icon']) {?>
                         <img src="<?= H(\Gini\ImageCache::makeURL($group['icon'], 72))?>" data-retina-src="<?= H(\Gini\ImageCache::makeURL($group['icon'], 144))?>" />
