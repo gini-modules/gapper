@@ -64,7 +64,7 @@ class SSO
 			if ($lparam !== NULL) $data['lParam'] = $lparam;
 
 			$http = \Gini\IoC::construct('\Gini\HTTP');
-			$response = $http->post($this->url, $data);
+			$response = $http->post($this->_url, $data);
 
 			$xml = @simplexml_load_string($response->body);
 			if (!$xml) throw new \Exception('XML无法解析');
