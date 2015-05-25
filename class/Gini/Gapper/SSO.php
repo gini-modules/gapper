@@ -63,7 +63,7 @@ class SSO
 			if ($wparam !== NULL) $data['wParam'] = $wparam;
 			if ($lparam !== NULL) $data['lParam'] = $lparam;
 
-			$http = \Gini\HTTP::instance();
+			$http = \Gini\IoC::construct('\Gini\HTTP');
 			$response = $http->post($this->url, $data);
 
 			$xml = @simplexml_load_string($response->body);
