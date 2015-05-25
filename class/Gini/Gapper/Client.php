@@ -59,6 +59,19 @@ class Client
             \Gini\Gapper\Client::logout();
             \Gini\Gapper\Client::loginByToken($gapperToken);
         }
+        else {
+            // 提供第三方登录验证入口
+            $third = (array) \Gini\Config::get('gapper.3rd');
+            foreach ($third as $key=>$value) {
+                if (isset($value['condition']) && !$_GET[$value['condition']]) {
+                    continue;
+                }
+                $className = $value['class'];
+                if (!class_exists($className)) continue;
+                $handler = \Gini\IoC::construct($className, $value['params']);
+                $handler->run();
+            }
+        }
 
         $gapperGroup = $_GET['gapper-group'];
         if ($gapperGroup && \Gini\Gapper\Client::getLoginStep() === \Gini\Gapper\Client::STEP_GROUP) {
