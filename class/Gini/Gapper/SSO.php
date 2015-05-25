@@ -31,8 +31,6 @@ class SSO
 
     private function _byCookie($opts)
     {
-        \Gini\Gapper\Client::logout();
-
         $key = $opts['key'];
         $method = $opts['method'];
         $result = $opts['result'];
@@ -49,7 +47,8 @@ class SSO
             $username = $user['username'];
         }
 
-        if ($username) {
+        if ($username && \Gini\Gapper\Client::getUserName()!==$username) {
+            \Gini\Gapper\Client::logout();
             \Gini\Gapper\Client::loginByUserName($username);
         }
     }
