@@ -3,16 +3,16 @@ auth:
   gapper:
     icon: assets/img/gapper-auth-gapper/logo.png
     name: Gapper
-3rd:
-  sso:
-    condition: sso
-    class: \Gini\Gapper\SSO
-    params:
-      url: SSO-URL
-      type: cookie
-      cookie: 
-      key: COOKIE-KEY
-        method: METHOD
-        result: RESULT-KEY
-        gapper-source: GAPPER-SOURCE 
+# 3rd:
+#   sso:
+#     condition: sso
+#     class: \Gini\Gapper\SSO
+#     params:
+#       url: SSO-URL
+#       type: cookie
+#       cookie: 
+#         key: COOKIE-KEY
+#         method: METHOD
+#         result: RESULT-KEY
+#         gapper-source: GAPPER-SOURCE 
 ...
