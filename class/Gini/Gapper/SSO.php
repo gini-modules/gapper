@@ -67,17 +67,17 @@ class SSO
 			$response = $http->post($this->url, $data);
 
 			$xml = @simplexml_load_string($response->body);
-			if (!$xml) throw new Error_Exception('XML无法解析');
+			if (!$xml) throw new \Exception('XML无法解析');
 
 			if ($xml->error) {
-				throw new Error_Exception((string) $xml->error);
+				throw new \Exception((string) $xml->error);
 			}
 
 			foreach ($xml->children() as $node) {
 				$results[$node->getName()] = (string) $node;
 			}
 		}
-		catch (Error_Exception $e) {
+		catch (\Exception $e) {
         }
 
         return $results;
