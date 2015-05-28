@@ -236,6 +236,11 @@ class Client
 
     private static $keyGroupID = 'groupid';
 
+    public static function resetGroup()
+    {
+        return self::setSession(self::$keyGroupID, 0);
+    }
+
     public static function chooseGroup($groupID)
     {
         $config = (array) \Gini\Config::get('gapper.rpc');
