@@ -90,10 +90,6 @@ class Client extends \Gini\Controller\CGI\Gapper
 
     public function actionLogin()
     {
-        if (isset($_GET['reset-group'])) {
-            \Gini\Gapper\Client::resetGroup();
-        }
-
         $redirect = $_GET['redirect'];
         if (\Gini\Gapper\Client::getLoginStep() === \Gini\Gapper\Client::STEP_DONE) {
             $redirect = $this->_checkUrl('/', $redirect) ? $redirect : '/';
