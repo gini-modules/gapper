@@ -52,15 +52,15 @@ abstract class RObject extends \Gini\ORM\Object
             if (is_array($this->_criteria) && count($this->_criteria) > 0) {
                 $criteria = $this->normalizeCriteria($this->_criteria);
 
-                if (isset($criteria['id'])) {
-                    $id = $criteria['id'];
+                $id = $criteria['id'] ?: null;
+                if ($id) {
                     $key = $this->name().'#'.$id;
                     $cacher = \Gini\Cache::of('orm');
                     $data = $cacher->get($key);
                     if (is_array($data)) {
-                        \Gini\Logger::of('orm')->debug("cache hits on $key");
+                        \Gini\Logger::of('orm')->debug("cache hits on {key}", ['key'=>$key]);
                     } else {
-                        \Gini\Logger::of('orm')->debug("cache missed on $key");
+                        \Gini\Logger::of('orm')->debug("cache missed on {key}", ['key'=>$key]);
                         $rdata = $this->fetchRPC($id);
                         if (is_array($rdata) && count($rdata) > 0) {
                             $data = $this->convertRPCData($rdata);

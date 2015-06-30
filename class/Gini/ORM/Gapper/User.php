@@ -22,22 +22,25 @@ class User extends RObject
                 $criteria = $this->normalizeCriteria($this->_criteria);
 
                 $data = null;
-                $key = isset($criteria['id']) ? $criteria['id'] : (isset($criteria['username']) ? $criteria['username'] : null);
-                $key = $this->name().'#'.$key;
+                $id = isset($criteria['id']) ? $criteria['id'] 
+                        : (isset($criteria['username']) ? $criteria['username'] : null);
+                if ($id) {
+                    $key = $this->name().'#'.$id;
 
-                $cacher = \Gini\Cache::of('orm');
-                $data = $cacher->get($key);
+                    $cacher = \Gini\Cache::of('orm');
+                    $data = $cacher->get($key);
 
-                if (is_array($data)) {
-                    \Gini\Logger::of('orm')->debug("cache hits on $key");
-                } else {
-                    \Gini\Logger::of('orm')->debug("cache missed on $key");
-                    $rdata = $this->fetchRPC($criteria);
+                    if (is_array($data)) {
+                        \Gini\Logger::of('orm')->debug("cache hits on {key}", ['key'=>$key]);
+                    } else {
+                        \Gini\Logger::of('orm')->debug("cache missed on {key}", ['key'=>$key]);
+                        $rdata = $this->fetchRPC($criteria);
 
-                    if (is_array($rdata) && count($rdata) > 0) {
-                        $data = $this->convertRPCData($rdata);
-                        // set ttl to 5 sec
-                        $cacher->set($key, $data, $this->cacheTimeout);
+                        if (is_array($rdata) && count($rdata) > 0) {
+                            $data = $this->convertRPCData($rdata);
+                            // set ttl to 5 sec
+                            $cacher->set($key, $data, $this->cacheTimeout);
+                        }
                     }
                 }
             }
