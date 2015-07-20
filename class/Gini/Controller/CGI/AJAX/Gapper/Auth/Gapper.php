@@ -30,8 +30,10 @@ class Gapper extends \Gini\Controller\CGI
      */
     public function actionGetForm()
     {
+        $conf = (array) \Gini\Config::get('gapper.auth');
         return $this->_showHTML('gapper/auth/gapper/login', [
             'info' => (object) \Gini\Config::get('gapper.auth')['gapper'],
+            'hasMultiLogType'=> !!(count(array_keys($conf)) > 1)
         ]);
     }
 
