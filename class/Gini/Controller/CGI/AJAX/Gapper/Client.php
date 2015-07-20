@@ -74,7 +74,7 @@ class Client extends \Gini\Controller\CGI
 
             return $this->_showJSON((string) V($view));
             break;
-        case Gini\Gapper\Client::STEP_DONE:
+        case \Gini\Gapper\Client::STEP_DONE:
             return $this->_showJSON(true);
             break;
         }
