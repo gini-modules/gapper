@@ -2,38 +2,42 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <?php if ($hasMultiLogType) {?>
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <?php }?>
-                <h4 class="modal-title"><?=H(T('LOGIN'))?></h4>
-            </div>
-            <form class="modal-body form gapper-auth-form gapper-auth-login-form" method="POST" action="ajax/gapper/auth/gapper/login"><dl class="dl-horizontal">
-                <dt class="text-center">
-                    <div class="app-icon">
-                        <div class="text-center app-icon-image"><img src="<?= H($info->icon) ?>" /></div>
-                        <div class="text-center app-icon-title"><?= H($info->name) ?></div>
-                    </div>
-                </dt>
-                <dd>
-                    <div class="gapper-auth-login-form-li form-group">
-                        <div class="gapper-auth-login-form-placeholder" style="display:none; display/*\**/:block\9;"><?=H(T('Email:'))?></div>
-                        <input class="form-control" type="text" name="username" placeholder="<?=H(T('Email'))?>" />
-                    </div>
-                    <div class="gapper-auth-login-form-li form-group">
-                        <div class="gapper-auth-login-form-placeholder" style="display:none; display/*\**/:block\9;"><?=H(T('Password:'))?></div>
-                        <input class="form-control" type="password" name="password" placeholder="<?=H(T('Password'))?>" />
-                        <div class="text-right">
-                            <a href="gapper/client/go-home/forgot-password" class="text-muted" target="_blank">
-                                <small><?= H(T('Forgot password?')) ?></small>
-                            </a>
+                <?php if ($hasMultiLogType) {
+    ?>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <?php 
+}?>
+                    <h4 class="modal-title"><?=H(T('LOGIN'))?></h4>
+                </div>
+                <form class="modal-body form gapper-auth-form gapper-auth-login-form" method="POST" action="ajax/gapper/auth/gapper/login"><dl class="dl-horizontal">
+                    <dt class="text-center">
+                        <div class="app-icon">
+                            <div class="text-center app-icon-image"><img src="<?= H($info->icon) ?>" /></div>
+                            <div class="text-center app-icon-title"><?= H($info->name) ?></div>
                         </div>
-                    </div>
-                    <div class="gapper-auth-login-form-li form-group">
-                        <input class="form-control btn btn-primary" type="submit" value="<?=H(T('Log In'))?>"/>
-                    </div>
-                </dd>
-            </dl></form>
+                    </dt>
+                    <dd>
+                        <div class="gapper-auth-login-form-li form-group">
+                            <div class="gapper-auth-login-form-placeholder" style="display:none; display/*\**/:block\9;"><?=H(T('Email:'))?></div>
+                            <input class="form-control" type="text" name="username" placeholder="<?=H(T('Email'))?>" />
+                        </div>
+                        <div class="gapper-auth-login-form-li form-group">
+                            <div class="gapper-auth-login-form-placeholder" style="display:none; display/*\**/:block\9;"><?=H(T('Password:'))?></div>
+                            <input class="form-control" type="password" name="password" placeholder="<?=H(T('Password'))?>" />
+                            <div class="text-right">
+                                <a href="gapper/client/go-home/forgot-password" class="text-muted" target="_blank">
+                                    <small><?= H(T('Forgot password?')) ?></small>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="gapper-auth-login-form-li form-group">
+                            <input class="form-control btn btn-primary" type="submit" value="<?=H(T('Log In'))?>"/>
+                        </div>
+                        <div class="gapper-auth-login-form-li  form-group text-center text-muted">
+                            No account? <a href="gapper/client/go-home/signup">Sign up here</a>
+                        </div>
+                    </dd>
+                </dl></form>
+            </div>
         </div>
     </div>
-</div>
-
