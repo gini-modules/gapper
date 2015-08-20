@@ -2,9 +2,11 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <?php if ($hasMultiLogType) {?>
+                <?php if ($hasMultiLogType) {
+    ?>
                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <?php }?>
+                    <?php 
+}?>
                     <h4 class="modal-title"><?=H(T('LOGIN'))?></h4>
                 </div>
                 <form class="modal-body form gapper-auth-form gapper-auth-login-form" method="POST" action="ajax/gapper/auth/gapper/login"><dl class="dl-horizontal">
