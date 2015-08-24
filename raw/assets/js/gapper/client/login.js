@@ -110,7 +110,7 @@ define('gapper/client/login', ['jquery', 'bootbox'], function($, bootbox) {
 	});
 
 	var data = {
-		showLogin: showLogin
+		show: showLogin
 	};
 	return data;
 });
