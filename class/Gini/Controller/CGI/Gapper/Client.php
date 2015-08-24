@@ -100,4 +100,12 @@ class Client extends \Gini\Controller\CGI\Gapper
         $view = \Gini\Config::get('gapper.login_view') ?: 'gapper/client/login';
         $this->view->body = VV($view);
     }
+
+    public function actionSignup()
+    {
+        // TODO
+        $view = \Gini\Config::get('gapper.signup_view') ?: 'gapper/client/signup';
+        parent::setJSVar('ACTION', 'signup');
+        $this->view->body = VV($view);
+    }
 }

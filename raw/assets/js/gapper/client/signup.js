@@ -1,5 +1,5 @@
-define('gapper/client/login', ['jquery', 'bootbox'], function($, bootbox) {
-
+define('gapper/client/signup', ['jquery', 'bootbox'], function($, bootbox) {
+	// TODO
 	function showSignup() {
 		console.log('here');
 	};
