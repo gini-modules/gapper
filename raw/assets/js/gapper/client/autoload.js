@@ -1,4 +1,4 @@
-define('gapper/client/autologin', function() {
+define('gapper/client/autoload', function() {
 	var action = window.ACTION ? window.ACTION: 'login';
 	var file;
 	switch (action) {
