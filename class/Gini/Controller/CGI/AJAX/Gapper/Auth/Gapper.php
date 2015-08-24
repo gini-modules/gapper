@@ -36,6 +36,9 @@ class Gapper extends \Gini\Controller\CGI
             'hasMultiLogType'=> !!(count(array_keys($conf)) > 1)
         ]);
     }
+    public function actionGetSignUp(){
+        return $this->_showHTML('gapper/auth/gapper/signup',['info'=>(object)\Gini\Config::get('gapper.auth')['gapper']]);
+    }
 
     /**
      * @brief 登录
@@ -64,6 +67,26 @@ class Gapper extends \Gini\Controller\CGI
         }
 
         return $this->_showJSON(T('Login failed! Please try again.'));
+    }
+    public function actionSignUp()
+    {
+        $form = $this->form('post');
+        $email=$form['email'];
+        $name = $form['name'];
+        $password = $form['password'];
+        try {
+            $bool = self::getRPC()->gapper->user->registeruser(['username'=>$email,'name'=>$name, 'email'=>$email,'password'=>$password]);
+        } catch (\Exception $e) {
+        }
+
+        if ($bool) {
+            $result = \Gini\Gapper\Client::loginByUserName($username);
+            if ($result) {
+                $this->redirect('/');
+            }
+        }
+
+        return $this->_showJSON(T('Sign up failed! Please try again.'));
     }
 
     /**
