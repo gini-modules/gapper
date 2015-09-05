@@ -90,6 +90,7 @@ class Client extends \Gini\Controller\CGI\Gapper
 
     public function actionLogin()
     {
+        error_log('login');
         $redirect = $_GET['redirect'];
         if (\Gini\Gapper\Client::getLoginStep() === \Gini\Gapper\Client::STEP_DONE) {
             $redirect = $this->_checkUrl('/', $redirect) ? $redirect : '/';
@@ -101,11 +102,23 @@ class Client extends \Gini\Controller\CGI\Gapper
         $this->view->body = VV($view);
     }
 
-    public function actionSignup()
+    public function actionNoAccount()
     {
         // TODO
-        $view = \Gini\Config::get('gapper.signup_view') ?: 'gapper/client/signup';
-        parent::setJSVar('ACTION', 'signup');
-        $this->view->body = VV($view);
+        $config = (array) \Gini\Config::get('gapper.rpc');
+        $client_id = $config['client_id'];
+        if (!$client_id) {
+            return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
+        }
+        $app = self::getRPC()->gapper->app->getInfo($client_id);
+        if($app['type']=='group'){
+            $view = \Gini\Config::get('gapper.group_account_view') ?: 'gapper/client/group_account';
+            parent::setJSVar('ACTION', 'group_account');
+            $this->view->body = VV($view);
+        }else if($app['type']=='user'){
+            $view = \Gini\Config::get('gapper.user_account_view') ?: 'gapper/client/user_account';
+            parent::setJSVar('ACTION', 'user_account');
+            $this->view->body = VV($view);
+        }
     }
 }

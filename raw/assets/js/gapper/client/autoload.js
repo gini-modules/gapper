@@ -5,10 +5,17 @@ define('gapper/client/autoload', function() {
 		case 'signup':
 			file = 'gapper/client/signup';
 			break;
+		case 'group_account':
+			file = 'gapper/client/group_account';
+			break;
+		case 'user_account':
+			file = 'gapper/client/user_account';
+			break;
 		case 'login':
 		default:
 			file = 'gapper/client/login';
 	}
+    console.log('autoload');
 	require([file], function($) {
 		$.show();
 	});
