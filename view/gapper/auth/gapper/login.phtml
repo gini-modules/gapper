@@ -31,9 +31,11 @@
                     <div class="gapper-auth-login-form-li form-group">
                         <input class="form-control btn btn-primary" type="submit" value="<?=H(T('Log In'))?>"/>
                     </div>
+                    <?php if(\Gini\Config::get('gapper.has_a_guide')) {?>
                     <div class="gapper-auth-login-form-li  form-group text-center text-muted">
-                        <a href="gapper/client/noaccount"><?=H(T('No account?'))?></a>
+                        <a href="gapper/client/no-account"><?=H(T('No account?'))?></a>
                     </div>
+                    <?php }?>
                 </dd>
             </dl></form>
         </div>

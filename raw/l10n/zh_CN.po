@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gapper 0.1.0\n"
 "Report-Msgid-Bugs-To: l10n@geneegroup.com\n"
-"POT-Creation-Date: 2015-08-27 03:36+0000\n"
+"POT-Creation-Date: 2015-09-07 10:04+0000\n"
 "PO-Revision-Date: 2014-09-24 07:47+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -15,15 +15,71 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: class/Gini/Controller/CGI/AJAX/Gapper/Auth/Gapper.php:66
+#: class/Gini/Controller/CGI/AJAX/Gapper/Auth/Gapper.php:72
 msgid "Login failed! Please try again."
 msgstr "登录失败! 请重试."
 
-#: class/Gini/Controller/CGI/AJAX/Gapper/Auth/Gapper.php:78
-#: class/Gini/Controller/CGI/AJAX/Gapper/Auth/Gapper.php:83
-#: class/Gini/Controller/CGI/AJAX/Gapper/Auth/Gapper.php:91
+#: class/Gini/Controller/CGI/AJAX/Gapper/Auth/Gapper.php:84
+#: class/Gini/Controller/CGI/AJAX/Gapper/Auth/Gapper.php:89
+#: class/Gini/Controller/CGI/AJAX/Gapper/Auth/Gapper.php:97
 msgid "Access Denied!"
 msgstr "您无权访问该页面!"
+
+#: view/gapper/auth/gapper/group_account.phtml:5
+#: view/gapper/auth/gapper/user_account.phtml:5
+msgid "No Account"
+msgstr ""
+
+#: view/gapper/auth/gapper/group_account.phtml:9
+#: view/gapper/auth/gapper/user_account.phtml:9
+msgid "In order to sign up, you might need a few steps"
+msgstr ""
+
+#: view/gapper/auth/gapper/group_account.phtml:12
+#: view/gapper/auth/gapper/user_account.phtml:12
+msgid "1.Fill in the necessary information to sign up"
+msgstr ""
+
+#: view/gapper/auth/gapper/group_account.phtml:13
+msgid "assets/img/gapper-no-account/group/signup.png"
+msgstr ""
+
+#: view/gapper/auth/gapper/group_account.phtml:16
+msgid "2.Click the [new group] beneath the avatar"
+msgstr ""
+
+#: view/gapper/auth/gapper/group_account.phtml:17
+msgid "assets/img/gapper-no-account/group/new_group.png"
+msgstr ""
+
+#: view/gapper/auth/gapper/group_account.phtml:20
+msgid "3.Fill in the Name, Title and click [add]."
+msgstr ""
+
+#: view/gapper/auth/gapper/group_account.phtml:21
+msgid "assets/img/gapper-no-account/group/add_group.png"
+msgstr ""
+
+#: view/gapper/auth/gapper/group_account.phtml:24
+msgid "4.Click [new app], search for the application you want"
+msgstr ""
+
+#: view/gapper/auth/gapper/group_account.phtml:25
+msgid "assets/img/gapper-no-account/group/search_app.png"
+msgstr ""
+
+#: view/gapper/auth/gapper/group_account.phtml:28
+msgid "5.There it is, you have installed the app"
+msgstr ""
+
+#: view/gapper/auth/gapper/group_account.phtml:29
+msgid "assets/img/gapper-no-account/group/launch_app.png"
+msgstr ""
+
+#: view/gapper/auth/gapper/group_account.phtml:32
+#: view/gapper/auth/gapper/user_account.phtml:28
+msgid "Get it. Go to sign up"
+msgstr ""
 
 #: view/gapper/auth/gapper/login.phtml:8
 msgid "LOGIN"
@@ -53,13 +109,37 @@ msgstr "忘记密码?"
 msgid "Log In"
 msgstr "登录"
 
-#: view/gapper/auth/gapper/login.phtml:35
-msgid "No account?"
-msgstr "没有账号?"
-
 #: view/gapper/auth/gapper/login.phtml:36
-msgid "Sign up here"
-msgstr "在这里注册"
+msgid "No account?"
+msgstr ""
+
+#: view/gapper/auth/gapper/user_account.phtml:13
+msgid "assets/img/gapper-no-account/user/signup.png"
+msgstr ""
+
+#: view/gapper/auth/gapper/user_account.phtml:16
+msgid "2.Click the [new app] on the right side"
+msgstr ""
+
+#: view/gapper/auth/gapper/user_account.phtml:17
+msgid "assets/img/gapper-no-account/user/new_app.png"
+msgstr ""
+
+#: view/gapper/auth/gapper/user_account.phtml:20
+msgid "3.Search for the application you want"
+msgstr ""
+
+#: view/gapper/auth/gapper/user_account.phtml:21
+msgid "assets/img/gapper-no-account/user/search_app.png"
+msgstr ""
+
+#: view/gapper/auth/gapper/user_account.phtml:24
+msgid "4.There it is, you have installed the app"
+msgstr ""
+
+#: view/gapper/auth/gapper/user_account.phtml:25
+msgid "assets/img/gapper-no-account/user/launch_app.png"
+msgstr ""
 
 #: view/gapper/client/checkauth.phtml:5
 msgid "Please Choose Your Authentication Method"
