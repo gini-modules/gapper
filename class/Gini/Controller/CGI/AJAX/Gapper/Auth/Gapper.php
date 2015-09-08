@@ -36,7 +36,7 @@ class Gapper extends \Gini\Controller\CGI
 
         return $this->_showHTML('gapper/auth/gapper/login', [
             'info' => (object) \Gini\Config::get('gapper.auth')['gapper'],
-            'hasMultiLogType' => !!(count(array_keys($conf)) > 1),
+            'hasMultiLogType' => !!(count(array_keys($conf)) > 1)
         ]);
     }
     public function actionGetGroupAccount()

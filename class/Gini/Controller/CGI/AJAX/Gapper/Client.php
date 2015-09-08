@@ -51,7 +51,7 @@ class Client extends \Gini\Controller\CGI
 
             return $this->_showJSON((string) V('gapper/client/checkauth', ['sources' => $sources]));
 
-case \Gini\Gapper\Client::STEP_GROUP:
+        case \Gini\Gapper\Client::STEP_GROUP:
             $groups = \Gini\Gapper\Client::getGroups();
             if ($groups && count($groups) == 1) {
                 $bool = \Gini\Gapper\Client::chooseGroup(current($groups)['id']);
