@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gapper 0.1.0\n"
 "Report-Msgid-Bugs-To: l10n@geneegroup.com\n"
-"POT-Creation-Date: 2015-09-07 10:04+0000\n"
+"POT-Creation-Date: 2015-09-08 00:54+0000\n"
 "PO-Revision-Date: 2014-09-24 07:47+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -32,8 +32,6 @@ msgstr "没有账号"
 
 #: view/gapper/auth/gapper/group_account.phtml:9
 #: view/gapper/auth/gapper/user_account.phtml:9
-msgid "In order to sign up, you might need a few steps"
-msgstr "为了完成注册，需要以下几步简单的操作"
 
 #: view/gapper/auth/gapper/group_account.phtml:12
 #: view/gapper/auth/gapper/user_account.phtml:12
@@ -153,6 +151,9 @@ msgstr "请选择分组:"
 #: view/gapper/client/error/401-user.phtml:5
 msgid "Please install the app before use it!"
 msgstr "使用前请先安装该应用!"
+
+#~ msgid "In order to sign up, you might need a few steps"
+#~ msgstr "为了完成注册，需要以下几步简单的操作"
 
 #~ msgid "close"
 #~ msgstr "关闭"
