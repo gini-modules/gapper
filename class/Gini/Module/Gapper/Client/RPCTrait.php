@@ -19,7 +19,7 @@ namespace Gini\Module\Gapper\Client
                         \Gini\Logger::of('gapper')->error('Your app was not registered in gapper server!');
                     }
                 } catch (\Gini\RPC\Exception $e) {
-                    \Gini\Logger::of('gapper')->error('Gapper::getRPC {message}[{code}]', [ 'code' => $e->getCode(), 'message' => $e->getMessage()]);
+                    \Gini\Logger::of('gapper')->error('Gapper::getRPC {message}[{code}]', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
                 }
             }
 

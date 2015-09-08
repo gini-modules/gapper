@@ -3,7 +3,9 @@
 /**
  * @file Client.php
  * @brief 用户登录
+ *
  * @author Hongjie Zhu
+ *
  * @version 0.1.0
  * @date 2015-01-08
  */
@@ -48,8 +50,8 @@ class Client extends \Gini\Controller\CGI
             }
 
             return $this->_showJSON((string) V('gapper/client/checkauth', ['sources' => $sources]));
-        
-        case \Gini\Gapper\Client::STEP_GROUP:
+
+case \Gini\Gapper\Client::STEP_GROUP:
             $groups = \Gini\Gapper\Client::getGroups();
             if ($groups && count($groups) == 1) {
                 $bool = \Gini\Gapper\Client::chooseGroup(current($groups)['id']);
@@ -79,5 +81,4 @@ class Client extends \Gini\Controller\CGI
             break;
         }
     }
-
 }

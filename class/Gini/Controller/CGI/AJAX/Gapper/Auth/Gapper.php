@@ -3,7 +3,9 @@
 /**
  * @file Client.php
  * @brief 用户登录
+ *
  * @author Hongjie Zhu
+ *
  * @version 0.1.0
  * @date 2015-01-08
  */
@@ -31,15 +33,18 @@ class Gapper extends \Gini\Controller\CGI
     public function actionGetForm()
     {
         $conf = (array) \Gini\Config::get('gapper.auth');
+
         return $this->_showHTML('gapper/auth/gapper/login', [
             'info' => (object) \Gini\Config::get('gapper.auth')['gapper'],
-            'hasMultiLogType'=> !!(count(array_keys($conf)) > 1)
+            'hasMultiLogType' => !!(count(array_keys($conf)) > 1),
         ]);
     }
-    public function actionGetGroupAccount(){
+    public function actionGetGroupAccount()
+    {
         return $this->_showHTML('gapper/auth/gapper/group_account');
     }
-    public function actionGetUserAccount(){
+    public function actionGetUserAccount()
+    {
         return $this->_showHTML('gapper/auth/gapper/user_account');
     }
 
@@ -96,5 +101,4 @@ class Gapper extends \Gini\Controller\CGI
 
         return $this->_showJSON(T('Access Denied!'));
     }
-
 }
