@@ -58,9 +58,9 @@ abstract class RObject extends \Gini\ORM\Object
                     $cacher = \Gini\Cache::of('orm');
                     $data = $cacher->get($key);
                     if (is_array($data)) {
-                        \Gini\Logger::of('orm')->debug("cache hits on {key}", ['key'=>$key]);
+                        \Gini\Logger::of('orm')->debug('cache hits on {key}', ['key' => $key]);
                     } else {
-                        \Gini\Logger::of('orm')->debug("cache missed on {key}", ['key'=>$key]);
+                        \Gini\Logger::of('orm')->debug('cache missed on {key}', ['key' => $key]);
                         $rdata = $this->fetchRPC($id);
                         if (is_array($rdata) && count($rdata) > 0) {
                             $data = $this->convertRPCData($rdata);
@@ -98,11 +98,11 @@ abstract class RObject extends \Gini\ORM\Object
         // 3. 初始化条件中有且仅有 id, (因为有别的条件的时候推测是可能期望通过抓取来筛选的)
         if ($this->_db_time == 0 && $name == 'id') {
             $criteria = $this->criteria();
-            if (count($criteria)==1 && isset($criteria['id'])) {
+            if (count($criteria) == 1 && isset($criteria['id'])) {
                 return $criteria['id'];
             }
         }
+
         return parent::__get($name);
     }
-
 }

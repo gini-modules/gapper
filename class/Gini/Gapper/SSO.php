@@ -89,9 +89,10 @@ class SSO
                 $results[$node->getName()] = (string) $node;
             }
         } catch (\Exception $e) {
-            $this->_loop--;
+            --$this->_loop;
             if ($this->_loop > 0) {
                 \usleep(200000);
+
                 return $this->_call($method, $wparam, $lparam);
             }
         }

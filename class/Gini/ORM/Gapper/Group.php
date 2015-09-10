@@ -4,11 +4,11 @@ namespace Gini\ORM\Gapper;
 
 class Group extends RObject
 {
-    public $name         = 'string:120';
-    public $creator      = 'object:user';
-    public $title        = 'string:120';
-    public $abbr         = 'string:40';
-    public $icon         = 'string:250';
+    public $name = 'string:120';
+    public $creator = 'object:user';
+    public $title = 'string:120';
+    public $abbr = 'string:40';
+    public $icon = 'string:250';
 
     protected function fetchRPC($criteria)
     {
