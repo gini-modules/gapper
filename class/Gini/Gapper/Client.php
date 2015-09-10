@@ -1,20 +1,21 @@
 <?php
+
 /**
  * @file Client.php
  * @brief APP <--> Gapper Client <--> Gapper Server
+ *
  * @author Hongjie Zhu
+ *
  * @version 0.1.0
  * @date 2014-06-18
  */
 
 /**
- *
  * $client = \Gini\IoC::construct('\Gini\Gapper\Client', true); (default)
  * $client = \Gini\IoC::construct('\Gini\Gapper\Client', false);
  * $username = $client->getCurrentUserName();
  * $userdata = $client->getUserInfo();
- * $groupdata = $client->getGroupInfo();
- *
+ * $groupdata = $client->getGroupInfo();.
  */
 namespace Gini\Gapper;
 
@@ -58,16 +59,17 @@ class Client
         if ($gapperToken) {
             \Gini\Gapper\Client::logout();
             \Gini\Gapper\Client::loginByToken($gapperToken);
-        }
-        else {
+        } else {
             // 提供第三方登录验证入口
             $third = (array) \Gini\Config::get('gapper.3rd');
-            foreach ($third as $key=>$value) {
+            foreach ($third as $key => $value) {
                 if (isset($value['condition']) && !$_GET[$value['condition']]) {
                     continue;
                 }
                 $className = $value['class'];
-                if (!class_exists($className)) continue;
+                if (!class_exists($className)) {
+                    continue;
+                }
                 $handler = \Gini\IoC::construct($className, $value['params']);
                 $handler->run();
             }
