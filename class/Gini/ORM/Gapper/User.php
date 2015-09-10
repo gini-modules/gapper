@@ -4,12 +4,12 @@ namespace Gini\ORM\Gapper;
 
 class User extends RObject
 {
-    public $name         = 'string:120';
-    public $initials     = 'string:10';
-    public $username     = 'string:120';
-    public $email        = 'string:120';
-    public $phone        = 'string:120';
-    public $icon         = 'string:250';
+    public $name = 'string:120';
+    public $initials = 'string:10';
+    public $username = 'string:120';
+    public $email = 'string:120';
+    public $phone = 'string:120';
+    public $icon = 'string:250';
 
     protected static $db_index = [
         'unique:username',
@@ -22,7 +22,7 @@ class User extends RObject
                 $criteria = $this->normalizeCriteria($this->_criteria);
 
                 $data = null;
-                $id = isset($criteria['id']) ? $criteria['id'] 
+                $id = isset($criteria['id']) ? $criteria['id']
                         : (isset($criteria['username']) ? $criteria['username'] : null);
                 if ($id) {
                     $key = $this->name().'#'.$id;
@@ -31,9 +31,9 @@ class User extends RObject
                     $data = $cacher->get($key);
 
                     if (is_array($data)) {
-                        \Gini\Logger::of('orm')->debug("cache hits on {key}", ['key'=>$key]);
+                        \Gini\Logger::of('orm')->debug('cache hits on {key}', ['key' => $key]);
                     } else {
-                        \Gini\Logger::of('orm')->debug("cache missed on {key}", ['key'=>$key]);
+                        \Gini\Logger::of('orm')->debug('cache missed on {key}', ['key' => $key]);
                         $rdata = $this->fetchRPC($criteria);
 
                         if (is_array($rdata) && count($rdata) > 0) {
