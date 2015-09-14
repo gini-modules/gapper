@@ -1,6 +1,6 @@
-define('gapper/client/group_account', ['jquery', 'bootbox'], function($, bootbox) {
+define('gapper/client/user-account', ['jquery', 'bootbox'], function($, bootbox) {
     function showNoAccount() {
-        $url='ajax/gapper/auth/gapper/get-group-account';
+        $url='ajax/gapper/auth/gapper/get-user-account';
         $.get($url,function(data){
             $(data).modal({
                 show:true,

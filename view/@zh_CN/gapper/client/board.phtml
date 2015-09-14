@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="gini-locale" content="<?=H(\Gini\Config::get('system.locale'))?>"/>
+    <title><?= \Gini\Config::get('app.title') ?></title>
+    <base href="<?= H(URL('/')) ?>">
+    <?php $addCSS('bootstrap', 'board');?>
+    <?php $addCSS('font-awesome', 'board');?>
+    <?php $addCSS('bootswatch', 'board');?>
+    <?php $addCSS('gapper-client-login', 'board');?>
+    <?=\Gini\Controller\CGI\Gapper::STRING_HEAD_CSS?>
+    <?=\Gini\Controller\CGI\Gapper::STRING_HEAD_JS?>
+</head>
+
+<body data-require="gapper/client/autoload" class="<?= $layout_class ?>">
+    <?=$body?>
+</body>
+</html>

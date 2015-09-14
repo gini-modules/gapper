@@ -41,11 +41,11 @@ class Gapper extends \Gini\Controller\CGI
     }
     public function actionGetGroupAccount()
     {
-        return $this->_showHTML('gapper/auth/gapper/group_account');
+        return $this->_showHTML('gapper/auth/gapper/group-account');
     }
     public function actionGetUserAccount()
     {
-        return $this->_showHTML('gapper/auth/gapper/user_account');
+        return $this->_showHTML('gapper/auth/gapper/user-account');
     }
 
     /**

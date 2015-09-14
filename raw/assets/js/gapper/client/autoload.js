@@ -3,10 +3,10 @@ define('gapper/client/autoload', function() {
     var file;
     switch (action) {
         case 'group_account':
-            file = 'gapper/client/group_account';
+            file = 'gapper/client/group-account';
             break;
         case 'user_account':
-            file = 'gapper/client/user_account';
+            file = 'gapper/client/user-account';
             break;
         case 'login':
         default:
