@@ -1,0 +1,44 @@
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <?php if ($hasMultiLogType) {?>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <?php }?>
+                <h4 class="modal-title"><?=H('登录')?></h4>
+            </div>
+            <form class="modal-body form gapper-auth-form gapper-auth-login-form" method="POST" action="ajax/gapper/auth/gapper/login"><dl class="dl-horizontal">
+                <dt class="text-center">
+                    <div class="app-icon">
+                        <div class="text-center app-icon-image"><img src="<?= H($info->icon) ?>" /></div>
+                        <div class="text-center app-icon-title"><?= H($info->name) ?></div>
+                    </div>
+                </dt>
+                <dd>
+                    <div class="gapper-auth-login-form-li form-group">
+                        <div class="gapper-auth-login-form-placeholder" style="display:none; display/*\**/:block\9;"><?=H('电子邮箱:')?></div>
+                        <input class="form-control" type="text" name="username" placeholder="<?=H('电子邮箱')?>" />
+                    </div>
+                    <div class="gapper-auth-login-form-li form-group">
+                        <div class="gapper-auth-login-form-placeholder" style="display:none; display/*\**/:block\9;"><?=H('密码:')?></div>
+                        <input class="form-control" type="password" name="password" placeholder="<?=H('密码')?>" />
+                        <div class="text-right">
+                            <a href="gapper/client/go-home/forgot-password" class="text-muted" target="_blank">
+                            <small><?=H('忘记密码?')?></small>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="gapper-auth-login-form-li form-group">
+                    <input class="form-control btn btn-primary" type="submit" value="<?=H('登录')?>"/>
+                    </div>
+                    <?php if(\Gini\Config::get('gapper.has_a_guide')) {?>
+                    <div class="gapper-auth-login-form-li  form-group text-center text-muted">
+                    <a href="gapper/client/no-account"><?=H('没有账号?')?></a>
+                    </div>
+                    <?php }?>
+                </dd>
+            </dl></form>
+        </div>
+    </div>
+</div>
+

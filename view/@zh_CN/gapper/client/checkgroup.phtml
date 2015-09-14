@@ -1,0 +1,23 @@
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><?=H('请选择分组:')?></h4>
+            </div>
+            <ul class="modal-body gapper-client-checkbox list-unstyled list-inline text-center">
+            <?php foreach ($groups as $gid=>$group) {?>
+                <li class="gapper-client-checkbox-li" data-gapper-client-group="<?=H($gid)?>"><div class="app-icon app-icon-hoverable" title="<?=H($group['abbr'])?>">
+                    <div class="app-icon-image">
+                    <?php if ($group['icon'] && parse_url($group['icon'])['scheme'] != 'abbr') {?>
+                        <img src="<?= H(\Gini\ImageCache::makeURL($group['icon'], 72))?>" data-retina-src="<?= H(\Gini\ImageCache::makeURL($group['icon'], 144))?>" />
+                    <?php } else {?>
+                        <div class="group-icon-text app-icon-text"><?= H($group['abbr'])?></div>
+                    <?php }?>
+                    </div>
+                    <div class="app-icon-title" title="<?=H($group['abbr'])?>"><?=H($group['abbr'])?></div>
+                </div></li>
+            <?php }?>
+            </ul>
+        </div>
+    </div>
+</div>

@@ -109,11 +109,11 @@ class Client extends \Gini\Controller\CGI\Gapper
         }
         $app = self::getRPC()->gapper->app->getInfo($client_id);
         if ($app['type'] == 'group') {
-            $view = \Gini\Config::get('gapper.group_account_view') ?: 'gapper/client/group_account';
+            $view = \Gini\Config::get('gapper.group_account_view') ?: 'gapper/client/group-account';
             parent::setJSVar('ACTION', 'group_account');
             $this->view->body = VV($view);
         } elseif ($app['type'] == 'user') {
-            $view = \Gini\Config::get('gapper.user_account_view') ?: 'gapper/client/user_account';
+            $view = \Gini\Config::get('gapper.user_account_view') ?: 'gapper/client/user-account';
             parent::setJSVar('ACTION', 'user_account');
             $this->view->body = VV($view);
         }

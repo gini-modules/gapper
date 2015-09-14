@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gapper 0.1.16-f\n"
 "Report-Msgid-Bugs-To: l10n@geneegroup.com\n"
-"POT-Creation-Date: 2015-09-10 12:16+0000\n"
+"POT-Creation-Date: 2015-09-12 11:41+0000\n"
 "PO-Revision-Date: 2015-09-10 12:16+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -25,60 +25,40 @@ msgstr "登录失败! 请重试."
 msgid "Access Denied!"
 msgstr "您无权访问该页面!"
 
-#: view/gapper/auth/gapper/group_account.phtml:5
+#: view/gapper/auth/gapper/group-account.phtml:5
 #: view/gapper/auth/gapper/login.phtml:36
-#: view/gapper/auth/gapper/user_account.phtml:5
+#: view/gapper/auth/gapper/user-account.phtml:5
 msgid "No account?"
 msgstr "没有账号?"
 
-#: view/gapper/auth/gapper/group_account.phtml:9
-#: view/gapper/auth/gapper/user_account.phtml:9
+#: view/gapper/auth/gapper/group-account.phtml:9
+#: view/gapper/auth/gapper/user-account.phtml:9
 msgid "In order to sign up, you might need a few steps:"
 msgstr "为了完成注册, 需要以下几步简单的操作:"
 
-#: view/gapper/auth/gapper/group_account.phtml:12
-#: view/gapper/auth/gapper/user_account.phtml:12
+#: view/gapper/auth/gapper/group-account.phtml:12
+#: view/gapper/auth/gapper/user-account.phtml:12
 msgid "1. Fill in the necessary information to sign up"
 msgstr "1. 填写注册信息"
 
-#: view/gapper/auth/gapper/group_account.phtml:13
-msgid "assets/img/gapper-no-account/group/signup.png"
-msgstr "assets/img/gapper-no-account/group/signup_zh.png"
-
-#: view/gapper/auth/gapper/group_account.phtml:16
+#: view/gapper/auth/gapper/group-account.phtml:16
 msgid "2. Click the \"new group\" beneath the avatar"
 msgstr "2. 点击左侧头像下方的 \"新增分组\""
 
-#: view/gapper/auth/gapper/group_account.phtml:17
-msgid "assets/img/gapper-no-account/group/new_group.png"
-msgstr "assets/img/gapper-no-account/group/new_group_zh.png"
-
-#: view/gapper/auth/gapper/group_account.phtml:20
+#: view/gapper/auth/gapper/group-account.phtml:20
 msgid "3. Fill in the Name, Title and click \"add\""
 msgstr "3. 填写分组的标识, 全称, 点击 \"添加\""
 
-#: view/gapper/auth/gapper/group_account.phtml:21
-msgid "assets/img/gapper-no-account/group/add_group.png"
-msgstr "assets/img/gapper-no-account/group/add_group_zh.png"
-
-#: view/gapper/auth/gapper/group_account.phtml:24
+#: view/gapper/auth/gapper/group-account.phtml:24
 msgid "4. Click \"new app\", search for the application you want"
 msgstr "4. 点击 \"新增应用\", 搜索应用名称"
 
-#: view/gapper/auth/gapper/group_account.phtml:25
-msgid "assets/img/gapper-no-account/group/search_app.png"
-msgstr "assets/img/gapper-no-account/group/search_app_zh.png"
-
-#: view/gapper/auth/gapper/group_account.phtml:28
+#: view/gapper/auth/gapper/group-account.phtml:28
 msgid "5. There it is, you have installed the app"
 msgstr "5. 完成应用的添加, 点击应用"
 
-#: view/gapper/auth/gapper/group_account.phtml:29
-msgid "assets/img/gapper-no-account/group/launch_app.png"
-msgstr "assets/img/gapper-no-account/group/launch_app_zh.png"
-
-#: view/gapper/auth/gapper/group_account.phtml:32
-#: view/gapper/auth/gapper/user_account.phtml:28
+#: view/gapper/auth/gapper/group-account.phtml:32
+#: view/gapper/auth/gapper/user-account.phtml:28
 msgid "Get it. Go to sign up"
 msgstr "懂了. 去注册"
 
@@ -110,33 +90,17 @@ msgstr "忘记密码?"
 msgid "Log In"
 msgstr "登录"
 
-#: view/gapper/auth/gapper/user_account.phtml:13
-msgid "assets/img/gapper-no-account/user/signup.png"
-msgstr "assets/img/gapper-no-account/user/signup_zh.png"
-
-#: view/gapper/auth/gapper/user_account.phtml:16
+#: view/gapper/auth/gapper/user-account.phtml:16
 msgid "2. Click the \"new app\" on the right side"
 msgstr "2. 点击最右侧的 \"新增应用\""
 
-#: view/gapper/auth/gapper/user_account.phtml:17
-msgid "assets/img/gapper-no-account/user/new_app.png"
-msgstr "assets/img/gapper-no-account/user/new_app_zh.png"
-
-#: view/gapper/auth/gapper/user_account.phtml:20
+#: view/gapper/auth/gapper/user-account.phtml:20
 msgid "3. Search for the application you want"
 msgstr "3. 在搜索框中搜索应用"
 
-#: view/gapper/auth/gapper/user_account.phtml:21
-msgid "assets/img/gapper-no-account/user/search_app.png"
-msgstr "assets/img/gapper-no-account/user/search_app_zh.png"
-
-#: view/gapper/auth/gapper/user_account.phtml:24
+#: view/gapper/auth/gapper/user-account.phtml:24
 msgid "4. There it is, you have installed the app"
 msgstr "4. 完成应用的添加, 点击应用"
-
-#: view/gapper/auth/gapper/user_account.phtml:25
-msgid "assets/img/gapper-no-account/user/launch_app.png"
-msgstr "assets/img/gapper-no-account/user/launch_app_zh.png"
 
 #: view/gapper/client/checkauth.phtml:5
 msgid "Please Choose Your Authentication Method"

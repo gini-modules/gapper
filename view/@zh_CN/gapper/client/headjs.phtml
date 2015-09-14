@@ -1,0 +1,12 @@
+<script data-main="<?= H(RURL('gapper/client/main.js', 'js')) ?>" src="<?= H(RURL('require.js', 'js')) ?>"></script>
+<!--[if lt IE 9]>
+<script src="<?= H(RURL('html5shiv.js', 'js')) ?>"></script>
+<script src="<?= H(RURL('respond.js', 'js')) ?>"></script>
+<![endif]-->
+<?php if (!empty($vars)) {?>
+<script>
+<?php foreach ($vars as $var=>$value) {?>
+window[<?=J($var)?>] = <?=J($value)?>;
+<?php }?>
+</script>
+<?php }?>
