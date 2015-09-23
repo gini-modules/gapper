@@ -90,12 +90,7 @@ class Client
             return self::STEP_LOGIN;
         }
 
-        try {
-            $app = self::getRPC()->gapper->app->getInfo($client_id);
-        } catch (\Gini\RPC\Exception $e) {
-            $app = [];
-        }
-
+        $app = self::getRPC()->gapper->app->getInfo($client_id);
         if (!isset($app['id'])) {
             return self::STEP_LOGIN;
         }
@@ -113,11 +108,7 @@ class Client
                 return self::STEP_GROUP_401;
             }
         } elseif ($app['type'] === 'user') {
-            try {
-                $apps = (array) self::getRPC()->gapper->user->getApps(self::getUserName());
-            } catch (\Gini\RPC\Exception $e) {
-                $apps = [];
-            }
+            $apps = (array) self::getRPC()->gapper->user->getApps(self::getUserName());
             if (!in_array($client_id, $apps)) {
                 return self::STEP_USER_401;
             }
@@ -183,12 +174,10 @@ class Client
         if (!self::getUserName()) {
             return;
         }
-        try {
-            $data = self::getRPC()->gapper->user->getInfo([
-                'username' => self::getUserName(),
-            ]);
-        } catch (\Gini\RPC\Exception $e) {
-        }
+
+        $data = self::getRPC()->gapper->user->getInfo([
+            'username' => self::getUserName(),
+        ]);
 
         return $data;
     }
@@ -201,10 +190,7 @@ class Client
             return false;
         }
 
-        try {
-            $app = self::getRPC()->gapper->app->getInfo($client_id);
-        } catch (\Exception $e) {
-        }
+        $app = self::getRPC()->gapper->app->getInfo($client_id);
         if (!$app['id']) {
             return false;
         }

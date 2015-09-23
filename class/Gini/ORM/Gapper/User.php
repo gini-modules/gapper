@@ -59,12 +59,7 @@ class User extends RObject
             return [];
         }
 
-        try {
-            return (array) static::getRPC()->gapper->user->getInfo($user_id);
-        } catch (\Gini\RPC\Exception $e) {
-        }
-
-        return [];
+        return (array) static::getRPC()->gapper->user->getInfo($user_id);
     }
 
     public function convertRPCData(array $rdata)
@@ -104,12 +99,7 @@ class User extends RObject
             \Gini\Logger::of('orm')->debug("cache hits on $key");
         } else {
             \Gini\Logger::of('orm')->debug("cache missed on $key");
-
-            try {
-                $data = static::getRPC()->gapper->user->getGroupInfo((int) $this->id, (int) $group->id);
-            } catch (\Gini\RPC\Exception $e) {
-            }
-
+            $data = static::getRPC()->gapper->user->getGroupInfo((int) $this->id, (int) $group->id);
             // set ttl to 5 sec
             $cacher->set($key, $data, $this->cacheTimeout);
         }
