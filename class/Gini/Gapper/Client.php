@@ -90,12 +90,7 @@ class Client
             return self::STEP_LOGIN;
         }
 
-        try {
-            $app = self::getRPC()->gapper->app->getInfo($client_id);
-        } catch (\Gini\RPC\Exception $e) {
-            $app = [];
-        }
-
+        $app = self::getRPC()->gapper->app->getInfo($client_id);
         if (!isset($app['id'])) {
             return self::STEP_LOGIN;
         }
@@ -113,11 +108,7 @@ class Client
                 return self::STEP_GROUP_401;
             }
         } elseif ($app['type'] === 'user') {
-            try {
-                $apps = (array) self::getRPC()->gapper->user->getApps(self::getUserName());
-            } catch (\Gini\RPC\Exception $e) {
-                $apps = [];
-            }
+            $apps = (array) self::getRPC()->gapper->user->getApps(self::getUserName());
             if (!in_array($client_id, $apps)) {
                 return self::STEP_USER_401;
             }
@@ -136,10 +127,7 @@ class Client
 
     public static function loginByToken($token)
     {
-        try {
-            $user = self::getRPC()->gapper->user->authorizeByToken($token);
-        } catch (\Exception $e) {
-        }
+        $user = self::getRPC()->gapper->user->authorizeByToken($token);
         if ($user && $user['username']) {
             return self::loginByUserName($user['username']);
         }
@@ -183,12 +171,10 @@ class Client
         if (!self::getUserName()) {
             return;
         }
-        try {
-            $data = self::getRPC()->gapper->user->getInfo([
-                'username' => self::getUserName(),
-            ]);
-        } catch (\Gini\RPC\Exception $e) {
-        }
+
+        $data = self::getRPC()->gapper->user->getInfo([
+            'username' => self::getUserName(),
+        ]);
 
         return $data;
     }
@@ -201,10 +187,7 @@ class Client
             return false;
         }
 
-        try {
-            $app = self::getRPC()->gapper->app->getInfo($client_id);
-        } catch (\Exception $e) {
-        }
+        $app = self::getRPC()->gapper->app->getInfo($client_id);
         if (!$app['id']) {
             return false;
         }
@@ -214,23 +197,17 @@ class Client
             return false;
         }
 
-        try {
-            $groups = self::getRPC()->gapper->user->getGroups($username);
-        } catch (\Exception $e) {
-        }
+        $groups = self::getRPC()->gapper->user->getGroups($username);
         if (empty($groups)) {
             return false;
         }
 
         $result = [];
-        try {
-            foreach ($groups as $k => $g) {
-                $apps = self::getRPC()->gapper->group->getApps((int) $g['id']);
-                if (is_array($apps) && in_array($client_id, array_keys($apps))) {
-                    $result[$k] = $g;
-                }
+        foreach ($groups as $k => $g) {
+            $apps = self::getRPC()->gapper->group->getApps((int) $g['id']);
+            if (is_array($apps) && in_array($client_id, array_keys($apps))) {
+                $result[$k] = $g;
             }
-        } catch (\Exception $e) {
         }
 
         return $result;
@@ -250,10 +227,8 @@ class Client
         if (!$client_id) {
             return false;
         }
-        try {
-            $app = self::getRPC()->gapper->app->getInfo($client_id);
-        } catch (\Exception $e) {
-        }
+
+        $app = self::getRPC()->gapper->app->getInfo($client_id);
         if (!$app['id']) {
             return false;
         }
@@ -263,10 +238,7 @@ class Client
             return false;
         }
 
-        try {
-            $groups = self::getRPC()->gapper->user->getGroups($username);
-        } catch (\Exception $e) {
-        }
+        $groups = self::getRPC()->gapper->user->getGroups($username);
         if (!is_array($groups) || !in_array($groupID, array_keys($groups))) {
             return false;
         }
@@ -288,21 +260,14 @@ class Client
     {
         if (self::hasSession(self::$keyGroupID)) {
             $groupID = self::getSession(self::$keyGroupID);
-            try {
-                $data = self::getRPC()->gapper->group->getInfo((int) $groupID);
-            } catch (\Exception $e) {
-            }
-
-            return $data;
+            return self::getRPC()->gapper->group->getInfo((int) $groupID);
         }
     }
 
     public static function getGroupID()
     {
         if (self::hasSession(self::$keyGroupID)) {
-            $groupID = self::getSession(self::$keyGroupID);
-
-            return $groupID;
+            return self::getSession(self::$keyGroupID);
         }
     }
 

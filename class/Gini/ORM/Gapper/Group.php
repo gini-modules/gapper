@@ -12,11 +12,7 @@ class Group extends RObject
 
     protected function fetchRPC($criteria)
     {
-        try {
-            return (array) self::getRPC()->gapper->group->getInfo($criteria);
-        } catch (\Gini\RPC\Exception $e) {
-            return [];
-        }
+        return (array) self::getRPC()->gapper->group->getInfo($criteria);
     }
 
     public function convertRPCData(array $rdata)
@@ -38,13 +34,8 @@ class Group extends RObject
 
     public function getMembers()
     {
-        try {
-            $result = [];
-            $members = (array) self::getRPC()->gapper->group->getMembers($this->id);
-
-            return $members;
-        } catch (\Gini\RPC\Exception $e) {
-        }
+        $members = (array) self::getRPC()->gapper->group->getMembers($this->id);
+        return $members;
     }
 
     public function icon($size = null)

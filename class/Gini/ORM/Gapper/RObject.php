@@ -20,12 +20,9 @@ abstract class RObject extends \Gini\ORM\Object
     {
         if (!self::$_RPC) {
             $conf = \Gini\Config::get('gapper.rpc');
-            try {
-                $rpc = \Gini\IoC::construct('\Gini\RPC', $conf['url']);
-                $rpc->gapper->app->authorize($conf['client_id'], $conf['client_secret']);
-                self::$_RPC = $rpc;
-            } catch (RPC\Exception $e) {
-            }
+            $rpc = \Gini\IoC::construct('\Gini\RPC', $conf['url']);
+            $rpc->gapper->app->authorize($conf['client_id'], $conf['client_secret']);
+            self::$_RPC = $rpc;
         }
 
         return self::$_RPC;
