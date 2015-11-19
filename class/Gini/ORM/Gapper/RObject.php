@@ -87,19 +87,4 @@ abstract class RObject extends \Gini\ORM\Object
         return false;
     }
 
-    // 为了提高效率和稳定性, 如果访问的是id, 我们就直接返回目前已有的值, 而不直接实例化
-    public function __get($name)
-    {
-        // 1. 还没有调用 fetch
-        // 2. 访问的是 id
-        // 3. 初始化条件中有且仅有 id, (因为有别的条件的时候推测是可能期望通过抓取来筛选的)
-        if ($this->_db_time == 0 && $name == 'id') {
-            $criteria = $this->criteria();
-            if (count($criteria) == 1 && isset($criteria['id'])) {
-                return $criteria['id'];
-            }
-        }
-
-        return parent::__get($name);
-    }
 }
