@@ -55,7 +55,7 @@ class Client extends \Gini\Controller\CGI\Gapper
         return $this->redirect($url);
     }
 
-    public function actionGo($client_id, $group_id)
+    public function actionGo($client_id, $group_id = null)
     {
         if (\Gini\Gapper\Client::getLoginStep() !== \Gini\Gapper\Client::STEP_DONE) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
