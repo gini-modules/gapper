@@ -19,7 +19,8 @@ class Client extends \Gini\Controller\CGI\Gapper
         $newTo = parse_url($to);
         if (!isset($newTo['scheme']) && !isset($newTo['host'])) {
             $newTo = (strpos('/', $to)!==0) ? "/{$to}" : $to;
-            $to = "{$newBase['scheme']}://{$newBase['host']}{$newTo}";
+            $newPort = isset($newBase['port']) ? ":{$newBase['port']}" : '';
+            $to = "{$newBase['scheme']}://{$newBase['host']}{$newPort}{$newTo}";
             return true;
         }
 
