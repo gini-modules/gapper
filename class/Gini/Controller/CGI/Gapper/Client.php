@@ -6,14 +6,24 @@ class Client extends \Gini\Controller\CGI\Gapper
 {
     use \Gini\Module\Gapper\Client\RPCTrait;
 
-    private function _checkUrl($base, $to)
+    private function _checkUrl($base, &$to)
     {
         if (empty($base) || empty($to)) {
             return false;
         }
-        $base = parse_url($base);
-        $to = parse_url($to);
-        if ($base['host'] != $to['host']) {
+        $newBase = parse_url($base);
+        if (!isset($newBase['scheme']) || !isset($newBase['host'])) {
+            return false;
+        }
+
+        $newTo = parse_url($to);
+        if (!isset($newTo['scheme']) && !isset($newTo['host'])) {
+            $newTo = (strpos('/', $to)!==0) ? "/{$to}" : $to;
+            $to = "{$newBase['scheme']}://{$newBase['host']}{$newTo}";
+            return true;
+        }
+
+        if ($newBase['host'] != $newTo['host']) {
             return false;
         }
 
