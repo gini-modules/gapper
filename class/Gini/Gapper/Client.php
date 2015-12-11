@@ -281,12 +281,7 @@ class Client
 
     public static function goLogin()
     {
-        $redirect = $_SERVER['REQUEST_URI'];
-        $redirect = \Gini\RUI::url($redirect, [
-            'gapper_token'=> '',
-            'gapper_group'=> ''
-        ]);
-        $url = \Gini\URI::url('gapper/client/login', ['redirect' => $redirect]);
+        $url = \Gini\URI::url('gapper/client/login', ['redirect' => $_SERVER['REQUEST_URI']]);
         \Gini\CGI::redirect($url);
     }
 }
