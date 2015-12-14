@@ -92,7 +92,7 @@ class Client extends \Gini\Controller\CGI\Gapper
 
         $url = $app['url'];
         $confs = \Gini\Config::get('gapper.proxy');
-        foreach ($confs as $conf) {
+        foreach ((array)$confs as $conf) {
             if ($url==$conf['url']) {
                 $url = $conf['proxy'] ?: $url;
                 break;
