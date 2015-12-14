@@ -16,6 +16,14 @@ class Client extends \Gini\Controller\CGI\Gapper
             return false;
         }
 
+        $confs = \Gini\Config::get('gapper.proxy');
+        foreach ($confs as $conf) {
+            if ($newBase['host']==$conf['host']) {
+                $newBase['host'] = $conf['proxy'] ?: $newBase['host'];
+                break;
+            }
+        }
+
         $newTo = parse_url($to);
         if (!isset($newTo['scheme']) && !isset($newTo['host'])) {
             $newTo = (strpos('/', $to)!==0) ? "/{$to}" : $to;
@@ -89,6 +97,7 @@ class Client extends \Gini\Controller\CGI\Gapper
         if (!$token) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
+
         $url = $app['url'];
         if ($this->_checkUrl($url, $redirect)) {
             $url = $redirect;
@@ -106,7 +115,10 @@ class Client extends \Gini\Controller\CGI\Gapper
     {
         $redirect = $_GET['redirect'];
         if (\Gini\Gapper\Client::getLoginStep() === \Gini\Gapper\Client::STEP_DONE) {
-            $redirect = $this->_checkUrl('/', $redirect) ? $redirect : '/';
+            $host = $_SERVER['HTTP_HOST'];
+            $port = $_SERVER['SERVER_PORT'];
+            $port = $port=='80' ? '' : ":{$port}";
+            $redirect = $this->_checkUrl("http://{$host}{$port}/", $redirect) ? $redirect : '/';
 
             return $this->redirect($redirect);
         }
