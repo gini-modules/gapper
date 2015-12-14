@@ -16,14 +16,6 @@ class Client extends \Gini\Controller\CGI\Gapper
             return false;
         }
 
-        $confs = \Gini\Config::get('gapper.proxy');
-        foreach ($confs as $conf) {
-            if ($newBase['host']==$conf['host']) {
-                $newBase['host'] = $conf['proxy'] ?: $newBase['host'];
-                break;
-            }
-        }
-
         $newTo = parse_url($to);
         if (!isset($newTo['scheme']) && !isset($newTo['host'])) {
             $newTo = (strpos('/', $to)!==0) ? "/{$to}" : $to;
@@ -99,6 +91,12 @@ class Client extends \Gini\Controller\CGI\Gapper
         }
 
         $url = $app['url'];
+        $confs = \Gini\Config::get('gapper.proxy');
+        foreach ($confs as $conf) {
+            if ($url==$conf['url']) {
+                $url = $conf['proxy'] ?: $url;
+            }
+        }
         if ($this->_checkUrl($url, $redirect)) {
             $url = $redirect;
         }

@@ -3,6 +3,9 @@ auth:
   gapper:
     icon: assets/img/gapper-auth-gapper/logo.png
     name: Gapper
+# proxy:
+#   - url: http://url/
+#     proxy: http://proxy.url/
 # 3rd:
 #   sso:
 #     condition: sso
