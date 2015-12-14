@@ -95,6 +95,7 @@ class Client extends \Gini\Controller\CGI\Gapper
         foreach ($confs as $conf) {
             if ($url==$conf['url']) {
                 $url = $conf['proxy'] ?: $url;
+                break;
             }
         }
         if ($this->_checkUrl($url, $redirect)) {
