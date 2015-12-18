@@ -115,9 +115,7 @@ class Client extends \Gini\Controller\CGI\Gapper
         $redirect = $_GET['redirect'];
         if (\Gini\Gapper\Client::getLoginStep() === \Gini\Gapper\Client::STEP_DONE) {
             $host = $_SERVER['HTTP_HOST'];
-            $port = $_SERVER['SERVER_PORT'];
-            $port = $port=='80' ? '' : ":{$port}";
-            $redirect = $this->_checkUrl("http://{$host}{$port}/", $redirect) ? $redirect : '/';
+            $redirect = $this->_checkUrl("http://{$host}/", $redirect) ? $redirect : '/';
 
             return $this->redirect($redirect);
         }
