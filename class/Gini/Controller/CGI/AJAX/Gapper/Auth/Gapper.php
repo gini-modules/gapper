@@ -74,10 +74,13 @@ class Gapper extends \Gini\Controller\CGI
                 // 登录成功直接返回TRUE, 又有有前端页面控制如何进行接下来的行为
                 // return $this->_showJSON(true);
                 // 我现在对他做如下修改:
-                //  如果用户只有一个组，那我就直接给他选择这个
-                $groups = \Gini\Gapper\Client::getGroups();
-                if ($groups && count($groups) == 1) {
-                    \Gini\Gapper\Client::chooseGroup(current($groups)['id']);
+                //   登录成功，直接当前页面选组
+                $bool = \Gini\CGI::request('ajax/gapper/client/sources', $this->env)->execute()->content();
+                if ($bool!==true && $bool) {
+                    return $this->_showJSON([
+                        'type'=> 'modal',
+                        'message'=> $bool
+                    ]);
                 }
                 return $this->_showJSON(true);
             }
