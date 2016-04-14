@@ -20,14 +20,14 @@ class Group extends RObject
         $data = [];
         $data['id'] = $rdata['id'];
         $data['name'] = $rdata['name'];
-        $data['creator'] = a('user', ['username' => $rdata['creator']]);
+        $data['creator_id'] = a('user', ['username' => $rdata['creator']])->id;
 
         $data['title'] = $rdata['title'];
         $data['abbr'] = $rdata['abbr'];
 
         $data['icon'] = $rdata['icon'];
 
-        $data['_extra'] = J(array_diff_key($rdata, array_flip(['id', 'name', 'title', 'abbr', 'creator', 'icon'])));
+        $data['_extra'] = J(array_diff_key($rdata, array_flip(['id', 'name', 'title', 'abbr', 'creator_id', 'icon'])));
 
         return $data;
     }
