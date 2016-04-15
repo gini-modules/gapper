@@ -37,7 +37,7 @@ class Step extends \Gini\Controller\CGI
             return \Gini\CGI::request('ajax/gpper/auth/gapper/getform', $this->env)->execute();
         }
 
-        return $this->_showHTML((string) V('gapper/client/checkauth', ['sources' => $sources]));
+        return $this->_showHTML('gapper/client/checkauth', ['sources' => $sources]);
     }
 
     public function actionGroup()
@@ -52,7 +52,7 @@ class Step extends \Gini\Controller\CGI
 
         $data['groups'] = $groups;
 
-        return $this->_showHTML((string) V('gapper/client/checkgroup', $data));
+        return $this->_showHTML('gapper/client/checkgroup', $data);
     }
 
     public function actionUser401() 
@@ -60,7 +60,7 @@ class Step extends \Gini\Controller\CGI
         \Gini\Gapper\Client::logout();
         $view = \Gini\Config::get('gapper.views')['client/error/401-user'] ?: 'gapper/client/error/401-user';
 
-        return $this->_showHTML((string) V($view));
+        return $this->_showHTML($view);
     }
 
     public function actionGroup401()
@@ -68,7 +68,7 @@ class Step extends \Gini\Controller\CGI
         \Gini\Gapper\Client::logout();
         $view = \Gini\Config::get('gapper.views')['client/error/401-group'] ?: 'gapper/client/error/401-group';
 
-        return $this->_showHTML((string) V($view));
+        return $this->_showHTML($view);
     }
 
     public function actionDone()
