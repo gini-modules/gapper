@@ -34,7 +34,10 @@ class Step extends \Gini\Controller\CGI
         }
 
         if (count($sources) == 1) {
-            return \Gini\CGI::request('ajax/gpper/auth/gapper/getform', $this->env)->execute();
+            return $this->_showHTML('gapper/auth/gapper/login', [
+                'info' => (object) \Gini\Config::get('gapper.auth')['gapper'],
+                'hasMultiLogType' => !!(count(array_keys($conf)) > 1)
+            ]);
         }
 
         return $this->_showHTML('gapper/client/checkauth', ['sources' => $sources]);
