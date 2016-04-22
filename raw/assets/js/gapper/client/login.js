@@ -6,6 +6,15 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 		dialog.prev('.modal-backdrop').remove();
 		dialog.remove();
 	};
+	var showDialog = function(html, callback) {
+		clearDialog();
+		dialog = $(html);
+		dialog.modal({
+			show: true
+			,backdrop: 'static'
+		});
+		callback && callback();
+	};
 	var showLogin = function() {
 		if (isWaitingLogin) return false;
 		isWaitingLogin = true;
@@ -16,18 +25,29 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 			}
 			if ($.isPlainObject(data)) {
 				var redirectURL = data.redirect;
-				window.location.href = redirectURL;
+				var message = data.message;
+				var callback = function() {
+					setTimeout(function() {
+						window.location.href = redirectURL;
+					}, 10);
+					setTimeout(function() {
+						isWaitingLogin = false;
+					}, 2000);
+				};
+
+				if (message) {
+					showDialog(message, callback);
+				}
+				else {
+					callback();
+				}
 				return;
 			}
-			clearDialog();
-			dialog = $(data);
-			dialog.modal({
-				show: true
-				,backdrop: 'static'
+			showDialog(data, function() {
+				setTimeout(function() {
+					isWaitingLogin = false;
+				}, 2000);
 			});
-			setTimeout(function() {
-				isWaitingLogin = false;
-			}, 2000);
 		});
 	};
 

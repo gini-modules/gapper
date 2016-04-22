@@ -81,7 +81,8 @@ class Step extends \Gini\Controller\CGI
         parse_str($query, $params);
         $redirectURL = \Gini\URI::url($params['redirect']);
         return $this->_showJSON([
-            'redirect'=> $redirectURL
+            'redirect'=> $redirectURL,
+            'message'=> (string)V('gapper/client/step/redirect')
         ]);
     }
 }
