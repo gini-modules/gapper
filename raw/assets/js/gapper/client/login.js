@@ -14,6 +14,10 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 			if (data === true) {
 				return window.location.reload();
 			}
+			if ($.isPlainObject(data)) {
+				var redirectURL = data.redirect;
+				window.location.href = redirectURL;
+			}
 			clearDialog();
 			dialog = $(data);
 			dialog.modal({
