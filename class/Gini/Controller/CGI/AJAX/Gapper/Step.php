@@ -49,7 +49,7 @@ class Step extends \Gini\Controller\CGI
         if ($groups && count($groups) == 1) {
             $bool = \Gini\Gapper\Client::chooseGroup(current($groups)['id']);
             if ($bool) {
-                return $this->actionDone();
+                return \Gini\CGI::request('ajax/gapper/step/done', $this->env)->execute();
             }
         }
 
