@@ -45,6 +45,9 @@ class Step extends \Gini\Controller\CGI
 
     public function actionGroup()
     {
+        $result = self::_trySourceMethod('group');
+        if ($result) return $result;
+
         $groups = \Gini\Gapper\Client::getGroups();
         if ($groups && count($groups) == 1) {
             $bool = \Gini\Gapper\Client::chooseGroup(current($groups)['id']);
@@ -60,6 +63,9 @@ class Step extends \Gini\Controller\CGI
 
     public function actionUser401() 
     {
+        $result = self::_trySourceMethod('user401');
+        if ($result) return $result;
+
         \Gini\Gapper\Client::logout();
         $view = \Gini\Config::get('gapper.views')['client/error/401-user'] ?: 'gapper/client/error/401-user';
 
@@ -68,6 +74,9 @@ class Step extends \Gini\Controller\CGI
 
     public function actionGroup401()
     {
+        $result = self::_trySourceMethod('group401');
+        if ($result) return $result;
+
         \Gini\Gapper\Client::logout();
         $view = \Gini\Config::get('gapper.views')['client/error/401-group'] ?: 'gapper/client/error/401-group';
 
@@ -76,14 +85,28 @@ class Step extends \Gini\Controller\CGI
 
     public function actionDone()
     {
+        $result = self::_trySourceMethod('groupDone');
+        if ($result) return $result;
+
         $referer = parse_url(\Gini\URI::url($_SERVER['HTTP_REFERER']));
         $query = $referer['query'];
         parse_str($query, $params);
         $redirectURL = \Gini\URI::url($params['redirect']);
         return $this->_showJSON([
             'redirect'=> $redirectURL,
-            'message'=> (string)V('gapper/client/step/redirect')
+            'message'=> (string)V('gapper/client/redirect')
         ]);
+    }
+
+    private static function _trySourceMethod($method)
+    {
+        $source = Auth::getSource();
+        if ($source) {
+            $className = "\Gini\Controller\CGI\AJAX\Gapper\Auth\{$source}\Step\{$method}";
+            if (class_exists($className)) {
+                return \Gini\CGI::request("ajax/gapper/auth/{$source}/step/{$method}", $this->env)->execute();
+            }
+        }
     }
 }
 

@@ -60,7 +60,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 		var $that = $(this);
 		if ($that.attr('data-gapper-auth-source')) {
 			var source = $that.attr('data-gapper-auth-source');
-			var url = 'ajax/gapper/auth/' + source + '/getForm';
+			var url = 'ajax/gapper/auth/getForm/' + source;
 			$.get(url, function(data) {
 				if ($.isPlainObject(data)) {
 					window.location.href = data.redirect;
