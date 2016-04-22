@@ -17,6 +17,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 			if ($.isPlainObject(data)) {
 				var redirectURL = data.redirect;
 				window.location.href = redirectURL;
+				return;
 			}
 			clearDialog();
 			dialog = $(data);
