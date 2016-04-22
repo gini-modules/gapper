@@ -49,13 +49,7 @@ class Step extends \Gini\Controller\CGI
         if ($groups && count($groups) == 1) {
             $bool = \Gini\Gapper\Client::chooseGroup(current($groups)['id']);
             if ($bool) {
-                $referer = parse_url(\Gini\URI::url($_SERVER['HTTP_REFERER']));
-                $query = $referer['query'];
-                parse_str($query, $params);
-                $redirectURL = \Gini\URI::url($params['redirect']);
-                return $this->_showJSON([
-                    'redirect'=> $redirectURL
-                ]);
+                return $this->actionDone();
             }
         }
 
@@ -82,7 +76,13 @@ class Step extends \Gini\Controller\CGI
 
     public function actionDone()
     {
-        return $this->_showJSON(true);
+        $referer = parse_url(\Gini\URI::url($_SERVER['HTTP_REFERER']));
+        $query = $referer['query'];
+        parse_str($query, $params);
+        $redirectURL = \Gini\URI::url($params['redirect']);
+        return $this->_showJSON([
+            'redirect'=> $redirectURL
+        ]);
     }
 }
 
