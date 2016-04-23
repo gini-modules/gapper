@@ -127,8 +127,23 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 							showLogin();
 						});
 						break;
-					default:
+					case 'alert':
 						bootbox.alert(pData);
+						break;
+					default:
+						if (pData.redirect) {
+							var callback = function() {
+								setTimeout(function() {
+									window.location.href = pData.redirect;
+								}, 10);
+							};
+							if (pData.message) {
+								showDialog(pData.message, callback);
+							}
+							else {
+								callback();
+							}
+						}
 				}
 			}
 			setTimeout(function() {
