@@ -77,6 +77,9 @@ class Gapper extends \Gini\Controller\CGI
                 //   登录成功，直接当前页面选组
                 $bool = \Gini\CGI::request('ajax/gapper/client/sources', $this->env)->execute()->content();
                 if ($bool!==true && $bool) {
+                    if (is_array($bool)) {
+                        return $this->_showJSON($bool);
+                    }
                     return $this->_showJSON([
                         'type'=> 'modal',
                         'message'=> (string)$bool
