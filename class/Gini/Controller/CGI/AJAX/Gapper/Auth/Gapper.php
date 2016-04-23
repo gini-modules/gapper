@@ -79,7 +79,7 @@ class Gapper extends \Gini\Controller\CGI
                 if ($bool!==true && $bool) {
                     return $this->_showJSON([
                         'type'=> 'modal',
-                        'message'=> $bool
+                        'message'=> (string)$bool
                     ]);
                 }
                 return $this->_showJSON(true);
