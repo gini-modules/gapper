@@ -85,7 +85,7 @@ class Gapper extends \Gini\Controller\CGI
                         'message'=> (string)$bool
                     ]);
                 }
-                return $this->_showJSON(true);
+                return \Gini\CGI::request('ajax/gapper/step/done', $this->env)->execute();
             }
         }
 
@@ -111,7 +111,7 @@ class Gapper extends \Gini\Controller\CGI
 
         $bool = \Gini\Gapper\Client::chooseGroup($form['id']);
         if ($bool) {
-            return $this->_showJSON(true);
+            return \Gini\CGI::request('ajax/gapper/step/done', $this->env)->execute();
         }
 
         return $this->_showJSON(T('Access Denied!'));

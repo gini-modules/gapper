@@ -96,6 +96,25 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 				if (true === data) {
 					window.location.reload();
 				}
+				if ($.isPlainObject(data) && data.redirect) {
+					window.location.href = data.redirect;
+					return;
+				}
+				if ($.isPlainObject(data) && data.type == 'modal' && data.message) {
+					data = data.message;
+					clearDialog();
+					dialog = $(data);
+					dialog.modal({
+						show: true
+						,backdrop: 'static'
+					});
+					dialog.on('hide.bs.modal', function() {
+						showLogin();
+					});
+					setTimeout(function() {
+						isWaitingClick = false;
+					}, 2000);
+				}
 				else {
 					bootbox.alert(data);
 				}
