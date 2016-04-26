@@ -23,7 +23,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 			if (data === true) {
 				return window.location.reload();
 			}
-			if ($.isPlainObject(data)) {
+			if ($.isPlainObject(data) && data.redirect && data.message) {
 				var redirectURL = data.redirect;
 				var message = data.message;
 				var callback = function() {
@@ -42,6 +42,9 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 					callback();
 				}
 				return;
+			}
+			if ($.isPlainObject(data) && data.type == 'modal' && data.message) {
+				data = data.message;
 			}
 			showDialog(data, function() {
 				setTimeout(function() {
@@ -62,9 +65,12 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 			var source = $that.attr('data-gapper-auth-source');
 			var url = 'ajax/gapper/auth/getForm/' + source;
 			$.get(url, function(data) {
-				if ($.isPlainObject(data)) {
+				if ($.isPlainObject(data) && data.redirect) {
 					window.location.href = data.redirect;
 					return;
+				}
+				if ($.isPlainObject(data) && data.type == 'modal' && data.message) {
+					data = data.message;
 				}
 				clearDialog();
 				dialog = $(data);
