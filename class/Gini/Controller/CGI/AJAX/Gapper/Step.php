@@ -45,7 +45,7 @@ class Step extends \Gini\Controller\CGI
 
     public function actionGroup()
     {
-        $result = self::_trySourceMethod('group');
+        $result = $this->_trySourceMethod('group');
         if ($result) return $result;
 
         $groups = \Gini\Gapper\Client::getGroups();
@@ -63,7 +63,7 @@ class Step extends \Gini\Controller\CGI
 
     public function actionUser401() 
     {
-        $result = self::_trySourceMethod('user401');
+        $result = $this->_trySourceMethod('user401');
         if ($result) return $result;
 
         \Gini\Gapper\Client::logout();
@@ -74,7 +74,7 @@ class Step extends \Gini\Controller\CGI
 
     public function actionGroup401()
     {
-        $result = self::_trySourceMethod('group401');
+        $result = $this->_trySourceMethod('group401');
         if ($result) return $result;
 
         \Gini\Gapper\Client::logout();
@@ -85,7 +85,7 @@ class Step extends \Gini\Controller\CGI
 
     public function actionDone()
     {
-        $result = self::_trySourceMethod('groupDone');
+        $result = $this->_trySourceMethod('groupDone');
         if ($result) return $result;
 
         $referer = parse_url(\Gini\URI::url($_SERVER['HTTP_REFERER']));
@@ -98,7 +98,7 @@ class Step extends \Gini\Controller\CGI
         ]);
     }
 
-    private static function _trySourceMethod($method)
+    private function _trySourceMethod($method)
     {
         $source = Auth::getSource();
         if ($source) {
