@@ -1,4 +1,4 @@
-define('utils/require', ['jquery'], function($) {
+define('gapper/client/utils/require', ['jquery'], function($) {
 	$(function() {
 		var run = function() {
 			$('[data-require]').each(function() {
