@@ -108,12 +108,6 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 						show: true
 						,backdrop: 'static'
 					});
-					dialog.on('hide.bs.modal', function() {
-						showLogin();
-					});
-					setTimeout(function() {
-						isWaitingClick = false;
-					}, 2000);
 				}
 				else {
 					bootbox.alert(data);
