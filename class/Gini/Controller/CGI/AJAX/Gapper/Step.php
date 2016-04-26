@@ -102,7 +102,7 @@ class Step extends \Gini\Controller\CGI
     {
         $source = Auth::getSource();
         if ($source) {
-            $className = "\Gini\Controller\CGI\AJAX\Gapper\Auth\{$source}\Step\{$method}";
+            $className = "\\Gini\\Controller\\CGI\\AJAX\\Gapper\\Auth\\{$source}\\Step\\{$method}";
             if (class_exists($className)) {
                 return \Gini\CGI::request("ajax/gapper/auth/{$source}/step/{$method}", $this->env)->execute();
             }
