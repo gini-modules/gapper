@@ -91,7 +91,10 @@ class Step extends \Gini\Controller\CGI
         $referer = parse_url(\Gini\URI::url($_SERVER['HTTP_REFERER']));
         $query = $referer['query'];
         parse_str($query, $params);
-        $redirectURL = \Gini\URI::url($params['redirect']?:'/');
+        $redirectURL = \Gini\URI::url($params['redirect']?:'/', [
+            'gapper-token'=> '',
+            'gapper-group'=> ''
+        ]);
         return $this->_showJSON([
             'redirect'=> $redirectURL,
             'message'=> (string)V('gapper/client/redirect')

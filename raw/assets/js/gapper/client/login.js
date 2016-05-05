@@ -33,7 +33,9 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 		isWaitingLogin = true;
 		var url = 'ajax/gapper/client/sources';
 		showLoadingDialog();
-		$.get(url, function(data) {
+		$.get(url, {
+			_t: (new Date()).getTime()
+		}, function(data) {
 			clearLoadingDialog();
 			if (data === true) {
 				return window.location.reload();
@@ -80,7 +82,9 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 			var source = $that.attr('data-gapper-auth-source');
 			var url = 'ajax/gapper/auth/getForm/' + source;
 			showLoadingDialog();
-			$.get(url, function(data) {
+			$.get(url, {
+				_t: (new Date()).getTime()
+			}, function(data) {
 				clearLoadingDialog();
 				if ($.isPlainObject(data) && data.redirect) {
 					window.location.href = data.redirect;
