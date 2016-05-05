@@ -12,7 +12,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 		loadingDialog.remove();
 	};
 	var showLoadingDialog = function() {
-		clearDialog();
+		clearLoadingDialog();
 		loadingDialog = $('<div class="modal"><div class="modal-dialog"><div class="modal-content"><h2 class="text-center"><span class="fa fa-spinner fa-spin fa-2x"></span></h2></div></div></div>');
 		loadingDialog.modal({
 			show: true
