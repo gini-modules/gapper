@@ -1,10 +1,23 @@
 define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-choose-group'], function($, bootbox) {
-	var dialog;
+	var dialog, loadingDialog;
 	var isWaitingLogin = false;
 	var clearDialog = function() {
 		if (!dialog || ! dialog.length) return;
 		dialog.prev('.modal-backdrop').remove();
 		dialog.remove();
+	};
+	var clearLoadingDialog = function() {
+		if (!loadingDialog || ! loadingDialog.length) return;
+		loadingDialog.prev('.modal-backdrop').remove();
+		loadingDialog.remove();
+	};
+	var showLoadingDialog = function() {
+		clearDialog();
+		loadingDialog = $('<div class="modal"><div class="modal-dialog"><div class="modal-content"><h2 class="text-center"><span class="fa fa-spinner fa-spin fa-2x"></span></h2></div></div></div>');
+		loadingDialog.modal({
+			show: true
+			,backdrop: 'static'
+		});
 	};
 	var showDialog = function(html, callback) {
 		clearDialog();
@@ -19,7 +32,9 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 		if (isWaitingLogin) return false;
 		isWaitingLogin = true;
 		var url = 'ajax/gapper/client/sources';
+		showLoadingDialog();
 		$.get(url, function(data) {
+			clearLoadingDialog();
 			if (data === true) {
 				return window.location.reload();
 			}
@@ -64,7 +79,9 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 		if ($that.attr('data-gapper-auth-source')) {
 			var source = $that.attr('data-gapper-auth-source');
 			var url = 'ajax/gapper/auth/getForm/' + source;
+			showLoadingDialog();
 			$.get(url, function(data) {
+				clearLoadingDialog();
 				if ($.isPlainObject(data) && data.redirect) {
 					window.location.href = data.redirect;
 					return;
@@ -87,6 +104,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 			});
 		}
 		if ($that.attr('data-gapper-client-group')) {
+			showLoadingDialog();
 			$.post('ajax/gapper/auth/gapper/choose', {
 				id: $that.attr('data-gapper-client-group')
 			}, function(data) {
@@ -100,6 +118,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 					window.location.href = data.redirect;
 					return;
 				}
+				clearLoadingDialog();
 				if ($.isPlainObject(data) && data.type == 'modal' && data.message) {
 					data = data.message;
 					clearDialog();
@@ -125,6 +144,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 		var $that = $(this).parents(classForm);
 		var url = $that.attr('action');
 		var data = $that.serialize();
+		showLoadingDialog();
 		$.post(url, data, function(pData) {
 			if (true === pData) {
 				window.location.reload();
@@ -136,6 +156,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 				};
 				switch (tData.type) {
 					case 'modal':
+						clearLoadingDialog();
 						clearDialog();
 						dialog = $(tData.message);
 						dialog.modal({
@@ -147,6 +168,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 						});
 						break;
 					case 'alert':
+						clearLoadingDialog();
 						bootbox.alert(pData);
 						break;
 					default:
