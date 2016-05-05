@@ -179,6 +179,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 								}, 10);
 							};
 							if (pData.message) {
+								clearLoadingDialog();
 								showDialog(pData.message, callback);
 							}
 							else {
