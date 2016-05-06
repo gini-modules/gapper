@@ -81,6 +81,10 @@ class Client
         }
     }
 
+    public static function getId() {
+        return \Gini\Config::get('gapper.rpc')['client_id'] ?: false;
+    }
+
     public static function getLoginStep()
     {
         // 错误的client信息，用户无法登陆

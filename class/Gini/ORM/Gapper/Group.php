@@ -46,6 +46,19 @@ class Group extends RObject
         return $result;
     }
 
+    public function getApps()
+    {
+        if (!$this->id) return [];
+        $cache = \Gini\Cache::of('orm');
+        $key = 'group['.$this->id.'].apps';
+        $apps = $cache->get($key);
+        if ($apps === false) {
+            $apps = (array) self::getRPC()->gapper->group->getApps($this->id);
+            $cache->set($key, $apps, 300);
+        }
+        return $apps;
+    }
+
     public function icon($size = null)
     {
         $url = $this->icon;
