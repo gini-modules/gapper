@@ -85,16 +85,23 @@ class Client
         return \Gini\Config::get('gapper.rpc')['client_id'] ?: false;
     }
 
+    public static function getInfo()
+    {
+        $info = [];
+        $client_id = self::getId();
+        if (!$client_id) return $info;
+        $info = self::getRPC()->gapper->app->getInfo($client_id);
+        return $info;
+    }
+
     public static function getLoginStep()
     {
-        // 错误的client信息，用户无法登陆
-        $config = \Gini\Config::get('gapper.rpc');
-        $client_id = $config['client_id'];
+        $client_id = self::getId();
         if (!$client_id) {
             return self::STEP_LOGIN;
         }
 
-        $app = self::getRPC()->gapper->app->getInfo($client_id);
+        $app = self::getInfo();
         if (!isset($app['id'])) {
             return self::STEP_LOGIN;
         }
@@ -144,13 +151,8 @@ class Client
     private static function setUserName($username)
     {
         // 错误的client信息，用户无法登陆
-        $config = \Gini\Config::get('gapper.rpc');
-        $client_id = $config['client_id'];
-        if (!$client_id) {
-            return false;
-        }
         try {
-            $app = self::getRPC()->gapper->app->getInfo($client_id);
+            $app = self::getInfo();
         } catch (\Exception $e) {
         }
         if (!$app['id']) {
@@ -185,13 +187,12 @@ class Client
 
     public static function getGroups()
     {
-        $config = \Gini\Config::get('gapper.rpc');
-        $client_id = $config['client_id'];
+        $client_id = self::getId();
         if (!$client_id) {
             return false;
         }
 
-        $app = self::getRPC()->gapper->app->getInfo($client_id);
+        $app = self::getInfo();
         if (!$app['id']) {
             return false;
         }
@@ -226,13 +227,12 @@ class Client
 
     public static function chooseGroup($groupID)
     {
-        $config = (array) \Gini\Config::get('gapper.rpc');
-        $client_id = $config['client_id'];
+        $client_id = self::getId();
         if (!$client_id) {
             return false;
         }
 
-        $app = self::getRPC()->gapper->app->getInfo($client_id);
+        $app = self::getInfo();
         if (!$app['id']) {
             return false;
         }
