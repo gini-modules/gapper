@@ -185,6 +185,21 @@ class Client
         return $data;
     }
 
+    public static function getUserByIdentity($source, $ident)
+    {
+        return self::getRPC()->Gapper->User->getUserByIdentity($source, $ident);
+    }
+
+    public static function linkIdentity($source, $ident)
+    {
+        $username = self::getUserName();
+        if (!$username) {
+            return false;
+        }
+
+        return self::getRPC()->Gapper->User->linkIdentity($username, $source, $ident);
+    }
+
     public static function getGroups()
     {
         $client_id = self::getId();
@@ -202,14 +217,15 @@ class Client
             return false;
         }
 
-        $groups = self::getRPC()->gapper->user->getGroups($username);
+        $rpc = self::getRPC();
+        $groups = $rpc->gapper->user->getGroups($username);
         if (empty($groups)) {
             return false;
         }
 
         $result = [];
         foreach ($groups as $k => $g) {
-            $apps = self::getRPC()->gapper->group->getApps((int) $g['id']);
+            $apps = $rpc->gapper->group->getApps((int) $g['id']);
             if (is_array($apps) && in_array($client_id, array_keys($apps))) {
                 $result[$k] = $g;
             }
@@ -283,9 +299,9 @@ class Client
         return true;
     }
 
-    public static function goLogin()
+    public static function goLogin($redirect=null)
     {
-        $url = \Gini\URI::url('gapper/client/login', ['redirect' => $_SERVER['REQUEST_URI']]);
+        $url = \Gini\URI::url('gapper/client/login', ['redirect' => $redirect ?: $_SERVER['REQUEST_URI']]);
         \Gini\CGI::redirect($url);
     }
 }

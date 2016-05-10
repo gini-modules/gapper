@@ -4,8 +4,6 @@ namespace Gini\Controller\CGI\Gapper;
 
 class Client extends \Gini\Controller\CGI\Gapper
 {
-    use \Gini\Module\Gapper\Client\RPCTrait;
-
     private function _checkUrl($base, &$to)
     {
         if (empty($base) || empty($to)) {
@@ -54,7 +52,7 @@ class Client extends \Gini\Controller\CGI\Gapper
 
         $user = \Gini\Gapper\Client::getUserInfo();
         if ($user['id']) {
-            $token = self::getRPC()->gapper->user->getLoginToken((int) $user['id'], $client_id);
+            $token = \Gini\Gapper\Client::getRPC()->gapper->user->getLoginToken((int) $user['id'], $client_id);
         }
 
         if ($token) {
@@ -77,7 +75,7 @@ class Client extends \Gini\Controller\CGI\Gapper
         if (!$client_id) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
-        $app = self::getRPC()->gapper->app->getInfo($client_id);
+        $app = \Gini\Gapper\Client::getRPC()->gapper->app->getInfo($client_id);
         if (!$app['id']) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
@@ -85,7 +83,7 @@ class Client extends \Gini\Controller\CGI\Gapper
         if (!$user['id']) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
-        $token = self::getRPC()->gapper->user->getLoginToken((int) $user['id'], $client_id);
+        $token = \Gini\Gapper\Client::getRPC()->gapper->user->getLoginToken((int) $user['id'], $client_id);
         if (!$token) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
@@ -130,7 +128,7 @@ class Client extends \Gini\Controller\CGI\Gapper
         if (!$client_id) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
-        $app = self::getRPC()->gapper->app->getInfo($client_id);
+        $app = \Gini\Gapper\Client::getRPC()->gapper->app->getInfo($client_id);
         if ($app['type'] == 'group') {
             $view = \Gini\Config::get('gapper.group_account_view') ?: 'gapper/client/group-account';
             parent::setJSVar('ACTION', 'group_account');

@@ -13,8 +13,6 @@ namespace Gini\Gapper;
 
 class SSO
 {
-    use \Gini\Module\Gapper\Client\RPCTrait;
-
     private $_url;
     private $_type;
     private $_params;
@@ -50,7 +48,7 @@ class SSO
         $username = $results[$result];
 
         if ($source) {
-            $user = (array) self::getRPC()->gapper->user->getUserByIdentity($source, $username);
+            $user = (array) \Gini\Gapper\Client::getRPC()->gapper->user->getUserByIdentity($source, $username);
             $username = $user['username'];
         }
 

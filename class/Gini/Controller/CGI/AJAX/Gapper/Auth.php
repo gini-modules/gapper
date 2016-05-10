@@ -8,7 +8,7 @@ class Auth extends \Gini\Controller\CGI
     public function actionGetForm($source)
     {
         $_SESSION[self::$_sessionKey] = strtoupper($source);
-        return \Gini\CGI::request("ajax/gapper/auth/{$source}/getForm", $this->env)->execute();
+        return \Gini\CGI::request("ajax/gapper/auth/{$source}/get-form", $this->env)->execute();
     }
 
     public static function getSource()
