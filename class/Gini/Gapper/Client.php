@@ -21,7 +21,23 @@ namespace Gini\Gapper;
 
 class Client
 {
-    use \Gini\Module\Gapper\Client\RPCTrait;
+    private static $_RPC;
+    public static function getRPC()
+    {
+        if (!self::$_RPC) {
+            $config = (array) \Gini\Config::get('gapper.rpc');
+            $api = $config['url'];
+            $client_id = $config['client_id'];
+            $client_secret = $config['client_secret'];
+            self::$_RPC = $rpc = \Gini\IoC::construct('\Gini\RPC', $api);
+            $token = $rpc->gapper->app->authorize($client_id, $client_secret);
+            if (!$token) {
+                \Gini\Logger::of('gapper')->error('Your app was not registered in gapper server!');
+            }
+        }
+
+        return self::$_RPC;
+    }
 
     const STEP_LOGIN = 0;
     const STEP_GROUP = 1;
