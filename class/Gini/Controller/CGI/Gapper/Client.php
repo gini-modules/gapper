@@ -32,7 +32,24 @@ class Client extends \Gini\Controller\CGI\Gapper
     public function actionGoHome()
     {
         $paths = func_get_args();
+        $homeAPPClientID = \Gini\Config::get('gapper.home_app_client');
+        if (!$homeAPPClientID) {
+            return $this->_goDefaultHome($paths);
+        }
 
+        $user = \Gini\Gapper\Client::getUserName();
+        if (!$user) {
+            $rpc = \Gini\Gapper\Client::getRPC();
+            $appInfo = $rpc->gapper->app->getInfo($homeAPPClientID);
+            $url = $appInfo['url'] ?: '/';
+            $this->redirect($url);
+            return;
+        }
+        return $this->actionGo($homeAPPClientID);
+    }
+
+    private function _goDefaultHome($paths=null)
+    {
         $config = (array) \Gini\Config::get('gapper.rpc');
         $client_id = $config['client_id'];
         if (!$client_id) {

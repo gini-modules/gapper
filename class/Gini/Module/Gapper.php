@@ -21,5 +21,24 @@ namespace Gini\Module
             \Gini\I18N::setup();
              */
         }
+
+        public static function diagnose()
+        {
+            $errors = [];
+
+            $serverHome = \Gini\Config::get('gapper.server_home');
+            if (!$serverHome) {
+                $errors[] = '如果不设置gapper.server_home，默认server_home的值为http://gapper.in';
+            }
+
+            $homeAPPClientID = \Gini\Config::get('gapper.home_app_client');
+            if (!$homeAPPClientID) {
+                $errors[] = '如果不设置gapper.home_app_client，默认首页将跳转到gapper.server_home定义的主页';
+            }
+
+            if (!empty($errors)) {
+                return $errors;
+            }
+        }
     }
 }
