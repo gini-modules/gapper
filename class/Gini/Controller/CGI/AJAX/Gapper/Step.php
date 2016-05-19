@@ -29,7 +29,7 @@ class Step extends \Gini\Controller\CGI
         $sources = [];
         foreach ($conf as $key => $info) {
             $key = strtolower($key);
-            $info['name'] = T($info['name']);
+            $info['name'] = $info['name'];
             $sources[$key] = $info;
         }
 
