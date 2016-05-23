@@ -8,7 +8,7 @@ namespace Gini\ORM\Gapper;
 abstract class RObject extends \Gini\ORM\Object
 {
     //缓存时间
-    protected $cacheTimeout = 5;
+    protected $cacheTimeout = 300;
 
     /**
      * 获取默认指定API路径的RPC对象
