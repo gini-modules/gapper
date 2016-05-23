@@ -101,13 +101,15 @@ class Client
         return \Gini\Config::get('gapper.rpc')['client_id'] ?: false;
     }
 
+    private static $_info;
     public static function getInfo()
     {
-        $info = [];
         $client_id = self::getId();
-        if (!$client_id) return $info;
-        $info = self::getRPC()->gapper->app->getInfo($client_id);
-        return $info;
+        if (!$client_id) return [];
+        if (!self::$_info) {
+            self::$_info = self::getRPC()->gapper->app->getInfo($client_id);
+        }
+        return self::$_info;
     }
 
     public static function getLoginStep()
@@ -188,17 +190,22 @@ class Client
         return $username;
     }
 
+    private static $_userInfo = [];
     public static function getUserInfo()
     {
-        if (!self::getUserName()) {
+        $username = self::getUserName();
+        if (!$username) {
             return;
         }
 
-        $data = self::getRPC()->gapper->user->getInfo([
-            'username' => self::getUserName(),
-        ]);
+        if (!isset(self::$_userInfo[$username])) {
+            self::$_userInfo[$username]
+                = self::getRPC()->gapper->user->getInfo([
+                    'username' => $username,
+                ]);
+        }
 
-        return $data;
+        return self::$_userInfo[$username];
     }
 
     public static function getUserByIdentity($source, $ident)
@@ -292,11 +299,15 @@ class Client
         return false;
     }
 
+    private static $_groupInfo = [];
     public static function getGroupInfo()
     {
         if (self::hasSession(self::$keyGroupID)) {
             $groupID = self::getSession(self::$keyGroupID);
-            return self::getRPC()->gapper->group->getInfo((int) $groupID);
+            if (!isset(self::$_groupInfo[$groupID])) {
+                self::$_groupInfo[$groupID] = self::getRPC()->gapper->group->getInfo((int)$groupID);
+            }
+            return self::$_groupInfo[$groupID];
         }
     }
 
