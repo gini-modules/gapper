@@ -93,6 +93,11 @@ class Client extends \Gini\Controller\CGI\Gapper
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
 
+        $app = \Gini\Gapper\Client::getRPC()->gapper->app->getInfo($client_id);
+        if (!$app['id'] || !$app['url']) {
+            return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
+        }
+
         $username = \Gini\Gapper\Client::getUserName();
         if (!$username) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
