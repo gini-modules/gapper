@@ -37,8 +37,8 @@ class Client extends \Gini\Controller\CGI\Gapper
             return $this->_goDefaultHome($paths);
         }
 
-        $user = \Gini\Gapper\Client::getUserName();
-        if (!$user) {
+        $username = \Gini\Gapper\Client::getUserName();
+        if (!$username) {
             $rpc = \Gini\Gapper\Client::getRPC();
             $appInfo = $rpc->gapper->app->getInfo($homeAPPClientID);
             $url = $appInfo['url'] ?: '/';
@@ -67,9 +67,9 @@ class Client extends \Gini\Controller\CGI\Gapper
             $url .= '/'.implode('/', $paths);
         }
 
-        $user = \Gini\Gapper\Client::getUserInfo();
-        if ($user['id']) {
-            $token = \Gini\Gapper\Client::getRPC()->gapper->user->getLoginToken((int) $user['id'], $client_id);
+        $username = \Gini\Gapper\Client::getUserName();
+        if ($username) {
+            $token = \Gini\Gapper\Client::getRPC()->gapper->user->getLoginToken($username, $client_id);
         }
 
         if ($token) {
@@ -92,15 +92,13 @@ class Client extends \Gini\Controller\CGI\Gapper
         if (!$client_id) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
-        $app = \Gini\Gapper\Client::getRPC()->gapper->app->getInfo($client_id);
-        if (!$app['id']) {
+
+        $username = \Gini\Gapper\Client::getUserName();
+        if (!$username) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
-        $user = \Gini\Gapper\Client::getUserInfo();
-        if (!$user['id']) {
-            return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
-        }
-        $token = \Gini\Gapper\Client::getRPC()->gapper->user->getLoginToken((int) $user['id'], $client_id);
+
+        $token = \Gini\Gapper\Client::getRPC()->gapper->user->getLoginToken($username, $client_id);
         if (!$token) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
