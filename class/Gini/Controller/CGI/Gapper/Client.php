@@ -138,14 +138,13 @@ class Client extends \Gini\Controller\CGI\Gapper
         $view = \Gini\Config::get('gapper.login_view') ?: 'gapper/client/login';
         $this->view->body = VV($view);
     }
+
     public function actionNoAccount()
     {
-        $config = (array) \Gini\Config::get('gapper.rpc');
-        $client_id = $config['client_id'];
-        if (!$client_id) {
+        if (!\Gini\Gapper\Client::getId()) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
-        $app = \Gini\Gapper\Client::getRPC()->gapper->app->getInfo($client_id);
+        $app = \Gini\Gapper\Client::getInfo();
         if ($app['type'] == 'group') {
             $view = \Gini\Config::get('gapper.group_account_view') ?: 'gapper/client/group-account';
             parent::setJSVar('ACTION', 'group_account');
@@ -156,4 +155,5 @@ class Client extends \Gini\Controller\CGI\Gapper
             $this->view->body = VV($view);
         }
     }
+
 }

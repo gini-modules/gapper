@@ -107,6 +107,11 @@ class User extends RObject
         return (array) $data;
     }
 
+    public function linkIdentity($source, $ident) {
+        if (!$this->id) return false;
+        return self::getRPC()->Gapper->User->linkIdentity($this->username, $source, $ident);
+    }
+
     public function icon($size = null)
     {
         $url = $this->icon;
