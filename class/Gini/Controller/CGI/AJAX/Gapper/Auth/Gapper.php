@@ -13,8 +13,6 @@ namespace Gini\Controller\CGI\AJAX\Gapper\Auth;
 
 class Gapper extends \Gini\Controller\CGI
 {
-    use \Gini\Module\Gapper\Client\RPCTrait;
-
     private function _showJSON($data)
     {
         return \Gini\IoC::construct('\Gini\CGI\Response\JSON', $data);
@@ -63,7 +61,7 @@ class Gapper extends \Gini\Controller\CGI
         $username = $form['username'];
         $password = $form['password'];
         try {
-            $bool = self::getRPC()->gapper->user->verify($username, $password);
+            $bool = \Gini\Gapper\Client::getRPC()->gapper->user->verify($username, $password);
         } catch (\Exception $e) {
         }
 
