@@ -334,7 +334,7 @@ class Client
 
     public static function getGroupApps($groupID=null)
     {
-        $groupID = self::getGroupID();
+        $groupID = $groupID ?: self::getGroupID();
         $cacheKey = "app#group#{$groupID}#apps";
         $apps = self::cache($cacheKey);
         if (empty($apps)) {
