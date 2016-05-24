@@ -47,7 +47,7 @@ class Client
             }
         }
 
-        return self::$_RPC;
+        return $rpc;
     }
 
     const STEP_LOGIN = 0;
