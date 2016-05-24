@@ -24,26 +24,26 @@ class Client
     private static $_RPC;
     public static function getRPC()
     {
-        if (!self::$_RPC) {
-            $config = (array) \Gini\Config::get('gapper.rpc');
-            $api = $config['url'];
-            $client_id = $config['client_id'];
-            $client_secret = $config['client_secret'];
-            $cacheKey = "app#client#{$client_id}#session_id";
-            $token = self::cache($cacheKey);
-            $rpc = \Gini\IoC::construct('\Gini\RPC', $api);
-            if ($token) {
-                $rpc->setHeader(["x-gini-session: {$token}"]);
+        if (self::$_RPC) return self::$_RPC;
+
+        $config = (array) \Gini\Config::get('gapper.rpc');
+        $api = $config['url'];
+        $client_id = $config['client_id'];
+        $client_secret = $config['client_secret'];
+        $cacheKey = "app#client#{$client_id}#session_id";
+        $token = self::cache($cacheKey);
+        $rpc = \Gini\IoC::construct('\Gini\RPC', $api);
+        if ($token) {
+            $rpc->setHeader(["x-gini-session: {$token}"]);
+        }
+        else {
+            $token = $rpc->gapper->app->authorize($client_id, $client_secret);
+            if (!$token) {
+                \Gini\Logger::of('gapper')->error('Your app was not registered in gapper server!');
             }
             else {
-                $token = $rpc->gapper->app->authorize($client_id, $client_secret);
-                if (!$token) {
-                    \Gini\Logger::of('gapper')->error('Your app was not registered in gapper server!');
-                }
-                else {
-                    self::cache($cacheKey, $token);
-                    self::$_RPC = $rpc;
-                }
+                self::cache($cacheKey, $token);
+                self::$_RPC = $rpc;
             }
         }
 
@@ -371,7 +371,7 @@ class Client
         $cacheKey = "app#user#{$username}#{$toClientID}#logintoken";
         $token = self::cache($cacheKey);
         if (!$token) {
-            $token = \Gini\Gapper\Client::getRPC()->gapper->user->getLoginToken($username, $toClientID);
+            $token = self::getRPC()->gapper->user->getLoginToken($username, $toClientID);
             self::cache($cacheKey, $token);
         }
         return $token;
