@@ -33,9 +33,7 @@ class Client
             $token = self::cache($cacheKey);
             $rpc = \Gini\IoC::construct('\Gini\RPC', $api);
             if ($token) {
-                $rpc->setHeader([
-                    'X-Gini-Session'=> $token
-                ]);
+                $rpc->setHeader(["x-gini-session: {$token}"]);
             }
             else {
                 $token = $rpc->gapper->app->authorize($client_id, $client_secret);
