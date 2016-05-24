@@ -42,9 +42,9 @@ class Client
                 }
                 else {
                     self::cache($cacheKey, $token);
+                    self::$_RPC = $rpc;
                 }
             }
-            self::$_RPC = $rpc;
         }
 
         return self::$_RPC;
@@ -266,7 +266,7 @@ class Client
             return false;
         }
 
-        $cacheKey = "app#user#{$username}#groups";
+        $cacheKey = "app#user#{$client_id}#{$username}#groups";
         $groups = self::cache($cacheKey);
         if (empty($groups)) {
             $groups = self::getRPC()->gapper->user->getGroups($username);
@@ -312,7 +312,7 @@ class Client
             return false;
         }
 
-        $cacheKey = "app#user#{$username}#groups";
+        $cacheKey = "app#user#{$client_id}#{$username}#groups";
         $groups = self::cache($cacheKey);
         if (empty($groups)) {
             $groups = self::getRPC()->gapper->user->getGroups($username);
