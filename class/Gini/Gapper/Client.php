@@ -29,11 +29,13 @@ class Client
             $api = $config['url'];
             $client_id = $config['client_id'];
             $client_secret = $config['client_secret'];
-            $cacheKey = "app#client#{$client_id}#cookie";
-            $cookie = self::cache($cacheKey);
+            $cacheKey = "app#client#{$client_id}#session_id";
+            $token = self::cache($cacheKey);
             $rpc = \Gini\IoC::construct('\Gini\RPC', $api);
             if ($cookie) {
-                $rpc->setCookie($cookie);
+                $rpc->setHeader([
+                    'X-Gini-Session'=> $token
+                ]);
             }
             else {
                 $token = $rpc->gapper->app->authorize($client_id, $client_secret);
@@ -41,7 +43,7 @@ class Client
                     \Gini\Logger::of('gapper')->error('Your app was not registered in gapper server!');
                 }
                 else {
-                    self::cache($cacheKey, $rpc->getCookie());
+                    self::cache($cacheKey, $token);
                 }
             }
             self::$_RPC = $rpc;
