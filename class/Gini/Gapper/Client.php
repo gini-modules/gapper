@@ -32,7 +32,7 @@ class Client
             $cacheKey = "app#client#{$client_id}#session_id";
             $token = self::cache($cacheKey);
             $rpc = \Gini\IoC::construct('\Gini\RPC', $api);
-            if ($cookie) {
+            if ($token) {
                 $rpc->setHeader([
                     'X-Gini-Session'=> $token
                 ]);
@@ -271,6 +271,7 @@ class Client
         $groups = self::cache($cacheKey);
         if (empty($groups)) {
             $groups = self::getRPC()->gapper->user->getGroups($username);
+            self::cache($cacheKey, $groups);
         }
 
         if (empty($groups)) {
@@ -352,7 +353,8 @@ class Client
             $cacheKey = "app#group#{$groupID}#info";
             $info = self::cache($cacheKey);
             if (!$info) {
-                 $info = self::getRPC()->gapper->group->getInfo((int)$groupID);
+                $info = self::getRPC()->gapper->group->getInfo((int)$groupID);
+                self::cache($cacheKey, $info);
             }
         }
         return $info;
