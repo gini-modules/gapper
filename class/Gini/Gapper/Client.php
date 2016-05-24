@@ -112,9 +112,9 @@ class Client
         return \Gini\Config::get('gapper.rpc')['client_id'] ?: false;
     }
 
-    public static function getInfo()
+    public static function getInfo($client_id=null)
     {
-        $client_id = self::getId();
+        $client_id = $client_id ?: self::getId();
         if (!$client_id) return [];
         $cacheKey = "app#client#{$client_id}#info";
         $info = self::cache($cacheKey);
@@ -208,9 +208,9 @@ class Client
     }
 
     private static $_userInfo = [];
-    public static function getUserInfo()
+    public static function getUserInfo($username=null)
     {
-        $username = self::getUserName();
+        $username = $username ?: self::getUserName();
         if (!$username) {
             return;
         }
@@ -238,9 +238,9 @@ class Client
         return $info;
     }
 
-    public static function linkIdentity($source, $ident)
+    public static function linkIdentity($source, $ident, $username=null)
     {
-        $username = self::getUserName();
+        $username = $username ?: self::getUserName();
         if (!$username) {
             return false;
         }
@@ -248,7 +248,7 @@ class Client
         return self::getRPC()->Gapper->User->linkIdentity($username, $source, $ident);
     }
 
-    public static function getGroups()
+    public static function getGroups($username=null)
     {
         $client_id = self::getId();
         if (!$client_id) {
@@ -261,6 +261,7 @@ class Client
         }
 
         $username = self::getUserName();
+        $username = $username ?: self::getUserName();
         if (!$username) {
             return false;
         }
@@ -278,12 +279,7 @@ class Client
 
         $result = [];
         foreach ($groups as $k => $g) {
-            $cacheKey = "app#group#{$g['id']}#apps";
-            $apps = self::cache($cacheKey);
-            if (empty($apps)) {
-                $apps = self::getRPC()->gapper->group->getApps((int) $g['id']);
-                self::cache($cacheKey, $apps);
-            }
+            $apps = self::getGroupApps((int)$g['id']);
             if (is_array($apps) && in_array($client_id, array_keys($apps))) {
                 $result[$k] = $g;
             }
@@ -326,15 +322,7 @@ class Client
             return false;
         }
 
-        try {
-            $cacheKey = "app#group#{$groupID}#apps";
-            $apps = self::cache($cacheKey);
-            if (empty($apps)) {
-                $apps = self::getRPC()->gapper->group->getApps((int) $groupID);
-                self::cache($cacheKey, $apps);
-            }
-        } catch (\Exception $e) {
-        }
+        $apps = self::getGroupApps((int)$groupID);
         if (is_array($apps) && in_array($client_id, array_keys($apps))) {
             self::setSession(self::$keyGroupID, $groupID);
 
@@ -342,6 +330,18 @@ class Client
         }
 
         return false;
+    }
+
+    public static function getGroupApps($groupID=null)
+    {
+        $groupID = self::getGroupID();
+        $cacheKey = "app#group#{$groupID}#apps";
+        $apps = self::cache($cacheKey);
+        if (empty($apps)) {
+            $apps = self::getRPC()->gapper->group->getApps((int)$groupID);
+            self::cache($cacheKey, $apps);
+        }
+        return $apps;
     }
 
     public static function getGroupInfo()
@@ -363,6 +363,18 @@ class Client
         if (self::hasSession(self::$keyGroupID)) {
             return self::getSession(self::$keyGroupID);
         }
+    }
+
+    public static function getLoginToken($toClientID, $username=null)
+    {
+        $username = $username ?: self::getUserName();
+        $cacheKey = "app#user#{$username}#{$toClientID}#logintoken";
+        $token = self::cache($cacheKey);
+        if (!$token) {
+            $token = \Gini\Gapper\Client::getRPC()->gapper->user->getLoginToken($username, $toClientID);
+            self::cache($cacheKey, $token);
+        }
+        return $token;
     }
 
     public static function logout()
