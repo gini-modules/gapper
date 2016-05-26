@@ -397,6 +397,6 @@ class Client
         if (is_null($value)) {
             return $cacher->get($key);
         }
-        $cacher->set($key, $value, 60);
+        $cacher->set($key, $value, 300);
     }
 }
