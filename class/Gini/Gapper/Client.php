@@ -159,7 +159,7 @@ class Client
                 $apps = (array) self::getRPC()->gapper->user->getApps($username);
                 self::cache($cacheKey, $apps);
             }
-            if (!in_array($client_id, $apps)) {
+            if (!isset($apps[$client_id])) {
                 return self::STEP_USER_401;
             }
         }
@@ -289,7 +289,7 @@ class Client
         $result = [];
         foreach ($groups as $k => $g) {
             $apps = self::getGroupApps((int)$g['id'], $force);
-            if (is_array($apps) && in_array($client_id, array_keys($apps))) {
+            if (is_array($apps) && isset($apps[$client_id])) {
                 $result[$k] = $g;
             }
         }
