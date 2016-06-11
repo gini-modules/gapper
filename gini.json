@@ -4,7 +4,7 @@
     "description": "Gapper API",
     "version": "0.3.33",
     "dependencies": {
-        "gini": ">=0.5.0",
+        "gini": ">=1.5.2",
         "cache": "*",
         "image-cache": "*"
     }

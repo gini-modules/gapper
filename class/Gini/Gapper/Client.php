@@ -34,14 +34,12 @@ class Client
         $token = self::cache($cacheKey);
         $rpc = \Gini\IoC::construct('\Gini\RPC', $api);
         if ($token) {
-            $rpc->setHeader(["x-gini-session: {$token}"]);
-        }
-        else {
+            $rpc->setHeader(['X-Gini-Session' => $token]);
+        } else {
             $token = $rpc->gapper->app->authorize($client_id, $client_secret);
             if (!$token) {
                 \Gini\Logger::of('gapper')->error('Your app was not registered in gapper server!');
-            }
-            else {
+            } else {
                 self::cache($cacheKey, $token);
                 self::$_RPC = $rpc;
             }
