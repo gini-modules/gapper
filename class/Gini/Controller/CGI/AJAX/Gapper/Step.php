@@ -103,7 +103,7 @@ class Step extends \Gini\Controller\CGI
 
     private function _trySourceMethod($method)
     {
-        $source = Auth::getSource();
+        $source = Auth::getSource() ?: 'gapper';
         if ($source) {
             $className = "\\Gini\\Controller\\CGI\\AJAX\\Gapper\\Auth\\{$source}\\Step\\{$method}";
             if (class_exists($className)) {
