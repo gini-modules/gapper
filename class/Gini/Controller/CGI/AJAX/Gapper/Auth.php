@@ -13,7 +13,7 @@ class Auth extends \Gini\Controller\CGI
 
     public static function getSource()
     {
-        return $_SESSION[self::$_sessionKey];
+        return $_SESSION[self::$_sessionKey] ?: 'gapper';
     }
 }
 
