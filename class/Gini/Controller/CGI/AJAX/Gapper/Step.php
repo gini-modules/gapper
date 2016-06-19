@@ -61,7 +61,7 @@ class Step extends \Gini\Controller\CGI
         return $this->_showHTML('gapper/client/checkgroup', $data);
     }
 
-    public function actionUser401() 
+    public function actionUser401()
     {
         $result = $this->_trySourceMethod('user401');
         if ($result) return $result;
@@ -76,8 +76,6 @@ class Step extends \Gini\Controller\CGI
     {
         $result = $this->_trySourceMethod('group401');
         if ($result) return $result;
-
-        \Gini\Gapper\Client::logout();
         $view = \Gini\Config::get('gapper.views')['client/error/401-group'] ?: 'gapper/client/error/401-group';
 
         return $this->_showHTML($view);
