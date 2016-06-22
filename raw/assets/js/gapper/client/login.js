@@ -22,6 +22,9 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
     var showDialog = function(html, callback) {
         clearDialog();
         dialog = $(html);
+        if (!dialog.hasClass('modal')) {
+            dialog = $(['<div class="modal fade">', '<div class="modal-dialog">', '<div class="modal-content">', '<div class="modal-body">', '<button class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>', '<h4 class="modal-title">', html, '</h4>', '</div>', '</div>', '</div>', '</div>'].join(''))
+        }
         dialog.modal({
             show: true
             ,backdrop: 'static'
@@ -125,16 +128,8 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
                 clearLoadingDialog();
                 if ($.isPlainObject(data) && data.type == 'modal' && data.message) {
                     data = data.message;
-                    clearDialog();
-                    dialog = $(data);
-                    dialog.modal({
-                        show: true
-                        ,backdrop: 'static'
-                    });
                 }
-                else {
-                    sAlert(data);
-                }
+                showDialog(data);
             });
         }
     });
@@ -173,7 +168,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
                         break;
                     case 'alert':
                         clearLoadingDialog();
-                        sAlert(pData);
+                        showDialog(pData);
                         break;
                     default:
                         if (pData.redirect) {
@@ -198,11 +193,6 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
         });
         return false;
     });
-
-    function sAlert(data) {
-        var html = ['<div class="modal fade">', '<div class="modal-dialog">', '<div class="modal-content">', '<div class="modal-body">', '<button class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>', '<h4 class="modal-title">', data, '</h4>', '</div>', '</div>', '</div>', '</div>'].join('');
-        showDialog(html);
-    }
 
     $(document).on('click', '.modal .close', function() {
         isWaitingLogin = true;
