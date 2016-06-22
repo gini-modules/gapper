@@ -66,7 +66,6 @@ class Step extends \Gini\Controller\CGI
         $result = $this->_trySourceMethod('user401');
         if ($result) return $result;
 
-        \Gini\Gapper\Client::logout();
         $view = \Gini\Config::get('gapper.views')['client/error/401-user'] ?: 'gapper/client/error/401-user';
 
         return $this->_showHTML($view);

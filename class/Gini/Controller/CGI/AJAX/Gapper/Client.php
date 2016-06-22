@@ -36,4 +36,10 @@ class Client extends \Gini\Controller\CGI
             return \Gini\CGI::request('ajax/gapper/step/done', $this->env)->execute();
         }
     }
+
+    public function actionLogout()
+    {
+        \Gini\Gapper\Client::logout();
+        return \Gini\IoC::construct('\Gini\CGI\Response\JSON', true);
+    }
 }

@@ -133,7 +133,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
                     });
                 }
                 else {
-                    bootbox.alert(data);
+                    sAlert(data);
                 }
             });
         }
@@ -173,7 +173,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
                         break;
                     case 'alert':
                         clearLoadingDialog();
-                        bootbox.alert(pData);
+                        sAlert(pData);
                         break;
                     default:
                         if (pData.redirect) {
@@ -197,6 +197,21 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
             }, 2000);
         });
         return false;
+    });
+
+    function sAlert(data) {
+        var html = ['<div class="modal fade">', '<div class="modal-dialog">', '<div class="modal-content">', '<div class="modal-body">', '<button class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>', '<h4 class="modal-title">', data, '</h4>', '</div>', '</div>', '</div>', '</div>'].join('');
+        showDialog(html);
+    }
+
+    $(document).on('click', '.modal .close', function() {
+        isWaitingLogin = true;
+        $.get('ajax/gapper/client/logout', {
+            _t: (new Date()).getTime()
+        }, function() {
+            isWaitingLogin = false;
+            showLogin();
+        });
     });
 
     var data = {
