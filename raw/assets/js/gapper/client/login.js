@@ -100,7 +100,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
                     ,backdrop: 'static'
                 });
                 dialog.on('hide.bs.modal', function() {
-                    showLogin();
+                    setTimeout(showLogin, 10);
                 });
                 setTimeout(function() {
                     isWaitingClick = false;
@@ -168,7 +168,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
                             ,backdrop: 'static'
                         });
                         dialog.on('hide.bs.modal', function() {
-                            showLogin();
+                            setTimeout(showLogin, 10);
                         });
                         break;
                     case 'alert':
@@ -210,7 +210,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
             _t: (new Date()).getTime()
         }, function() {
             isWaitingLogin = false;
-            showLogin();
+            setTimeout(showLogin, 10);
         });
     });
 
