@@ -5,6 +5,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
         if (!dialog || ! dialog.length) return;
         dialog.prev('.modal-backdrop').remove();
         dialog.remove();
+        dialog = undefined;
     };
     var clearLoadingDialog = function() {
         if (!loadingDialog || ! loadingDialog.length) return;
@@ -21,10 +22,10 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
     };
     var showDialog = function(html, callback) {
         clearDialog();
-        dialog = $('<div></div>');
-        dialog.html(html);
-        dialog = dialog.find('.modal');
-        if (!dialog.length) {
+        try {
+            dialog = $(html);
+        } catch(err) {}
+        if (!dialog || ! dialog.hasClass('modal')) {
             dialog = $('<div class="modal fade"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"><button class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button><h4 class="modal-title"></h4></div></div></div></div>');
             dialog.html(html);
         }
