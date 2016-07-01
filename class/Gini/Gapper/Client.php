@@ -55,6 +55,7 @@ class Client
     const STEP_GROUP_401 = 4;
 
     private static $sessionKey = 'gapper.client';
+    private static $sessionAuthPrefix = 'gapper-auth-';
     private static function prepareSession()
     {
         $_SESSION[self::$sessionKey] = $_SESSION[self::$sessionKey] ?: [];
@@ -400,6 +401,11 @@ class Client
     {
         self::unsetSession(self::$keyGroupID);
         self::unsetSession(self::$keyUserName);
+
+        foreach (array_keys($_SESSION) as $key) {
+            if (0!==strpos($key, self::$sessionAuthPrefix)) continue;
+            unset($_SESSION[$key]);
+        }
 
         return true;
     }
