@@ -384,7 +384,11 @@ class Client
     public static function getGroupID()
     {
         if (self::hasSession(self::$keyGroupID)) {
-            return self::getSession(self::$keyGroupID);
+            $groupID = self::getSession(self::$keyGroupID);
+            $groups = self::getGroups();
+            if (is_array($groups) && isset($groups[$groupID])) {
+                return $groupID;
+            }
         }
     }
 
