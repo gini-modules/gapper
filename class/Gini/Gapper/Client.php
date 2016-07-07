@@ -115,8 +115,8 @@ class Client
     {
         $client_id = $client_id ?: self::getId();
         if (!$client_id) return [];
+        $cacheKey = "app#client#{$client_id}#info";
         if (!$force) {
-            $cacheKey = "app#client#{$client_id}#info";
             $info = self::cache($cacheKey);
             if ($info) return $info;
         }
@@ -150,8 +150,9 @@ class Client
                 return self::STEP_GROUP_401;
             }
         } elseif ($app['type'] === 'user') {
+            $cacheKeyUserName = self::makeUserName($username);
+            $cacheKey = "app#user#{$cacheKeyUserName}#apps";
             if (!$force) {
-                $cacheKey = "app#user#{$username}#apps";
                 $apps = self::cache($cacheKey);
             }
             if (empty($apps)) {
@@ -223,8 +224,9 @@ class Client
             return;
         }
 
+        $cacheKeyUserName = self::makeUserName($username);
+        $cacheKey = "app#user#{$cacheKeyUserName}#info";
         if (!$force) {
-            $cacheKey = "app#user#{$username}#info";
             $info = self::cache($cacheKey);
         }
         if (!$info) {
@@ -239,8 +241,8 @@ class Client
 
     public static function getUserByIdentity($source, $ident, $force=false)
     {
+        $cacheKey = "app#ident#{$source}#{$ident}#info";
         if (!$force) {
-            $cacheKey = "app#ident#{$source}#{$ident}#info";
             $info = self::cache($cacheKey);
         }
         if (!$info) {
@@ -277,8 +279,9 @@ class Client
             return false;
         }
 
+        $cacheKeyUserName = self::makeUserName($username);
+        $cacheKey = "app#user#{$client_id}#{$cacheKeyUserName}#groups";
         if (!$force) {
-            $cacheKey = "app#user#{$client_id}#{$username}#groups";
             $groups = self::cache($cacheKey);
         }
         if (empty($groups)) {
@@ -325,8 +328,9 @@ class Client
             return false;
         }
 
+        $cacheKeyUserName = self::makeUserName($username);
+        $cacheKey = "app#user#{$client_id}#{$cacheKeyUserName}#groups";
         if (!$force) {
-            $cacheKey = "app#user#{$client_id}#{$username}#groups";
             $groups = self::cache($cacheKey);
         }
         if (empty($groups)) {
@@ -351,8 +355,8 @@ class Client
     {
         $groupID = $groupID ?: self::getGroupID();
         if ($groupID) {
+            $cacheKey = "app#group#{$groupID}#apps";
             if (!$force) {
-                $cacheKey = "app#group#{$groupID}#apps";
                 $apps = self::cache($cacheKey);
             }
             if (empty($apps)) {
@@ -368,8 +372,8 @@ class Client
         if (self::hasSession(self::$keyGroupID)) {
             $groupID = self::getSession(self::$keyGroupID);
             if ($groupID) {
+                $cacheKey = "app#group#{$groupID}#info";
                 if (!$force) {
-                    $cacheKey = "app#group#{$groupID}#info";
                     $info = self::cache($cacheKey);
                 }
                 if (!$info) {
@@ -395,8 +399,9 @@ class Client
     public static function getLoginToken($toClientID, $username=null, $force=false)
     {
         $username = $username ?: self::getUserName();
+        $cacheKeyUserName = self::makeUserName($username);
+        $cacheKey = "app#user#{$cacheKeyUserName}#{$toClientID}#logintoken";
         if (!$force) {
-            $cacheKey = "app#user#{$username}#{$toClientID}#logintoken";
             $token = self::cache($cacheKey);
         }
         if (!$token) {
