@@ -166,12 +166,17 @@ class Client
         return self::STEP_DONE;
     }
 
+    public static function makeUserName($username, $backend=null)
+    {
+        list($name, $b) = explode('|', $username, 2);
+        $backend = $backend ?: ($b ?: 'gapper');
+        return "{$name}|{$backend}";
+    }
+
     public static function loginByUserName($username)
     {
-        list($name, $backend) = explode('|', $username, 2);
-        $backend = $backend ?: 'gapper';
-
-        return self::setUserName($name.'|'.$backend);
+        $username = self::makeUserName($username);
+        return self::setUserName($username);
     }
 
     public static function loginByToken($token)
