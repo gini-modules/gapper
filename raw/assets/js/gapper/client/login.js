@@ -83,7 +83,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
     var classBox = 'gapper-client-checkbox';
     var classLi = 'gapper-client-checkbox-li';
     var isWaitingClick = false;
-    $('body') on('click', '.' + classBox + ' .' + classLi, function() {
+    $('body').on('click', '.' + classBox + ' .' + classLi, function() {
         if (isWaitingClick) return false;
         isWaitingClick = true;
         var $that = $(this);
