@@ -27,10 +27,12 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
         } catch(err) {}
         if (!dialog || ! dialog.hasClass('modal')) {
             dialog = $(['<div class="modal fade"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"><button class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button><h4 class="modal-title">', html, '</h4></div></div></div></div>'].join(''));
-            dialog.attr('data-showlogin-after-close', true);
         }
         if (!dialog.hasClass('gapper-login-modal')) {
             dialog.addClass('gapper-login-modal');
+        }
+        if (!dialog.find('form').length) {
+            dialog.attr('data-showlogin-after-close', true);
         }
         dialog.modal({
             show: true
