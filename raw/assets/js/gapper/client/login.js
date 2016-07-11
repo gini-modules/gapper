@@ -27,6 +27,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
         } catch(err) {}
         if (!dialog || ! dialog.hasClass('modal')) {
             dialog = $(['<div class="modal fade"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"><button class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button><h4 class="modal-title">', html, '</h4></div></div></div></div>'].join(''));
+            dialog.attr('data-showlogin-after-close', true);
         }
         if (!dialog.hasClass('gapper-login-modal')) {
             dialog.addClass('gapper-login-modal');
@@ -37,6 +38,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
         });
         callback && callback();
     };
+
     var showLogin = function() {
         if (isWaitingLogin) return false;
         isWaitingLogin = true;
@@ -103,17 +105,14 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
                     data = data.message;
                 }
                 clearDialog();
-                dialog = $(data);
-                dialog.modal({
-                    show: true
-                    ,backdrop: 'static'
+                showDialog(data, function() {
+                    dialog.on('hide.bs.modal', function() {
+                        setTimeout(showLogin, 1);
+                    });
+                    setTimeout(function() {
+                        isWaitingClick = false;
+                    }, 2000);
                 });
-                dialog.on('hide.bs.modal', function() {
-                    setTimeout(showLogin, 1);
-                });
-                setTimeout(function() {
-                    isWaitingClick = false;
-                }, 2000);
             });
         }
         if ($that.attr('data-gapper-client-group')) {
@@ -163,13 +162,10 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
                     case 'modal':
                         clearLoadingDialog();
                         clearDialog();
-                        dialog = $(tData.message);
-                        dialog.modal({
-                            show: true
-                            ,backdrop: 'static'
-                        });
-                        dialog.on('hide.bs.modal', function() {
-                            setTimeout(showLogin, 1);
+                        showDialog(tData.message, function() {
+                            dialog.on('hide.bs.modal', function() {
+                                setTimeout(showLogin, 1);
+                            });
                         });
                         break;
                     case 'alert':
@@ -203,13 +199,13 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
     $(document).on('click', '.gapper-login-modal .close', function() {
         isWaitingLogin = true;
         var $pa = $(this).parents('.modal');
-        var isLoginForm = $pa.find('.gapper-auth-login-form').length;
+        var needShowlogin = $pa.attr('data-showlogin-after-close');
         $.get('ajax/gapper/client/logout', {
             _t: (new Date()).getTime()
         }, function() {
             isWaitingLogin = false;
-            if (!isLoginForm) {
-                setTimeout(showLogin, 10);
+            if (needShowlogin) {
+                setTimeout(showLogin, 1);
             }
         });
     });
