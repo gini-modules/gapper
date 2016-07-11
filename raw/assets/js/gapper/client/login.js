@@ -28,8 +28,8 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
         if (!dialog || ! dialog.hasClass('modal')) {
             dialog = $(['<div class="modal fade"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"><button class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button><h4 class="modal-title">', html, '</h4></div></div></div></div>'].join(''));
         }
-        if (!dialog.hasClass('login-modal')) {
-            dialog.addClass('login-modal');
+        if (!dialog.hasClass('gapper-login-modal')) {
+            dialog.addClass('gapper-login-modal');
         }
         dialog.modal({
             show: true
@@ -83,7 +83,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
     var classBox = 'gapper-client-checkbox';
     var classLi = 'gapper-client-checkbox-li';
     var isWaitingClick = false;
-    $('body').on('click', '.' + classBox + ' .' + classLi, function() {
+    $('body') on('click', '.' + classBox + ' .' + classLi, function() {
         if (isWaitingClick) return false;
         isWaitingClick = true;
         var $that = $(this);
@@ -200,13 +200,17 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
         return false;
     });
 
-    $(document).on('click', '.login-modal .close', function() {
+    $(document).on('click', '.gapper-login-modal .close', function() {
         isWaitingLogin = true;
+        var $pa = $(this).parents('.modal');
+        var isLoginForm = $pa.find('.gapper-auth-login-form').length;
         $.get('ajax/gapper/client/logout', {
             _t: (new Date()).getTime()
         }, function() {
             isWaitingLogin = false;
-            setTimeout(showLogin, 10);
+            if (!isLoginForm) {
+                setTimeout(showLogin, 10);
+            }
         });
     });
 
