@@ -31,9 +31,6 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
         if (!dialog.hasClass('gapper-login-modal')) {
             dialog.addClass('gapper-login-modal');
         }
-        if (!dialog.find('form').length) {
-            dialog.attr('data-showlogin-after-close', true);
-        }
         dialog.modal({
             show: true
             ,backdrop: 'static'
@@ -200,8 +197,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 
     $(document).on('click', '.gapper-login-modal .close', function() {
         isWaitingLogin = true;
-        var $pa = $(this).parents('.modal');
-        var needShowlogin = $pa.attr('data-showlogin-after-close');
+        var needShowlogin = !! $(this).attr('data-just-close');
         $.get('ajax/gapper/client/logout', {
             _t: (new Date()).getTime()
         }, function() {
