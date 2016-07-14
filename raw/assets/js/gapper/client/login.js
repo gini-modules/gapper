@@ -197,7 +197,7 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
 
     $(document).on('click', '.gapper-login-modal .close', function() {
         isWaitingLogin = true;
-        var needShowlogin = !! $(this).attr('data-just-close');
+        var needShowlogin = ! $(this).attr('data-just-close');
         $.get('ajax/gapper/client/logout', {
             _t: (new Date()).getTime()
         }, function() {
