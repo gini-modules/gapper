@@ -22,7 +22,7 @@ namespace Gini\Module
             if ($appInfo['type']==='group') {
                 $group = a('group', $me->id ? \Gini\Gapper\Client::getGroupID() : null);
                 _G('GROUP', $group);
-                $bool = $bool && !!$group->id
+                $bool = $bool && !!$group->id;
             }
 
             if (!$bool && \Gini\Gapper\Client::getLoginStep()===\GIni\Gapper\Client::STEP_DONE) {
