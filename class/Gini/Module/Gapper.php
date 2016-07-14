@@ -6,20 +6,34 @@ namespace Gini\Module
     {
         public static function setup()
         {
-            /*
             date_default_timezone_set(\Gini\Config::get('system.timezone') ?: 'Asia/Shanghai');
 
-            _G('HEADCSS', '<GINI-HEADCSS>');
-            _G('HEADJS', '<GINI-HEADJS>');
+            class_exists('\Gini\Those');
+            class_exists('\Gini\ThoseIndexed');
 
-            if (isset($_GET['locale'])) {
-                $_SESSION['locale'] = $_GET['locale'];
+            \Gini\Gapper\Client::init();
+
+            $me = a('user', ['username' => \Gini\Gapper\Client::getUserName()]);
+            _G('ME', $me);
+
+            $bool = !!$me->id;
+
+            $appInfo = \Gini\Gapper\Client::getInfo();
+            if ($appInfo['type']==='group') {
+                $group = a('group', $me->id ? \Gini\Gapper\Client::getGroupID() : null);
+                _G('GROUP', $group);
+                $bool = $bool && !!$group->id
             }
-            if ($_SESSION['locale']) {
-                \Gini\Config::set('system.locale', $_SESSION['locale']);
+
+            if (!$bool && \Gini\Gapper\Client::getLoginStep()===\GIni\Gapper\Client::STEP_DONE) {
+                \Gini\Gapper\Client::logout();
             }
+
+            isset($_GET['locale']) and $_SESSION['locale'] = $_GET['locale'];
+            isset($_SESSION['locale']) and \Gini\Config::set('system.locale', $_SESSION['locale']);
             \Gini\I18N::setup();
-             */
+
+            \Gini\Locale::set(LC_MONETARY, (\Gini\Config::get('system.locale') ?: 'en_US').'.UTF-8');
         }
 
         public static function diagnose()
