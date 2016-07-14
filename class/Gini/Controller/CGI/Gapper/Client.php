@@ -48,6 +48,12 @@ class Client extends \Gini\Controller\CGI\Gapper
         return $this->actionGo($homeAPPClientID);
     }
 
+    public function actionGoGapperServer()
+    {
+        $paths = func_get_args();
+        return $this->_goDefaultHome($paths);
+    }
+
     private function _goDefaultHome($paths=null)
     {
         $config = (array) \Gini\Config::get('gapper.rpc');
