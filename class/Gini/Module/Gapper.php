@@ -13,15 +13,12 @@ namespace Gini\Module
 
             \Gini\Gapper\Client::init();
 
-            $me = a('user', ['username' => \Gini\Gapper\Client::getUserName()]);
-            _G('ME', $me);
-
+            $me = a('gapper/user', ['username' => \Gini\Gapper\Client::getUserName()]);
             $bool = !!$me->id;
 
             $appInfo = \Gini\Gapper\Client::getInfo();
             if ($appInfo['type']==='group') {
-                $group = a('group', $me->id ? \Gini\Gapper\Client::getGroupID() : null);
-                _G('GROUP', $group);
+                $group = a('gapper/group', $me->id ? \Gini\Gapper\Client::getGroupID() : null);
                 $bool = $bool && !!$group->id;
             }
 
