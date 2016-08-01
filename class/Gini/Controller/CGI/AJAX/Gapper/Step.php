@@ -27,7 +27,11 @@ class Step extends \Gini\Controller\CGI
     {
         $result = $this->_trySourceMethod('login');
         if ($result) return $result;
+        return $this->login();
+    }
 
+    public function login()
+    {
         $conf = (array) \Gini\Config::get('gapper.auth');
         $sources = [];
         foreach ($conf as $key => $info) {
@@ -50,7 +54,11 @@ class Step extends \Gini\Controller\CGI
     {
         $result = $this->_trySourceMethod('group');
         if ($result) return $result;
+        return $this->group();
+    }
 
+    public function group()
+    {
         $groups = \Gini\Gapper\Client::getGroups();
         if ($groups && count($groups) == 1) {
             $bool = \Gini\Gapper\Client::chooseGroup(current($groups)['id']);
@@ -68,7 +76,11 @@ class Step extends \Gini\Controller\CGI
     {
         $result = $this->_trySourceMethod('user401');
         if ($result) return $result;
+        return $this->user401();
+    }
 
+    public function user401() 
+    {
         $view = \Gini\Config::get('gapper.views')['client/error/401-user'] ?: 'gapper/client/error/401-user';
 
         return $this->_showHTML($view);
@@ -78,6 +90,11 @@ class Step extends \Gini\Controller\CGI
     {
         $result = $this->_trySourceMethod('group401');
         if ($result) return $result;
+        return $this->group401();
+    }
+
+    public function group401()
+    {
         $view = \Gini\Config::get('gapper.views')['client/error/401-group'] ?: 'gapper/client/error/401-group';
 
         return $this->_showHTML($view);
@@ -87,7 +104,11 @@ class Step extends \Gini\Controller\CGI
     {
         $result = $this->_trySourceMethod('groupDone');
         if ($result) return $result;
+        return $this->done();
+    }
 
+    public function done()
+    {
         $referer = parse_url(\Gini\URI::url($_SERVER['HTTP_REFERER']));
         $query = $referer['query'];
         parse_str($query, $params);
