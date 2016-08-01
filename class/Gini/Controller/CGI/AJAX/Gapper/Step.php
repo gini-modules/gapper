@@ -25,6 +25,9 @@ class Step extends \Gini\Controller\CGI
 
     public function actionLogin()
     {
+        $result = $this->_trySourceMethod('login');
+        if ($result) return $result;
+
         $conf = (array) \Gini\Config::get('gapper.auth');
         $sources = [];
         foreach ($conf as $key => $info) {
