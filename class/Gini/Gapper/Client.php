@@ -230,9 +230,7 @@ class Client
             $info = self::cache($cacheKey);
         }
         if (!$info) {
-            $info = self::getRPC()->gapper->user->getInfo([
-                'username' => $username,
-            ]);
+            $info = self::getRPC()->gapper->user->getInfo($username);
             self::cache($cacheKey, $info);
         }
 
