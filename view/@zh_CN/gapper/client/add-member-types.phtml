@@ -1,0 +1,15 @@
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="text-center modal-body clearfix" data-gid="<?=H($group)?>" data-callback data-require="gapper/client/add-member">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                <?php foreach ((array) $data as $vType=>$vInfo) {?>
+                    <div class="add-member-icon add-member-handler" data-type="<?=H($vType)?>">
+                        <div class="add-member-icon-image"><img src="<?=H($vInfo['icon'])?>" /></div>
+                        <div class="add-member-icon-title"><?=H($vInfo['name'])?></div>
+                    </div>
+                <?php }?>
+            </div>
+        </div>
+    </div>
+</div>

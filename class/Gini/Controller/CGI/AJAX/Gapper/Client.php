@@ -42,4 +42,82 @@ class Client extends \Gini\Controller\CGI
         \Gini\Gapper\Client::logout();
         return \Gini\IoC::construct('\Gini\CGI\Response\JSON', true);
     }
+
+    public function actionGetAddMemberTypes()
+    {
+        $current = \Gini\Gapper\Client::getLoginStep();
+        if ($current!==\Gini\Gapper\Client::STEP_DONE) return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
+
+        $app = \Gini\Gapper\Client::getInfo();
+        if (strtolower($app['type'])!='group') return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
+
+        $conf = (array) \Gini\Config::get('gapper.auth');
+        $data = [];
+        foreach ($conf as $type=>$info) {
+            $handler = $info['add_member_handler'] ?: "\Gini\Controller\CGI\AJAX\Gapper\Auth\\{$type}::addmember";
+            if (is_callable($handler)) {
+                $data[$type] = $info;
+                continue;
+            }
+        }
+        if (!empty($data)) {
+            return \Gini\IoC::construct('\Gini\CGI\Response\HTML', V('gapper/client/add-member-types', [
+                'data'=> $data,
+                'group'=> \Gini\Gapper\Client::getGroupID()
+            ]));
+        }
+    }
+
+    public function actionGetAddModal()
+    {
+        $form = $this->form('post');
+        $conf = (array) \Gini\Config::get('gapper.auth');
+        $type = $form['type'];
+        $gid = $form['gid'];
+        if ($gid!=\Gini\Gapper\Client::getGroupID()) {
+            return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
+        }
+
+        $info = $conf[$type];
+        if (empty($info)) return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
+
+        $handler = $info['add_member_handler'] ?: "\Gini\Controller\CGI\AJAX\Gapper\Auth\\{$type}::addmember";
+        if (!is_callable($handler)) {
+            return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
+        }
+        return call_user_func_array($handler, ['get-add-modal', $type, $gid]);
+    }
+
+    public function actionSearch()
+    {
+        $data = $this->form('get');
+        $value = $data['value'];
+        $type = $data['type'];
+        if (!$value) return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
+        $conf = (array) \Gini\Config::get('gapper.auth');
+        $info = $conf[$type];
+        if (empty($info)) return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
+        $handler = $info['add_member_handler'] ?: "\Gini\Controller\CGI\AJAX\Gapper\Auth\\{$type}::addmember";
+        if (!is_callable($handler)) {
+            return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
+        }
+        return call_user_func_array($handler, ['search', $type, $value]);
+    }
+
+    public function actionPostAdd()
+    {
+        $form = $this->form('post');
+        $username = $form['username'];
+        if (empty($username)) return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
+        $get = $this->form('get');
+        $type = $get['type'];
+        $conf = (array) \Gini\Config::get('gapper.auth');
+        $info = $conf[$type];
+        if (empty($info)) return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
+        $handler = $info['add_member_handler'] ?: "\Gini\Controller\CGI\AJAX\Gapper\Auth\\{$type}::addmember";
+        if (!is_callable($handler)) {
+            return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
+        }
+        return call_user_func_array($handler, ['post-add', $type, $form]);
+    }
 }

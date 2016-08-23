@@ -1,0 +1,23 @@
+<form class="text-center add-member-matched" style="padding-bottom:5px;">
+    <input type="hidden" name="username" value="<?=H($username)?>" />
+    <div class="text-right clearfix">
+        <span class="pull-left"><?=H(T('姓名'))?></span>
+        <?php if ($error['name']) { ?>
+        <span class="text-danger"><small><?=H($error['name'])?></small></span>
+        <?php }?>
+    </div>
+    <div class="form-group<?=$error['name'] ? ' has-error' : ''?>">
+        <input class="form-control" type="text" name="name" value="<?=H($name)?>" />
+    </div>
+    <div class="text-right clearfix">
+        <span class="pull-left"><?=H(T('Email'))?></span>
+        <?php if ($error['email']) { ?>
+        <span class="text-danger"><small><?=H($error['email'])?></small></span>
+        <?php }?>
+    </div>
+    <div class="form-group<?=$error['email'] ? ' has-error' : ''?>">
+        <input class="form-control" type="text" name="email" value="<?=H($email)?>" />
+        <div class="text-right text-muted"><small><?=H(T('请使用正确的Email, 该Email一经添加不允许更改!'))?></small></div>
+    </div>
+    <input type="button" class="add-member-confirm btn btn-primary" value="<?=H(T('确认添加'))?>" />
+</form>

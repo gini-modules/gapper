@@ -1,0 +1,23 @@
+<form class="text-center add-member-matched">
+    <input type="hidden" name="username" value="<?=H($username)?>" />
+    <input type="hidden" name="name" value="<?=H($name)?>" />
+    <input type="hidden" name="email" value="<?=H($email)?>" />
+    <input type="hidden" name="disable-error" value="1" />
+    <div class="add-member-icon">
+        <div class="add-member-icon-image">
+            <?php if ($icon && parse_url($icon)['scheme']!='initials') { ?>
+            <img src="<?=H($icon)?>" />
+            <?php } else { ?>
+            <div class="add-member-icon-text">
+                <?php if ($initials) { ?>
+                    <span><?=H($initials)?></span>
+                <?php } else { ?>
+                    <span class="fa fa-question"></span>
+                <?php } ?>
+            </div>
+            <?php } ?>
+        </div>
+        <div class="add-member-icon-title"><?=H($name?:T('未知用户'))?></div>
+    </div>
+    <div style="padding-bottom:5px;"><input type="button" class="add-member-confirm btn btn-primary" value="<?=H(T('确认添加'))?>" /></div>
+</form>

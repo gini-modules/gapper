@@ -1,0 +1,12 @@
+<h4 class="text-muted text-center">
+    <span class="fa fa-smile-o text-danger"></span>
+    <span><?=H(T('添加成功!'))?></span>
+</h4>
+<div class="text-center" style="padding-bottom:10px;">
+    <u class="app-add-member-handler text-muted"><?=H(T('继续添加成员'))?></u>
+    <span class="text-muted">|</span>
+    <span class="text-muted"><?=T(':time秒后自动:close', [
+        ':time'=> '<span class="add-member-close-in text-danger">5</span>',
+        ':close'=> '<a class="text-muted" data-dismiss="modal" href="#"><u>'.T('关闭窗口').'</u></a>'
+    ])?></span>
+</div>
