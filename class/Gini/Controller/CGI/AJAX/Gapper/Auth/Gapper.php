@@ -192,7 +192,7 @@ class Gapper extends \Gini\Controller\CGI
 
         if ($info['id']) {
             try {
-                $groups = self::getRPC()->gapper->user->getGroups((int)$info['id']);
+                $groups = \Gini\Gapper\Client::getRPC()->gapper->user->getGroups((int)$info['id']);
             } catch (\Exception $e) {
                 return self::_alert(T('操作失败，请您重试'));
             }
@@ -201,7 +201,7 @@ class Gapper extends \Gini\Controller\CGI
             }
 
             try {
-                $bool = self::getRPC()->gapper->group->addMember((int)$current, (int)$info['id']);
+                $bool = \Gini\Gapper\Client::getRPC()->gapper->group->addMember((int)$current, (int)$info['id']);
             } catch (\Exception $e) {
                 return self::_alert(T('操作失败，请您重试'));
             }
@@ -244,7 +244,7 @@ class Gapper extends \Gini\Controller\CGI
         $name = $form['name'];
         if ($username!=$email) {
             try {
-                $info = self::getRPC()->gapper->user->getInfo($email);
+                $info = \Gini\Gapper\Client::getRPC()->gapper->user->getInfo($email);
             } catch (\Exception $e) {
                 return self::_alert(T('操作失败，请您重试'));
             }
