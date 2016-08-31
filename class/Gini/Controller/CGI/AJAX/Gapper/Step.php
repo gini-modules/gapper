@@ -13,6 +13,7 @@ namespace Gini\Controller\CGI\AJAX\Gapper;
 
 class Step extends \Gini\Controller\CGI
 {
+    private static $_defaultAuthType='gapper';
     private function _showJSON($data)
     {
         return \Gini\IoC::construct('\Gini\CGI\Response\JSON', $data);
@@ -25,7 +26,11 @@ class Step extends \Gini\Controller\CGI
 
     public function actionLogin()
     {
-        $result = $this->_trySourceMethod('login');
+        $source = Auth::getSource();
+        if ($source) {
+            $source = \Gini\Config::get('gapper.auth-default-login')?:self::$_defaultAuthType;
+        }
+        $result = $this->_trySourceMethod('login', $source);
         if ($result) return $result;
         return $this->login();
     }
@@ -52,7 +57,11 @@ class Step extends \Gini\Controller\CGI
 
     public function actionGroup()
     {
-        $result = $this->_trySourceMethod('group');
+        $source = Auth::getSource();
+        if ($source) {
+            $source = \Gini\Config::get('gapper.auth-default-group')?:self::$_defaultAuthType;
+        }
+        $result = $this->_trySourceMethod('group', $source);
         if ($result) return $result;
         return $this->group();
     }
@@ -74,7 +83,11 @@ class Step extends \Gini\Controller\CGI
 
     public function actionUser401()
     {
-        $result = $this->_trySourceMethod('user401');
+        $source = Auth::getSource();
+        if ($source) {
+            $source = \Gini\Config::get('gapper.auth-default-user-401')?:self::$_defaultAuthType;
+        }
+        $result = $this->_trySourceMethod('user401', $source);
         if ($result) return $result;
         return $this->user401();
     }
@@ -88,7 +101,11 @@ class Step extends \Gini\Controller\CGI
 
     public function actionGroup401()
     {
-        $result = $this->_trySourceMethod('group401');
+        $source = Auth::getSource();
+        if ($source) {
+            $source = \Gini\Config::get('gapper.auth-default-group-401')?:self::$_defaultAuthType;
+        }
+        $result = $this->_trySourceMethod('group401', $source);
         if ($result) return $result;
         return $this->group401();
     }
@@ -102,7 +119,11 @@ class Step extends \Gini\Controller\CGI
 
     public function actionDone()
     {
-        $result = $this->_trySourceMethod('groupDone');
+        $source = Auth::getSource();
+        if ($source) {
+            $source = \Gini\Config::get('gapper.auth-default-done')?:self::$_defaultAuthType;
+        }
+        $result = $this->_trySourceMethod('groupDone', $source);
         if ($result) return $result;
         return $this->done();
     }
@@ -122,9 +143,8 @@ class Step extends \Gini\Controller\CGI
         ]);
     }
 
-    private function _trySourceMethod($method)
+    private function _trySourceMethod($method, $source=null)
     {
-        $source = Auth::getSource();
         if ($source) {
             $className = "\\Gini\\Controller\\CGI\\AJAX\\Gapper\\Auth\\{$source}\\Step\\{$method}";
             if (class_exists($className)) {
