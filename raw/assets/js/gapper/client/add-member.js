@@ -55,7 +55,7 @@ define('gapper/client/add-member', ['jquery', 'bootbox', 'css!../../../css/add-m
     // 确认添加
     $(document).on('click', selector.confirm, function(pEvt) {
         pEvt.preventDefault();
-        var iContainer = $(this).parents('.modal-body').find(selector.matched);
+        var iContainer = $(this).parents('form');
         var iModal = $(this).parents('.modal');
         var iCallback = iModal.attr('data-callback');
         resetXHR();
