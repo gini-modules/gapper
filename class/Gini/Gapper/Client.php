@@ -144,7 +144,10 @@ class Client
 
         if ($app['type'] === 'group' && empty(self::getGroupInfo($force))) {
             $groups = self::getGroups(self::getUserName(), $force);
-            if (!empty($groups) && is_array($groups)) {
+            if ($groups === false) {
+                exit;
+            }
+            elseif (!empty($groups) && is_array($groups)) {
                 return self::STEP_GROUP;
             } else {
                 return self::STEP_GROUP_401;
@@ -288,7 +291,7 @@ class Client
         }
 
         if (empty($groups)) {
-            return false;
+            return [];
         }
 
         $result = [];
