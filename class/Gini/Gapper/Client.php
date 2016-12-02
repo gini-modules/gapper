@@ -81,14 +81,10 @@ class Client
 
     public static function init()
     {
-        static $procGT='';
         $gapperToken = $_GET['gapper-token'];
         if ($gapperToken) {
-            if (!$procGT) {
-                \Gini\Gapper\Client::logout();
-                \Gini\Gapper\Client::loginByToken($gapperToken);
-                $procGT = $gapperToken;
-            }
+            \Gini\Gapper\Client::logout();
+            \Gini\Gapper\Client::loginByToken($gapperToken);
         } else {
             // 提供第三方登录验证入口
             $third = (array) \Gini\Config::get('gapper.3rd');
