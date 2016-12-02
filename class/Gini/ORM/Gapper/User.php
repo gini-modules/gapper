@@ -59,7 +59,7 @@ class User extends RObject
             return [];
         }
 
-        return (array) static::getRPC()->gapper->user->getInfo($user_id);
+        return (array) \Gini\Gapper\Client::getUserInfo($user_id);
     }
 
     public function convertRPCData(array $rdata)
@@ -109,7 +109,7 @@ class User extends RObject
 
     public function linkIdentity($source, $ident) {
         if (!$this->id) return false;
-        return self::getRPC()->Gapper->User->linkIdentity($this->username, $source, $ident);
+        return \Gini\Gapper\Client::linkIdentity($source, $ident, $this->username);
     }
 
     public function icon($size = null)

@@ -39,8 +39,7 @@ class Client extends \Gini\Controller\CGI\Gapper
 
         $username = \Gini\Gapper\Client::getUserName();
         if (!$username) {
-            $rpc = \Gini\Gapper\Client::getRPC();
-            $appInfo = $rpc->gapper->app->getInfo($homeAPPClientID);
+            $appInfo = \Gini\Gapper\Client::getInfo($homeAPPClientID);
             $url = $appInfo['url'] ?: '/';
             $this->redirect($url);
             return;
@@ -75,7 +74,7 @@ class Client extends \Gini\Controller\CGI\Gapper
 
         $username = \Gini\Gapper\Client::getUserName();
         if ($username) {
-            $token = \Gini\Gapper\Client::getRPC()->gapper->user->getLoginToken($username, $client_id);
+            $token = \Gini\Gapper\Client::getLoginToken($client_id, $username);
         }
 
         if ($token) {
@@ -99,7 +98,7 @@ class Client extends \Gini\Controller\CGI\Gapper
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
 
-        $app = \Gini\Gapper\Client::getRPC()->gapper->app->getInfo($client_id);
+        $app = \Gini\Gapper\Client::getInfo($client_id);
         if (!$app['id'] || !$app['url']) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
@@ -109,7 +108,7 @@ class Client extends \Gini\Controller\CGI\Gapper
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
 
-        $token = \Gini\Gapper\Client::getRPC()->gapper->user->getLoginToken($username, $client_id);
+        $token = \Gini\Gapper\Client::getLoginToken($client_id, $username);
         if (!$token) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }

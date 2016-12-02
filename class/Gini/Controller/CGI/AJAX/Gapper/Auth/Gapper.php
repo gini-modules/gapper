@@ -145,14 +145,14 @@ class Gapper extends \Gini\Controller\CGI
         }
 
         try {
-            $info = \Gini\Gapper\Client::getRPC()->gapper->user->getInfo($email);
+            $info = \Gini\Gapper\Client::getUserInfo($email);
         } catch (\Exception $e) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
 
         if ($info && $info['id']) {
             try {
-                $groups = \Gini\Gapper\Client::getRPC()->gapper->user->getGroups((int)$info['id']);
+                $groups = \Gini\Gapper\Client::getGroups($email, true);
             } catch (\Exception $e) {
                 return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
             }
@@ -183,7 +183,7 @@ class Gapper extends \Gini\Controller\CGI
     {
         $username = $form['username'];
         try {
-            $info = \Gini\Gapper\Client::getRPC()->gapper->user->getInfo($username);
+            $info = \Gini\Gapper\Client::getUserInfo($username);
         } catch (\Exception $e) {
             return self::_alert(T('操作失败，请您重试'));
         }
@@ -192,7 +192,7 @@ class Gapper extends \Gini\Controller\CGI
 
         if ($info['id']) {
             try {
-                $groups = \Gini\Gapper\Client::getRPC()->gapper->user->getGroups((int)$info['id']);
+                $groups = \Gini\Gapper\Client::getGroups($username, true);
             } catch (\Exception $e) {
                 return self::_alert(T('操作失败，请您重试'));
             }
@@ -244,7 +244,7 @@ class Gapper extends \Gini\Controller\CGI
         $name = $form['name'];
         if ($username!=$email) {
             try {
-                $info = \Gini\Gapper\Client::getRPC()->gapper->user->getInfo($email);
+                $info = \Gini\Gapper\Client::getUserInfo($email);
             } catch (\Exception $e) {
                 return self::_alert(T('操作失败，请您重试'));
             }
@@ -278,7 +278,7 @@ class Gapper extends \Gini\Controller\CGI
         } catch (\Exception $e) {
         }
         if ($bool) {
-            $info = \Gini\Gapper\Client::getRPC()->gapper->user->getInfo((int)$uid);
+            $info = \Gini\Gapper\Client::getUserInfo($email);
             return self::_success($info);
         }
 

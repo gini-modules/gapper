@@ -15,17 +15,9 @@ abstract class RObject extends \Gini\ORM\Object
      *
      * @return new RPC
      **/
-    protected static $_RPC = null;
     protected static function getRPC()
     {
-        if (!self::$_RPC) {
-            $conf = \Gini\Config::get('gapper.rpc');
-            $rpc = \Gini\IoC::construct('\Gini\RPC', $conf['url']);
-            $rpc->gapper->app->authorize($conf['client_id'], $conf['client_secret']);
-            self::$_RPC = $rpc;
-        }
-
-        return self::$_RPC;
+        return \Gini\Gapper\Client::getRPC();
     }
 
     /**

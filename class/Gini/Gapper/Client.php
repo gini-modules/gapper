@@ -227,7 +227,7 @@ class Client
             return;
         }
 
-        $cacheKeyUserName = self::makeUserName($username);
+        $cacheKeyUserName = is_numeric($username) ? $username : self::makeUserName($username);
         $cacheKey = "app#user#{$cacheKeyUserName}#info";
         if (!$force) {
             $info = self::cache($cacheKey);
@@ -368,22 +368,58 @@ class Client
         return $apps;
     }
 
-    public static function getGroupInfo($force=false)
+    private static function _getCurrentGroupInfo($force=false)
     {
         if (self::hasSession(self::$keyGroupID)) {
             $groupID = self::getSession(self::$keyGroupID);
             if ($groupID) {
                 $cacheKey = "app#group#{$groupID}#info";
-                if (!$force) {
-                    $info = self::cache($cacheKey);
-                }
-                if (!$info) {
-                    $info = self::getRPC()->gapper->group->getInfo((int)$groupID);
-                    self::cache($cacheKey, $info);
-                }
+                return self::_getGroupInfo($cacheKey, (int)$groupID, $force);
             }
         }
+    }
+
+    private static function _getTheGroupInfo($criteria, $force=false)
+    {
+        if (is_numeric($criteria)) {
+            $key = $criteria;
+        } else {
+            $key = md5(J($criteria));
+        }
+        $cacheKey = "app#group#{$key}#info";
+        return self::_getGroupInfo($cacheKey, $criteria, $force);
+    }
+
+    private static function _getGroupInfo($cacheKey, $criteria, $force=false) 
+    {
+        if (!$force) {
+            $info = self::cache($cacheKey);
+        }
+        if (!$info) {
+            $info = self::getRPC()->gapper->group->getInfo($criteria);
+            self::cache($cacheKey, $info);
+        }
         return $info;
+    }
+
+    // public static function getGroupInfo($force=false)
+    // public static function getGroupInfo(array $criteria=[], $force=false)
+    // public static function getGroupInfo($groupID, $force=false)
+    public static function getGroupInfo($force=false)
+    {
+        $args = func_get_args();
+        $count = count($args);
+        if (!$count || ($count==1 && is_bool($args[0]))) {
+            return self::_getCurrentGroupInfo(@$args[0]);
+        }
+
+        if ($count==1) {
+            return self::_getTheGroupInfo($args[0]);
+        }
+
+        if ($count==2) {
+            return self::_getTheGroupInfo($args[0], $args[1]);
+        }
     }
 
     public static function getGroupID()

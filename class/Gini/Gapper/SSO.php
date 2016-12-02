@@ -48,7 +48,7 @@ class SSO
         $username = $results[$result];
 
         if ($source) {
-            $user = (array) \Gini\Gapper\Client::getRPC()->gapper->user->getUserByIdentity($source, $username);
+            $user = (array) \Gini\Gapper\Client::getUserByIdentity($source, $username);
             $username = $user['username'];
         }
 

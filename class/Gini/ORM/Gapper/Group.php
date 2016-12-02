@@ -12,7 +12,7 @@ class Group extends RObject
 
     protected function fetchRPC($criteria)
     {
-        return (array) self::getRPC()->gapper->group->getInfo($criteria);
+        return (array)\Gini\Gapper\Client::getGroupInfo($criteria);
     }
 
     public function convertRPCData(array $rdata)
@@ -49,14 +49,7 @@ class Group extends RObject
     public function getApps()
     {
         if (!$this->id) return [];
-        $cache = \Gini\Cache::of('orm');
-        $key = 'group['.$this->id.'].apps';
-        $apps = $cache->get($key);
-        if ($apps === false) {
-            $apps = (array) self::getRPC()->gapper->group->getApps($this->id);
-            $cache->set($key, $apps, 300);
-        }
-        return $apps;
+        return (array) \Gini\Gapper\Client::getGroupApps($this->id);
     }
 
     public function icon($size = null)
