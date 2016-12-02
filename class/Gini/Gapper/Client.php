@@ -81,10 +81,14 @@ class Client
 
     public static function init()
     {
+        static $procGT='';
         $gapperToken = $_GET['gapper-token'];
         if ($gapperToken) {
-            \Gini\Gapper\Client::logout();
-            \Gini\Gapper\Client::loginByToken($gapperToken);
+            if (!$procGT) {
+                \Gini\Gapper\Client::logout();
+                \Gini\Gapper\Client::loginByToken($gapperToken);
+                $procGT = $gapperToken;
+            }
         } else {
             // 提供第三方登录验证入口
             $third = (array) \Gini\Config::get('gapper.3rd');
@@ -463,7 +467,24 @@ class Client
 
     public static function goLogin($redirect=null)
     {
-        $url = \Gini\URI::url('gapper/client/login', ['redirect' => $redirect ?: $_SERVER['REQUEST_URI']]);
+        $redirect = $redirect ?: $_SERVER['REQUEST_URI'];
+
+        if (self::getLoginStep()===self::STEP_GROUP) {
+            $groups = self::getGroups();
+            if ($groups && count($groups)==1) {
+                self::chooseGroup(current($groups)['id']);
+            }
+        }
+
+        if (self::getLoginStep()===self::STEP_DONE) {
+            $url = \Gini\URI::url($redirect, [
+                'gapper-token'=> '',
+                'gapper-group'=> ''
+            ]);
+        } else {
+            $url = \Gini\URI::url('gapper/client/login', ['redirect' => $redirect]);
+        }
+
         \Gini\CGI::redirect($url);
     }
 
