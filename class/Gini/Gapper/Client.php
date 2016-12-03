@@ -334,8 +334,8 @@ class Client
         if (!$force) {
             $groups = self::cache($cacheKey);
         }
-        if (empty($groups)) {
-            $groups = self::getRPC()->gapper->user->getGroups($username);
+        if (false === $groups) {
+            $groups = self::getRPC()->gapper->user->getGroups($username) ?: [];
             self::cache($cacheKey, $groups);
         }
         if (!is_array($groups) || !in_array($groupID, array_keys($groups))) {
@@ -360,8 +360,8 @@ class Client
             if (!$force) {
                 $apps = self::cache($cacheKey);
             }
-            if (empty($apps)) {
-                $apps = self::getRPC()->gapper->group->getApps((int)$groupID);
+            if (false === $apps) {
+                $apps = self::getRPC()->gapper->group->getApps((int)$groupID) ?: [];
                 self::cache($cacheKey, $apps);
             }
         }
