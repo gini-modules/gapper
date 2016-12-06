@@ -484,7 +484,7 @@ class Client
         \Gini\CGI::redirect($url);
     }
 
-    private static function cache($key, $value=null)
+    public static function cache($key, $value=null)
     {
         $cacher = \Gini\Cache::of('gapper');
         if (is_null($value)) {
