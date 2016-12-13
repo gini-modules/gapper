@@ -40,7 +40,7 @@ class Client
             if (!$token) {
                 \Gini\Logger::of('gapper')->error('Your app was not registered in gapper server!');
             } else {
-                self::cache($cacheKey, $token);
+                self::cache($cacheKey, $token, 1200);
                 self::$_RPC = $rpc;
             }
         }
@@ -285,8 +285,8 @@ class Client
         if (!$force) {
             $groups = self::cache($cacheKey);
         }
-        if (empty($groups)) {
-            $groups = self::getRPC()->gapper->user->getGroups($username);
+        if (false === $groups) {
+            $groups = self::getRPC()->gapper->user->getGroups($username) ?: [];
             self::cache($cacheKey, $groups);
         }
 
@@ -484,12 +484,11 @@ class Client
         \Gini\CGI::redirect($url);
     }
 
-    public static function cache($key, $value=null)
-    {
+    public static function cache($key, $value=false, $ttl=300) {
         $cacher = \Gini\Cache::of('gapper');
-        if (is_null($value)) {
+        if (false === $value) {
             return $cacher->get($key);
         }
-        $cacher->set($key, $value, 300);
+        $cacher->set($key, $value, $ttl);
     }
 }
