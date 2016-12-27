@@ -282,6 +282,7 @@ class Client
 
         $cacheKeyUserName = self::makeUserName($username);
         $cacheKey = "app#user#{$client_id}#{$cacheKeyUserName}#groups";
+        $groups = false;
         if (!$force) {
             $groups = self::cache($cacheKey);
         }
@@ -331,6 +332,7 @@ class Client
 
         $cacheKeyUserName = self::makeUserName($username);
         $cacheKey = "app#user#{$client_id}#{$cacheKeyUserName}#groups";
+        $groups = false;
         if (!$force) {
             $groups = self::cache($cacheKey);
         }
@@ -357,6 +359,7 @@ class Client
         $groupID = $groupID ?: self::getGroupID();
         if ($groupID) {
             $cacheKey = "app#group#{$groupID}#apps";
+            $apps = false;
             if (!$force) {
                 $apps = self::cache($cacheKey);
             }
