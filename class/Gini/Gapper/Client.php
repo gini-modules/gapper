@@ -40,7 +40,7 @@ class Client
             if (!$token) {
                 \Gini\Logger::of('gapper')->error('Your app was not registered in gapper server!');
             } else {
-                self::cache($cacheKey, $token, 1200);
+                self::cache($cacheKey, $token, 700);
                 self::$_RPC = $rpc;
             }
         }
