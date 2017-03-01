@@ -153,15 +153,7 @@ class Client
                 return self::STEP_GROUP_401;
             }
         } elseif ($app['type'] === 'user') {
-            $cacheKeyUserName = self::makeUserName($username);
-            $cacheKey = "app#user#{$cacheKeyUserName}#apps";
-            if (!$force) {
-                $apps = self::cache($cacheKey);
-            }
-            if (empty($apps)) {
-                $apps = (array) self::getRPC()->gapper->user->getApps($username);
-                self::cache($cacheKey, $apps);
-            }
+            $apps = self::getUserApps($username, $force);
             if (!isset($apps[$client_id])) {
                 return self::STEP_USER_401;
             }
@@ -352,6 +344,21 @@ class Client
         }
 
         return false;
+    }
+
+    public static function getUserApps($username=null, $force=false)
+    {
+        $username = $username ?: self::getUserName();
+        $cacheKeyUserName = self::makeUserName($username);
+        $cacheKey = "app#user#{$cacheKeyUserName}#apps";
+        if (!$force) {
+            $apps = self::cache($cacheKey);
+        }
+        if (false===$apps) {
+            $apps = (array) self::getRPC()->gapper->user->getApps($username);
+            self::cache($cacheKey, $apps);
+        }
+        return is_array($apps) ? $apps : [];
     }
 
     public static function getGroupApps($groupID=null, $force=false)
