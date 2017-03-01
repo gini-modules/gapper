@@ -351,6 +351,7 @@ class Client
         $username = $username ?: self::getUserName();
         $cacheKeyUserName = self::makeUserName($username);
         $cacheKey = "app#user#{$cacheKeyUserName}#apps";
+        $apps = false;
         if (!$force) {
             $apps = self::cache($cacheKey);
         }
