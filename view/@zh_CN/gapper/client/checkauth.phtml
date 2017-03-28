@@ -4,16 +4,19 @@
             <div class="modal-header">
                 <h4 class="modal-title"><?=H('请选择登录方式:')?></h4>
             </div>
-            <ul class="modal-body gapper-client-checkbox list-unstyled list-inline text-center">
-            <?php foreach ($sources as $source=>$info) {?>
-                <li class="gapper-client-checkbox-li" data-gapper-auth-source="<?=H($source)?>">
-                    <div class="app-icon app-icon-hoverable">
-                        <div class="app-icon-image"><img src="<?=H($info['icon'])?>" /></div>
-                        <div class="app-icon-title"><?=H($info['name'])?></div>
-                    </div>
-                </li>
-            <?php }?>
-            </ul>
+            <div class="modal-body ">
+                <ul class="gapper-client-checkbox list-unstyled list-inline text-center">
+                    <?php foreach ($sources as $source=>$info) {?>
+                        <li class="gapper-client-checkbox-li" data-gapper-auth-source="<?=H($source)?>">
+                            <div class="app-icon app-icon-hoverable">
+                                <div class="app-icon-image"><img src="<?=H($info['icon'])?>" /></div>
+                                <div class="app-icon-title"><?=H($info['name'])?></div>
+                            </div>
+                        </li>
+                    <?php }?>
+                </ul>
+                <div class="text-right"><a href="<?= \Gini\URI::url('gapper/client/gohome')?>"><?= H(T('返回首页'))?></a></div>
+            </div>
         </div>
     </div>
 </div>
