@@ -4,10 +4,10 @@
 #auth-default-group-401: AUTH TYPE
 #auth-default-user-401: AUTH TYPE
 #auth-default-done: AUTH TYPE
-auth:
-  gapper:
-    icon: assets/img/gapper-auth-gapper/logo.png
-    name: Gapper
+#auth:
+#  gapper:
+#    icon: assets/img/gapper-auth-gapper/logo.png
+#    name: Gapper
 # proxy:
 #   - url: http://url
 #     proxy: http://proxy.url
