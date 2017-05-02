@@ -51,7 +51,14 @@ class Step extends \Gini\Controller\CGI
                 'hasMultiLogType' => !!(count(array_keys($conf)) > 1)
             ]);
         }
-
+            
+        $gatewayConf = \Gini\Config::get('gapper.auth')['gateway'];
+        if ('tht' == \Gini\Config::get('app.node') && in_array('gateway', array_keys($sources))) {
+            return $this->_showHTML('gapper/auth/gateway/login', [
+                'icon' => $gatewayConf['icon'],
+                'type' => $gatewayConf['name']
+            ]);
+        }
         return $this->_showHTML('gapper/client/checkauth', ['sources' => $sources]);
     }
 
