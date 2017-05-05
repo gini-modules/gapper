@@ -41,7 +41,7 @@ class Step extends \Gini\Controller\CGI
         $sources = [];
         foreach ($conf as $key => $info) {
             $key = strtolower($key);
-            if (!$info['show']) continue;
+            if ($info['show']===false) continue;
             $info['name'] = $info['name'];
             $sources[$key] = $info;
         }
