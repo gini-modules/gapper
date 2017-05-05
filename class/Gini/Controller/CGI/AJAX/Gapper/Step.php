@@ -41,15 +41,20 @@ class Step extends \Gini\Controller\CGI
         $sources = [];
         foreach ($conf as $key => $info) {
             $key = strtolower($key);
+            if (!$info['show']) continue;
             $info['name'] = $info['name'];
             $sources[$key] = $info;
         }
 
         if (count($sources) == 1) {
-            return $this->_showHTML('gapper/auth/gapper/login', [
-                'info' => (object) \Gini\Config::get('gapper.auth')['gapper'],
-                'hasMultiLogType' => !!(count(array_keys($conf)) > 1)
-            ]);
+            $ck = current(array_keys($conf));
+            if ($ck==self::$_defaultAuthType) {
+                return $this->_showHTML('gapper/auth/gapper/login', [
+                    'info' => (object) \Gini\Config::get('gapper.auth')['gapper'],
+                    'hasMultiLogType' => !!(count(array_keys($conf)) > 1)
+                ]);
+            }
+            return \Gini\CGI::request("ajax/gapper/auth/get-form/{$key}", $this->env)->execute();
         }
 
         return $this->_showHTML('gapper/client/checkauth', ['sources' => $sources]);
