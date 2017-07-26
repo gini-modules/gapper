@@ -55,7 +55,7 @@ class Client extends \Gini\Controller\CGI
         $data = [];
         foreach ($conf as $type=>$info) {
             $handler = $info['add_member_handler'] ?: "\Gini\Controller\CGI\AJAX\Gapper\Auth\\{$type}::addmember";
-            if (is_callable($handler)) {
+            if (is_callable($handler) && ($info['show'] !== false)) {
                 $data[$type] = $info;
                 continue;
             }
