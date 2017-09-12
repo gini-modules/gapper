@@ -30,7 +30,7 @@ class User extends RObject
                     $cacher = \Gini\Cache::of('orm');
                     $data = $cacher->get($key);
 
-                    if (is_array($data)) {
+                    if (is_array($data) && $data['id']) {
                         \Gini\Logger::of('orm')->debug('cache hits on {key}', ['key' => $key]);
                     } else {
                         \Gini\Logger::of('orm')->debug('cache missed on {key}', ['key' => $key]);
