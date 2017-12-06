@@ -9,12 +9,12 @@
                     <?php foreach ($sources as $source=>$info) {?>
                         <li class="<?= $info['url'] ? '' : 'gapper-client-checkbox-li'?>" data-gapper-auth-source="<?=H($source)?>">
                         <?php if ($info['url']) {?>
-                            <a href="<?=$info['url']?>" rel="noreferrer">
+                            <a href="<?=$info['url']?>" rel="noreferrer" style="display:inline-block;">
                         <?php } ?>
                             <div class="app-icon app-icon-hoverable">
                                 <div class="app-icon-image"><img src="<?=H($info['icon'])?>" /></div>
                                 <div class="app-icon-title"><?=H($info['name'])?></div>
-                            </div>                
+                            </div>
                         <?php if ($info['url']) {?>
                             </a>
                         <?php }?>
