@@ -43,6 +43,11 @@ class Step extends \Gini\Controller\CGI
             $key = strtolower($key);
             if ($info['show']===false) continue;
             $info['name'] = $info['name'];
+            $keyData = \Gini\CGI::request("ajax/gapper/auth/{$key}/get-form", $this->env)->execute();
+            $keyData = @json_decode($keyData,true);
+            if ($keyData && is_array($keyData) && $keyData['redirect']) {
+                $info['url'] = $keyData['redirect'];
+            }
             $sources[$key] = $info;
         }
 
@@ -97,7 +102,7 @@ class Step extends \Gini\Controller\CGI
         return $this->user401();
     }
 
-    public function user401() 
+    public function user401()
     {
         $view = \Gini\Config::get('gapper.views')['client/error/401-user'] ?: 'gapper/client/error/401-user';
 
@@ -158,4 +163,3 @@ class Step extends \Gini\Controller\CGI
         }
     }
 }
-
