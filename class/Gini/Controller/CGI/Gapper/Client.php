@@ -88,12 +88,6 @@ class Client extends \Gini\Controller\CGI\Gapper
 
     public function actionGo($client_id, $group_id = null)
     {
-        if (\Gini\Gapper\Client::getLoginStep() !== \Gini\Gapper\Client::STEP_DONE) {
-            return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
-        }
-
-        $redirect = $_GET['redirect'];
-
         if (!$client_id) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
@@ -103,15 +97,11 @@ class Client extends \Gini\Controller\CGI\Gapper
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
 
-        $username = \Gini\Gapper\Client::getUserName();
-        if (!$username) {
+        if (\Gini\Gapper\Client::getLoginStep() !== \Gini\Gapper\Client::STEP_DONE) {
             return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
         }
 
-        $token = \Gini\Gapper\Client::getLoginToken($client_id, $username);
-        if (!$token) {
-            return \Gini\IoC::construct('\Gini\CGI\Response\Nothing');
-        }
+        $redirect = $_GET['redirect'];
 
         $url = $app['url'];
         $confs = \Gini\Config::get('gapper.proxy');
@@ -121,14 +111,29 @@ class Client extends \Gini\Controller\CGI\Gapper
                 break;
             }
         }
+
+	$currentURL = 'http://' . $_SERVER['HTTP_HOST'];
+
         if ($this->_checkUrl($url, $redirect)) {
             $url = $redirect;
         }
 
-        $url = \Gini\URI::url($url, 'gapper-token='.$token);
-        if ($group_id) {
-            $url = \Gini\URI::url($url, 'gapper-group='.$group_id);
-        }
+        $query = [];
+        // mall-old采用的不是gini框架的共享session机制。需要独立登录
+        // 如果从域名和path兼容的角度，还是要token的
+        // if ($app['module_name']=='mall-old' || !$this->_checkUrl($currentURL, $url)) {
+                $username = \Gini\Gapper\Client::getUserName();
+                if ($username) {
+                        $token = \Gini\Gapper\Client::getLoginToken($client_id, $username);
+                        if ($token) {
+                                $query['gapper-token'] = $token;
+                        }
+                }
+        // }
+
+        if ($group_id) $query['gapper-group'] = $group_id;
+
+        $url = \Gini\URI::url($url, $query);
 
         return $this->redirect($url);
     }

@@ -83,7 +83,6 @@ class Client
     {
         $gapperToken = $_GET['gapper-token'];
         if ($gapperToken) {
-            \Gini\Gapper\Client::logout();
             \Gini\Gapper\Client::loginByToken($gapperToken);
         } else {
             // 提供第三方登录验证入口
@@ -98,12 +97,21 @@ class Client
                 }
                 $handler = \Gini\IoC::construct($className, $value['params']);
                 $handler->run();
+		$userChanged = true;
             }
         }
 
         $gapperGroup = $_GET['gapper-group'];
-        if ($gapperGroup && \Gini\Gapper\Client::getLoginStep() === \Gini\Gapper\Client::STEP_GROUP) {
-            \Gini\Gapper\Client::chooseGroup($gapperGroup);
+	$currentGapperGroup = self::getGroupID();
+	$currentStep = self::getLoginStep();
+        if ((!$currentGapperGroup || $gapperGroup && $gapperGroup!=$currentGapperGroup) && in_array($currentStep, [
+		self::STEP_GROUP,
+		self::STEP_DONE
+	])) {
+	    $username = self::getUserName();
+	    self::logout();
+	    self::loginByUserName($username);
+            if (self::getUserName()) self::chooseGroup($gapperGroup);
         }
     }
 
@@ -179,6 +187,10 @@ class Client
     {
         $user = self::getRPC()->gapper->user->authorizeByToken($token);
         if ($user && $user['username']) {
+            $myUsername = self::getUserName();
+            if ($myUsername && $user['username']!=$makeUserName) {
+	        \Gini\Gapper\Client::logout();
+            }
             return self::loginByUserName($user['username']);
         }
 
@@ -305,7 +317,7 @@ class Client
         return self::setSession(self::$keyGroupID, 0);
     }
 
-    public static function chooseGroup($groupID, $force=false)
+    public static function chooseGroup($groupID=null, $force=false)
     {
         $client_id = self::getId();
         if (!$client_id) {
@@ -332,7 +344,11 @@ class Client
             $groups = self::getRPC()->gapper->user->getGroups($username) ?: [];
             self::cache($cacheKey, $groups);
         }
-        if (!is_array($groups) || !in_array($groupID, array_keys($groups))) {
+        if (!is_array($groups)) return false;
+	if (!$groupID && count($groups)==1) {
+		$groupID = current($groups)['id'];
+	}
+	if (!in_array($groupID, array_keys($groups))) {
             return false;
         }
 
@@ -474,19 +490,16 @@ class Client
 
     public static function goLogin($redirect=null)
     {
-        $redirect = $redirect ?: $_SERVER['REQUEST_URI'];
+        $redirect = $redirect ?: '/';
 
         if (self::getLoginStep()===self::STEP_GROUP) {
-            $groups = self::getGroups();
-            if ($groups && count($groups)==1) {
-                self::chooseGroup(current($groups)['id']);
-            }
+                self::chooseGroup();
         }
 
         if (self::getLoginStep()===self::STEP_DONE) {
             $url = \Gini\URI::url($redirect, [
-                'gapper-token'=> '',
-                'gapper-group'=> ''
+                'gapper-token'=> null,
+                'gapper-group'=> null
             ]);
         } else {
             $url = \Gini\URI::url('gapper/client/login', ['redirect' => $redirect]);

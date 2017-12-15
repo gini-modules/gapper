@@ -11,24 +11,6 @@ namespace Gini\Module
             class_exists('\Gini\Those');
             class_exists('\Gini\ThoseIndexed');
 
-            $needPrepareGapperInfo = \Gini\Config::get('gapper.need_prepare_gapper_info_in_module_setup');
-            if ($needPrepareGapperInfo!==false) {
-                \Gini\Gapper\Client::init();
-
-                $me = a('gapper/user', ['username' => \Gini\Gapper\Client::getUserName()]);
-                $bool = !!$me->id;
-
-                $appInfo = \Gini\Gapper\Client::getInfo();
-                if ($appInfo['type']==='group') {
-                    $group = a('gapper/group', $me->id ? \Gini\Gapper\Client::getGroupID() : null);
-                    $bool = $bool && !!$group->id;
-                }
-
-                if (!$bool && \Gini\Gapper\Client::getLoginStep()===\GIni\Gapper\Client::STEP_DONE) {
-                    \Gini\Gapper\Client::logout();
-                }
-            }
-
             isset($_GET['locale']) and $_SESSION['locale'] = $_GET['locale'];
             isset($_SESSION['locale']) and \Gini\Config::set('system.locale', $_SESSION['locale']);
             \Gini\I18N::setup();
