@@ -488,9 +488,8 @@ class Client
         return true;
     }
 
-    public static function goLogin($redirect=null, $forceRedirect=true)
+    public static function goLogin($redirect=null)
     {
-        $isnull = $redirect ? false : true;
         $redirect = $redirect ?: '/';
 
         if (self::getLoginStep()===self::STEP_GROUP) {
@@ -498,7 +497,6 @@ class Client
         }
 
         if (self::getLoginStep()===self::STEP_DONE) {
-            if ($isnull && !$forceRedirect) return;
             $url = \Gini\URI::url($redirect, [
                 'gapper-token'=> null,
                 'gapper-group'=> null
