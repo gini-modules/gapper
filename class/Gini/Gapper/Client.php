@@ -188,7 +188,7 @@ class Client
         $user = self::getRPC()->gapper->user->authorizeByToken($token);
         if ($user && $user['username']) {
             $myUsername = self::getUserName();
-            if ($myUsername && $user['username']!=$makeUserName) {
+            if ($myUsername && $user['username']!=$myUsername) {
 	        \Gini\Gapper\Client::logout();
             }
             return self::loginByUserName($user['username']);
