@@ -345,10 +345,20 @@ class Client
             self::cache($cacheKey, $groups);
         }
         if (!is_array($groups)) return false;
-	if (!$groupID && count($groups)==1) {
-		$groupID = current($groups)['id'];
-	}
-	if (!in_array($groupID, array_keys($groups))) {
+
+        $newGroups = [];
+        foreach ($groups as $k => $g) {
+            $apps = self::getGroupApps((int)$g['id'], $force);
+            if (is_array($apps) && isset($apps[$client_id])) {
+                $newGroups[$k] = $g;
+            }
+        }
+        $groups = $newGroups;
+
+        if (!$groupID && count($groups)==1) {
+            $groupID = current($groups)['id'];
+        }
+        if (!in_array($groupID, array_keys($groups))) {
             return false;
         }
 
@@ -417,7 +427,7 @@ class Client
         return self::_getGroupInfo($cacheKey, $criteria, $force);
     }
 
-    private static function _getGroupInfo($cacheKey, $criteria, $force=false) 
+    private static function _getGroupInfo($cacheKey, $criteria, $force=false)
     {
         if (!$force) {
             $info = self::cache($cacheKey);
