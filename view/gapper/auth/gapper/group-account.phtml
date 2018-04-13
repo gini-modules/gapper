@@ -30,7 +30,11 @@
                     </p>
                     <p>
                         <h5><?=H(T('Get it. Go to sign up'))?></h5>
-                        <a href="http://gapper.in/signup">http://gapper.in/signup</a>
+                        <?php 
+                            $vGapperURL = rtrim(\Gini\Config::get('gapper.server_home') ?: 'http://gapper.in/', '/');
+                            $vSignupURL = $vGapperURL . '/signup';
+                        ?>
+                        <a href="<?=$vSignupURL?>"><?=$vSignupURL?></a>
                     </p>
                 </div>
             </div>
