@@ -9,6 +9,7 @@ auth:
     icon: assets/img/gapper-auth-gapper/logo.png
     name: Gapper
     show: ${SHOW_LOGIN_TYPE_GAPPER}
+server_home: ${GAPPER_URL:='http://gapper.in/'}
 # proxy:
 #   - url: http://url
 #     proxy: http://proxy.url
