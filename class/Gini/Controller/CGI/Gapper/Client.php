@@ -118,10 +118,16 @@ class Client extends \Gini\Controller\CGI\Gapper
             $url = $redirect;
         }
 
+        $toURI = parse_url($url);
+        $toDomain = $toURI['host'];
+        $fromDomain= $_SERVER['SERVER_NAME'];
+        $isSelf = !!($fromDomain==$toDomain);
+
         $query = [];
         // mall-old采用的不是gini框架的共享session机制。需要独立登录
         // 如果从域名和path兼容的角度，还是要token的
         // if ($app['module_name']=='mall-old' || !$this->_checkUrl($currentURL, $url)) {
+        if (!$isSelf) {
                 $username = \Gini\Gapper\Client::getUserName();
                 if ($username) {
                         $token = \Gini\Gapper\Client::getLoginToken($client_id, $username);
@@ -129,9 +135,10 @@ class Client extends \Gini\Controller\CGI\Gapper
                                 $query['gapper-token'] = $token;
                         }
                 }
+        }
         // }
 
-        if ($group_id) $query['gapper-group'] = $group_id;
+        if ($group_id && (!$isSelf || $group_id!=_G('GROUP')->id)) $query['gapper-group'] = $group_id;
 
         $url = \Gini\URI::url($url, $query);
 
