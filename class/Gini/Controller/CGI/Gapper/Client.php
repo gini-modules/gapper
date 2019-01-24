@@ -112,7 +112,7 @@ class Client extends \Gini\Controller\CGI\Gapper
             }
         }
 
-	$currentURL = 'http://' . $_SERVER['HTTP_HOST'];
+        $currentURL = 'http://' . $_SERVER['HTTP_HOST'];
 
         if ($this->_checkUrl($url, $redirect)) {
             $url = $redirect;
@@ -127,7 +127,8 @@ class Client extends \Gini\Controller\CGI\Gapper
         // mall-old采用的不是gini框架的共享session机制。需要独立登录
         // 如果从域名和path兼容的角度，还是要token的
         // if ($app['module_name']=='mall-old' || !$this->_checkUrl($currentURL, $url)) {
-        if (!$isSelf) {
+        $isOP = !!($app['module_name'] == 'mall-old');
+        if (!$isSelf || $isOP) {
                 $username = \Gini\Gapper\Client::getUserName();
                 if ($username) {
                         $token = \Gini\Gapper\Client::getLoginToken($client_id, $username);
