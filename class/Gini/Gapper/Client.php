@@ -428,16 +428,6 @@ class Client
                 $groups = self::getRPC()->gapper->user->getGroups($username) ?: [];
                 self::cache($cacheKey, $groups);
             }
-            if ($hasServerAgent && $groups) {
-                $gids = array_keys($groups);
-                $userInfo = self::getUserInfo($username);
-                if ($userID = $userInfo['id']) {
-                    $db = a('gapper/agent/group/user')->db();
-                    foreach ($gids as $gid) {
-                        $db->query("insert into gapper_agent_group_user(group_id,user_id) values({$userID}, {$gid})");
-                    }
-                }
-            }
         }
 
         if (empty($groups)) {
@@ -449,6 +439,17 @@ class Client
             $apps = self::getGroupApps((int)$g['id'], $force);
             if (is_array($apps) && isset($apps[$client_id])) {
                 $result[$k] = $g;
+            }
+        }
+
+        if ($hasServerAgent && $groups) {
+            $gids = array_keys($groups);
+            $userInfo = self::getUserInfo($username);
+            if ($userID = $userInfo['id']) {
+                $db = a('gapper/agent/group/user')->db();
+                foreach ($result as $group) {
+                    $db->query("insert into gapper_agent_group_user(group_id,user_id) values({$group['id']}, {$userID})");
+                }
             }
         }
 
