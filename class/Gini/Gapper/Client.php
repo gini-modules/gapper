@@ -447,9 +447,11 @@ class Client
             $userInfo = self::getUserInfo($username);
             if ($userID = $userInfo['id']) {
                 $db = a('gapper/agent/group/user')->db();
+                $db->beginTransaction();
                 foreach ($result as $group) {
                     $db->query("insert into gapper_agent_group_user(group_id,user_id) values({$group['id']}, {$userID})");
                 }
+                $db->commit();
             }
         }
 
@@ -555,16 +557,70 @@ class Client
     public static function getGroupApps($groupID=null, $force=false)
     {
         $groupID = $groupID ?: self::getGroupID();
-        if ($groupID) {
-            $cacheKey = "app#group#{$groupID}#apps";
-            $apps = false;
-            if (!$force) {
-                $apps = self::cache($cacheKey);
+        if (!$groupID) return;
+
+        $hasServerAgent = self::hasServerAgent();
+        if ($hasServerAgent) {
+            $apps = self::getAgentGroupApps((int)$groupID);
+            if ($apps) return $apps;
+        }
+
+        $cacheKey = "app#group#{$groupID}#apps";
+        $apps = false;
+        if (!$force) {
+            $apps = self::cache($cacheKey);
+        }
+        if (false === $apps) {
+            $apps = self::getRPC()->gapper->group->getApps((int)$groupID) ?: [];
+            self::cache($cacheKey, $apps);
+        }
+
+        if ($hasServerAgent && $apps) {
+            $db = a('gapper/agent/app')->db();
+            $clientIDs = $db->quote(array_keys($apps));
+            $query = $db->query("select client_id,name from gapper_agent_app where client_id in ({$clientIDs})");
+            if ($query) {
+                $rows = $query->rows();
+                if (count($rows)) {
+                    $result = [];
+                    $db->beginTransaction();
+                    foreach ($rows as $row) {
+                        $clientID = $row->client_id;
+                        $app_name = $row->name;
+                        $result[$clientID] = $apps[$clientID];
+                        $gaString = $db->quote([$groupID, $app_name]);
+                        $db->query('insert into gapper_agent_group_app(group_id,app_name) values({$gaString})');
+                    }
+                    $db->commit();
+                    $apps = $result;
+                }
             }
-            if (false === $apps) {
-                $apps = self::getRPC()->gapper->group->getApps((int)$groupID) ?: [];
-                self::cache($cacheKey, $apps);
-            }
+        }
+
+        return $apps;
+    }
+
+    private static function getAgentGroupApps($groupID)
+    {
+        $groupID = (int)$groupID;
+        $db = a('gapper/agent/group/app')->db();
+        $query = $db->query("select gaa.id as id, gaa.client_id as client_id, gaa.name as name, gaa.title as title, gaa.short_title as short_title, gaa.url as url, gaa.icon_url as icon_url, gaa.type as type, gaa.rate as rate, gaa.font_icon as font_icon from gapper_agent_group_app as gga left join gapper_agent_app as gaa on gga.app_name=gaa.name where gga.group_id={$groupID}");
+        if (!$query) return;
+        $rows = $query->rows();
+        $apps = [];
+        foreach ($rows as $row) {
+            $apps[$row->client_id] = [
+                'id'=> $row->id,
+                'name'=> $row->name,
+                'title'=> $row->title,
+                'short_title'=> $row->short_title,
+                'url'=> $row->url,
+                'icon_url'=> $row->icon_url,
+                'type'=> $row->type,
+                'rate'=> $row->rate,
+                'font_icon'=> $row->font_icon,
+                'module_name'=> $row->name
+            ];
         }
         return $apps;
     }
