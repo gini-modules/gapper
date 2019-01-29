@@ -455,7 +455,7 @@ class Client
                 $db = a('gapper/agent/group/user')->db();
                 $db->beginTransaction();
                 foreach ($result as $group) {
-                    $db->query("insert into gapper_agent_group_user(group_id,user_id) values({$group['id']}, {$userID})");
+                    $db->query("insert ignore into gapper_agent_group_user(group_id,user_id) values({$group['id']}, {$userID})");
                 }
                 $db->commit();
             }
@@ -582,7 +582,7 @@ class Client
                             $app_name = $row->name;
                             $result[$clientID] = $apps[$clientID];
                             $uaString = $db->quote([$userID, $app_name]);
-                            $db->query("insert into gapper_agent_user_app(user_id,app_name) values({$uaString})");
+                            $db->query("insert ignore into gapper_agent_user_app(user_id,app_name) values({$uaString})");
                         }
                         $db->commit();
                         $apps = $result;
@@ -643,7 +643,7 @@ class Client
                         $app_name = $row->name;
                         $result[$clientID] = $apps[$clientID];
                         $gaString = $db->quote([$groupID, $app_name]);
-                        $db->query("insert into gapper_agent_group_app(group_id,app_name) values({$gaString})");
+                        $db->query("insert ignore into gapper_agent_group_app(group_id,app_name) values({$gaString})");
                     }
                     $db->commit();
                     $apps = $result;
