@@ -589,7 +589,7 @@ class Client
                         $app_name = $row->name;
                         $result[$clientID] = $apps[$clientID];
                         $gaString = $db->quote([$groupID, $app_name]);
-                        $db->query('insert into gapper_agent_group_app(group_id,app_name) values({$gaString})');
+                        $db->query("insert into gapper_agent_group_app(group_id,app_name) values({$gaString})");
                     }
                     $db->commit();
                     $apps = $result;
