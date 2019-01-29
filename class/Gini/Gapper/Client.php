@@ -268,6 +268,13 @@ class Client
             return;
         }
 
+        $hasServerAgent = self::hasServerAgent();
+        // 先检查本地缓存的数据时有没有
+        if ($hasServerAgent) {
+            $info = self::getAgentUserInfo($username);
+            if ($info) return $info;
+        }
+
         $cacheKeyUserName = is_numeric($username) ? $username : self::makeUserName($username);
         $cacheKey = "app#user#{$cacheKeyUserName}#info";
         if (!$force) {
@@ -278,11 +285,59 @@ class Client
             self::cache($cacheKey, $info);
         }
 
+        // 将数据本地缓存
+        if ($hasServerAgent && $info) {
+            self::replaceAgentUserInfo($username, $info);
+        }
+
         return $info;
+    }
+
+    private static function replaceAgentUserInfo($username, $info)
+    {
+        $username = self::makeUserName($username);
+        $user = a('gapper/agent/user', ['username'=>$username]);
+        if ($user->id && (int)$info['id']!==(int)$user->id) return;
+        if (!$user->id) $user->id = $info['id'];
+        $user->name = $info['name'];
+        $user->initials = $info['initials'];
+        $user->username = $username;
+        $user->email = $info['email'];
+        $user->phone = $info['phone'];
+        $user->icon = $info['icon'];
+        $user->stime = date('Y-m-d H:i:s');
+        return $user->save();
+    }
+
+    private static function getAgentUserInfo($username)
+    {
+        $username = self::makeUserName($username);
+        $user = a('gapper/agent/user', ['username'=>$username]);
+        if (!$user->id) return;
+        return self::makeAgentUserData($user);
+    }
+
+    private static function makeAgentUserData($user)
+    {
+        return [
+            'id'=> $user->id,
+            'name'=> $user->name,
+            'initials'=> $user->initials,
+            'username'=> $user->username,
+            'email'=> $user->email,
+            'phone'=> $user->phone,
+            'icon'=> $user->icon,
+        ];
     }
 
     public static function getUserByIdentity($source, $ident, $force=false)
     {
+        $hasServerAgent = self::hasServerAgent();
+        if ($hasServerAgent) {
+            $info = self::getAgentUserByIdentity($source, $ident);
+            if ($info) return $info;
+        }
+
         $cacheKey = "app#ident#{$source}#{$ident}#info";
         if (!$force) {
             $info = self::cache($cacheKey);
@@ -291,7 +346,35 @@ class Client
             $info = self::getRPC()->Gapper->User->getUserByIdentity($source, $ident);
             self::cache($cacheKey, $info);
         }
+
+        if ($hasServerAgent && $info) {
+            self::replaceAgentUserIdentity($source, $ident, $info);
+        }
+
         return $info;
+    }
+
+    private static function getAgentUserByIdentity($source, $ident)
+    {
+        $ui = a('gapper/agent/user/identity', ['identity'=> $ident, 'source'=> $source]);
+        if (!$ui->id) return;
+        $user = a('gapper/agent/user', ['id'=> $ui->user_id]);
+        if (!$user->id) return;
+        return self::makeAgentUserData($user);
+    }
+
+    private static function replaceAgentUserIdentity($source, $ident, $info)
+    {
+        $user = a('gapper/agent/user', ['id'=> $info['id']]);
+        if (!$user->id) {
+            if (!self::replaceAgentUserInfo($info['username'], $info)) return;
+        }
+        $ui = a('gapper/agent/user/identity', ['identity'=> $ident, 'source'=> $source]);
+        if ($ui->id) return;
+        $ui->source = $source;
+        $ui->identity = $ident;
+        $ui->user_id = $info['id'];
+        return $ui->save();
     }
 
     public static function linkIdentity($source, $ident, $username=null)
