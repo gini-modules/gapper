@@ -287,7 +287,7 @@ class Client
 
         // 将数据本地缓存
         if ($hasServerAgent && $info) {
-            self::replaceAgentUserInfo($username, $info);
+            self::replaceAgentUserInfo($info);
         }
 
         return $info;
@@ -304,10 +304,9 @@ class Client
         return $user;
     }
 
-    private static function replaceAgentUserInfo($username, $info)
+    private static function replaceAgentUserInfo($info)
     {
-        $user = self::getAgentUser($username);
-        if ($user->id && (int)$info['id']!==(int)$user->id) return;
+        $user = self::getAgentUser((int)$info['id']);
         if (!$user->id) $user->id = $info['id'];
         $user->name = $info['name'];
         $user->initials = $info['initials'];
@@ -376,7 +375,7 @@ class Client
     {
         $user = a('gapper/agent/user', ['id'=> $info['id']]);
         if (!$user->id) {
-            if (!self::replaceAgentUserInfo($info['username'], $info)) return;
+            if (!self::replaceAgentUserInfo($info)) return;
         }
         $ui = a('gapper/agent/user/identity', ['identity'=> $ident, 'source'=> $source]);
         if ($ui->id) return;
@@ -558,6 +557,12 @@ class Client
 
     private static function _getGroupInfo($cacheKey, $criteria, $force=false)
     {
+        $hasServerAgent = self::hasServerAgent();
+        if ($hasServerAgent) {
+            $info = self::getAgentGroupInfo($criteria);
+            if ($info) return $info;
+        }
+
         if (!$force) {
             $info = self::cache($cacheKey);
         }
@@ -565,7 +570,54 @@ class Client
             $info = self::getRPC()->gapper->group->getInfo($criteria);
             self::cache($cacheKey, $info);
         }
+
+        if ($hasServerAgent && $info) {
+            self::replaceAgentGroupInfo($info);
+        }
+
         return $info;
+    }
+
+    private static function replaceAgentGroupInfo($info)
+    {
+        $group = self::getAgentGroup((int)$info['id']);
+        if (!$group->id) $group->id = $info['id'];
+        $group->name = $info['name'];
+        $group->title = $info['title'];
+        $group->abbr = $info['abbr'];
+        $group->creator = $info['creator'];
+        $group->icon = $info['icon'];
+        $group->stime = date('Y-m-d H:i:s');
+        return $group->save();
+    }
+
+    private static function getAgentGroup($criteria)
+    {
+        if (is_int($criteria)) {
+            $group = a('gapper/agent/group', $criteria);
+        } else {
+            $group = a('gapper/agent/group', ['name'=>$criteria]);
+        }
+        return $group;
+    }
+
+    private static function getAgentGroupInfo($criteria)
+    {
+        $group = self::getAgentGroup($criteria);
+        if (!$group->id) return;
+        return self::makeAgentGroupData($group);
+    }
+
+    private static function makeAgentGroupData($group)
+    {
+        return [
+            'id'=> $group->id,
+            'name'=> $group->name,
+            'title'=> $group->title,
+            'abbr'=> $group->abbr,
+            'creator'=> $group->creator,
+            'icon'=> $group->icon,
+        ];
     }
 
     // public static function getGroupInfo($force=false)
