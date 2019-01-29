@@ -412,15 +412,32 @@ class Client
             return false;
         }
 
-        $cacheKeyUserName = self::makeUserName($username);
-        $cacheKey = "app#user#{$client_id}#{$cacheKeyUserName}#groups";
-        $groups = false;
-        if (!$force) {
-            $groups = self::cache($cacheKey);
+        $hasServerAgent = self::hasServerAgent();
+        if ($hasServerAgent) {
+            $groups = self::getAgentUserGroups($username);
         }
-        if (false === $groups) {
-            $groups = self::getRPC()->gapper->user->getGroups($username) ?: [];
-            self::cache($cacheKey, $groups);
+
+        if (!$groups) {
+            $cacheKeyUserName = self::makeUserName($username);
+            $cacheKey = "app#user#{$client_id}#{$cacheKeyUserName}#groups";
+            $groups = false;
+            if (!$force) {
+                $groups = self::cache($cacheKey);
+            }
+            if (false === $groups) {
+                $groups = self::getRPC()->gapper->user->getGroups($username) ?: [];
+                self::cache($cacheKey, $groups);
+            }
+            if ($hasServerAgent && $groups) {
+                $gids = array_keys($groups);
+                $userInfo = self::getUserInfo($username);
+                if ($userID = $userInfo['id']) {
+                    $db = a('gapper/agent/group/user')->db();
+                    foreach ($gids as $gid) {
+                        $db->query("insert into gapper_agent_group_user(group_id,user_id) values({$userID}, {$gid})");
+                    }
+                }
+            }
         }
 
         if (empty($groups)) {
@@ -435,6 +452,24 @@ class Client
             }
         }
 
+        return $result;
+    }
+
+    private static function getAgentUserGroups($username)
+    {
+        $userInfo = self::getUserInfo($username);
+        if (!$userInfo) return;
+        $userID = (int)$userInfo['id'];
+        if (!$userInfo) return;
+        $db = a('gapper/agent/group/user')->db();
+        $query = $db->query("select group_id from gapper_agent_group_user where user_id={$userID}");
+        if (!$query) return;
+        $rows = $query->rows();
+        if (!count($rows)) return;
+        $result = [];
+        foreach ($rows as $row) {
+            $result[$row->group_id] = self::_getTheGroupInfo((int)$row->group_id);
+        }
         return $result;
     }
 
