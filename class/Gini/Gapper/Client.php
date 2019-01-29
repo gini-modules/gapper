@@ -21,6 +21,23 @@ namespace Gini\Gapper;
 
 class Client
 {
+    private static $_has_server_agent = null;
+    public static function hasServerAgent()
+    {
+        if (!is_null(self::$_has_server_agent)) return self::$_has_server_agent;
+
+        $config = \Gini\Config::get('database.gapper-server-agent-db');
+        $username = $config['username'];
+        // 如果配置了user，就认为dsn和password也配置了
+        // 如果有人配置了user，但是没有对应的dsn和password，那就是这个人配置有问题了
+        if (!$username) {
+            self::$_has_server_agent = false;
+        } else {
+            self::$_has_server_agent = true;
+        }
+        return self::$_has_server_agent;
+    }
+
     private static $_RPC;
     public static function getRPC()
     {
@@ -97,20 +114,20 @@ class Client
                 }
                 $handler = \Gini\IoC::construct($className, $value['params']);
                 $handler->run();
-		$userChanged = true;
+                $userChanged = true;
             }
         }
 
         $gapperGroup = $_GET['gapper-group'];
-	$currentGapperGroup = self::getGroupID();
-	$currentStep = self::getLoginStep();
+        $currentGapperGroup = self::getGroupID();
+        $currentStep = self::getLoginStep();
         if ((!$currentGapperGroup || $gapperGroup && $gapperGroup!=$currentGapperGroup) && in_array($currentStep, [
-		self::STEP_GROUP,
-		self::STEP_DONE
-	])) {
-	    $username = self::getUserName();
-	    self::logout();
-	    self::loginByUserName($username);
+            self::STEP_GROUP,
+            self::STEP_DONE
+        ])) {
+            $username = self::getUserName();
+            self::logout();
+            self::loginByUserName($username);
             if (self::getUserName()) self::chooseGroup($gapperGroup);
         }
     }
@@ -123,6 +140,9 @@ class Client
     {
         $client_id = $client_id ?: self::getId();
         if (!$client_id) return [];
+        if (self::hasServerAgent()) {
+            return self::getAgentAPPInfo($client_id);
+        }
         $cacheKey = "app#client#{$client_id}#info";
         if (!$force) {
             $info = self::cache($cacheKey);
@@ -131,6 +151,23 @@ class Client
         $info = self::getRPC()->gapper->app->getInfo($client_id);
         self::cache($cacheKey, $info);
         return $info;
+    }
+
+    private static function getAgentAPPInfo($client_id)
+    {
+        $app = a('gapper/agent/app', ['client_id'=>$client_id]);
+        if (!$app->id) return [];
+        return [
+            'id'=> $app->id,
+            'name'=> $app->name,
+            'title'=> $app->title,
+            'short_title'=> $app->short_title,
+            'url'=> $app->url,
+            'icon_url'=> $app->icon_url,
+            'type'=> $app->type,
+            'rate'=> $app->rate,
+            'module_name'=> $app->name
+        ];
     }
 
     public static function getLoginStep($force=false)
@@ -189,7 +226,7 @@ class Client
         if ($user && $user['username']) {
             $myUsername = self::getUserName();
             if ($myUsername && $user['username']!=$myUsername) {
-	        \Gini\Gapper\Client::logout();
+                \Gini\Gapper\Client::logout();
             }
             return self::loginByUserName($user['username']);
         }
