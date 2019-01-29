@@ -293,15 +293,25 @@ class Client
         return $info;
     }
 
+    private static function getAgentUser($username)
+    {
+        if (is_int($username)) {
+            $user = a('gapper/agent/user', ['id'=>$username]);
+        } else {
+            $username = self::makeUserName($username);
+            $user = a('gapper/agent/user', ['username'=>$username]);
+        }
+        return $user;
+    }
+
     private static function replaceAgentUserInfo($username, $info)
     {
-        $username = self::makeUserName($username);
-        $user = a('gapper/agent/user', ['username'=>$username]);
+        $user = self::getAgentUser($username);
         if ($user->id && (int)$info['id']!==(int)$user->id) return;
         if (!$user->id) $user->id = $info['id'];
         $user->name = $info['name'];
         $user->initials = $info['initials'];
-        $user->username = $username;
+        $user->username = $info['username'];
         $user->email = $info['email'];
         $user->phone = $info['phone'];
         $user->icon = $info['icon'];
@@ -311,8 +321,7 @@ class Client
 
     private static function getAgentUserInfo($username)
     {
-        $username = self::makeUserName($username);
-        $user = a('gapper/agent/user', ['username'=>$username]);
+        $user = self::getAgentUser($username);
         if (!$user->id) return;
         return self::makeAgentUserData($user);
     }
