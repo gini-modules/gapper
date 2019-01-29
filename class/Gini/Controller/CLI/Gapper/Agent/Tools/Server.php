@@ -94,7 +94,7 @@ class Server extends \Gini\Controller\CLI
 
 	private static function replaceLocalApp($info)
 	{
-        $db = \Gini\Database::db('node-share-db');
+        $db = \Gini\Database::db('gapper-server-agent-db');
         $values = $db->quote([
             $info['id'],
             $info['client_id'], $info['client_secret'],
@@ -103,7 +103,7 @@ class Server extends \Gini\Controller\CLI
             $info['type'], $info['rate'],
             $info['font_icon']?:'',
         ]);
-        $db->query("replace into app (id,client_id,client_secret,name,title,short_title,url,icon_url,type,rate,font_icon) values({$values})");
+        $db->query("replace into gapper_agent_app (id,client_id,client_secret,name,title,short_title,url,icon_url,type,rate,font_icon) values({$values})");
 	}
 
     private static function getAppInfo($clientID)
