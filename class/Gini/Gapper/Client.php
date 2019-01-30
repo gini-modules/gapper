@@ -619,7 +619,8 @@ class Client
 
     public static function getGroupMembers($groupID)
     {
-        $groupInfo = self::getGroupInfo((int)$group->id, false);
+        $groupID = (int)$groupID;
+        $groupInfo = self::getGroupInfo($groupID, false);
         if (!$groupInfo) return;
 
         $hasServerAgent = self::hasServerAgent();
