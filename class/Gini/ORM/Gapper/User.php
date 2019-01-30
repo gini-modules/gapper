@@ -90,21 +90,31 @@ class User extends RObject
             return [];
         }
 
-        $key = $this->name().'#'.$this->id.':'.$group->name().'#'.$group->id;
+        $groupInfo = \Gini\Gapper\Client::getGroupInfo((int)$group->id, false);
+        if (!$groupInfo) return [];
 
-        $cacher = \Gini\Cache::of('orm');
-        $data = $cacher->get($key);
-
-        if (is_array($data)) {
-            \Gini\Logger::of('orm')->debug("cache hits on $key");
-        } else {
-            \Gini\Logger::of('orm')->debug("cache missed on $key");
-            $data = static::getRPC()->gapper->user->getGroupInfo((int) $this->id, (int) $group->id);
-            // set ttl to 5 sec
-            $cacher->set($key, $data, $this->cacheTimeout);
+        if ($groupInfo['creator']==$this->username) {
+            $groupInfo['admin'] = true;
         }
 
-        return (array) $data;
+        return $groupInfo;
+
+
+        // $key = $this->name().'#'.$this->id.':'.$group->name().'#'.$group->id;
+
+        // $cacher = \Gini\Cache::of('orm');
+        // $data = $cacher->get($key);
+
+        // if (is_array($data)) {
+        //     \Gini\Logger::of('orm')->debug("cache hits on $key");
+        // } else {
+        //     \Gini\Logger::of('orm')->debug("cache missed on $key");
+        //     $data = static::getRPC()->gapper->user->getGroupInfo((int) $this->id, (int) $group->id);
+        //     // set ttl to 5 sec
+        //     $cacher->set($key, $data, $this->cacheTimeout);
+        // }
+
+        // return (array) $data;
     }
 
     public function linkIdentity($source, $ident) {
