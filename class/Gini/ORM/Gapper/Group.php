@@ -32,10 +32,17 @@ class Group extends RObject
         return $data;
     }
 
-    public function getMembers()
+    public function getMembers($isObjectList=false)
     {
         if (!$this->id) return [];
-        return \Gini\Gapper\Client::getGroupMembers((int)$this->id);
+        $result = \Gini\Gapper\Client::getGroupMembers((int)$this->id);
+        if (!$isObjectList) return $result;
+        $members = [];
+        foreach ($result as $k=>$v) {
+            $member = a('gapper/user')->setData($v);
+            $members[$k] = $member;
+        }
+        return $members;
     }
 
     public function getApps()
