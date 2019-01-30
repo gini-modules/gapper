@@ -639,35 +639,42 @@ class Client
             }
         }
 
-        if ($result) return $result;
+        if (!$result) {
+            $start = 0;
+            $per_page = 50;
+            $result = [];
+            while (true) {
+                $members = (array) self::getRPC()->gapper->group->getMembers((int)$groupID, null ,$start, $per_page);
+                $start += $per_page;
+                if (!count($members)) break;
+                $result = $result + $members;
+            }
 
-        $start = 0;
-        $per_page = 50;
-        $result = [];
-        while (true) {
-            $members = (array) self::getRPC()->gapper->group->getMembers((int)$groupID, null ,$start, $per_page);
-            $start += $per_page;
-            if (!count($members)) break;
-            $result = $result + $members;
+            if ($hasServerAgent && $result) {
+                $db = a('gapper/agent/group/user')->db();
+                $db->beginTransaction();
+                $values = [];
+                foreach ($result as $userInfo) {
+                    if ($db->query("select exists(select 1 from gapper_agent_group_user where group_id={$groupID} and user_id={$userInfo['id']})")->value()) continue;
+                    $values[] = $db->quote([$groupID, $userInfo['id']]);
+                }
+                if ($values) {
+                    $valuesStr = implode('),(', $values);
+                    $db->query("insert into gapper_agent_group_user (group_id, user_id) values ({$valuesStr})");
+                }
+                $db->query("update gapper_agent_group set mstime=CURRENT_TIMESTAMP where id={$groupID}");
+                $db->commit();
+            }
         }
 
-        if ($hasServerAgent && $result) {
-            $db = a('gapper/agent/group/user')->db();
-            $db->beginTransaction();
-            $values = [];
-            foreach ($result as $userInfo) {
-                if ($db->query("select exists(select 1 from gapper_agent_group_user where group_id={$groupID} and user_id={$userInfo['id']})")->value()) continue;
-                $values[] = $db->quote([$groupID, $userInfo['id']]);
-            }
-            if ($values) {
-                $valuesStr = implode('),(', $values);
-                $db->query("insert into gapper_agent_group_user (group_id, user_id) values ({$valuesStr})");
-            }
-            $db->query("update gapper_agent_group set mstime=CURRENT_TIMESTAMP where id={$groupID}");
-            $db->commit();
+        $members = [];
+        foreach ($result as $uid=>$udata) {
+            $user = a('gapper/user');
+            $user->setData($udata);
+            $members[$udata['id']] = $user;
         }
 
-        return $result;
+        return $members;
     }
 
     public static function getGroupApps($groupID=null, $force=false)
