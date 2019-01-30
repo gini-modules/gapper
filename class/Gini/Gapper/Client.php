@@ -675,17 +675,17 @@ class Client
         $groupID = (int)$groupID;
         $userID = (int)$userID;
         $userInfo = self::getUserInfo($userID);
-        if (!$userInfo) return;
+        if (!$userInfo) return false;
         
         try {
             $bool = self::getRPC()->gapper->group->removeMember($groupID, $userID);
         } catch (\Exception $e) {
         }
 
-        if (!$bool) return;
+        if (!$bool) return false;
         if (self::hasServerAgent()) {
             $db = a('gapper/agent/group/user')->db();
-            return $db->query("delete from gapper_agent_group_user where group_id={$groupID} and user_id={$userID}");
+            return !!($db->query("delete from gapper_agent_group_user where group_id={$groupID} and user_id={$userID}"));
         } 
         self::getGroups($userInfo['username'], true);
         return true;
