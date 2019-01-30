@@ -10,7 +10,7 @@ class Group extends \Gini\ORM\Gapper\Agent\SObject
     public $creator = 'string:120,comment:创建人的username';
     public $icon = 'string:250,comment:组logo';
     public $stime = 'datetime,comment:同步时间';
-    public $mstime = 'datetime,default:null,comment:最后一次同步云端组成员的时间';
+    public $mstime = 'datetime,null,comment:最后一次同步云端组成员的时间';
 
     protected static $db_index = [
         'unique:name',
