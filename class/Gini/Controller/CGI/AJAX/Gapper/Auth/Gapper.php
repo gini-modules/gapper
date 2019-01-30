@@ -60,12 +60,8 @@ class Gapper extends \Gini\Controller\CGI
         $form = $this->form('post');
         $username = $form['username'];
         $password = $form['password'];
-        try {
-            $bool = \Gini\Gapper\Client::getRPC()->gapper->user->verify($username, $password);
-        } catch (\Exception $e) {
-        }
 
-        if ($bool) {
+        if (\Gini\Gapper\Client::verfiyUserPassword($username, $password)) {
             $result = \Gini\Gapper\Client::loginByUserName($username);
             if ($result) {
                 // by pihizi
@@ -200,14 +196,8 @@ class Gapper extends \Gini\Controller\CGI
                 return self::_success($info);
             }
 
-            try {
-                $bool = \Gini\Gapper\Client::getRPC()->gapper->group->addMember((int)$current, (int)$info['id']);
-            } catch (\Exception $e) {
-                return self::_alert(T('操作失败，请您重试'));
-            }
-            if ($bool) {
-                return self::_success($info);
-            }
+            if (\Gini\Gapper\Client::addGroupMember((int)$current, (int)$info['id'])) return self::_success($info);
+
             return self::_alert(T('操作失败，请您重试'));
         }
 
@@ -260,24 +250,16 @@ class Gapper extends \Gini\Controller\CGI
             }
         }
 
-        try {
-            $uid = \Gini\Gapper\Client::getRPC()->gapper->user->registerUser([
-                'username'=> $username,
-                'password'=> \Gini\Util::randPassword(),
-                'name'=> $name,
-                'email'=> $email
-            ]);
-        } catch (\Exception $e) {
-            return self::_alert(T('操作失败，请您重试'));
-        }
+        $uid = \Gini\Gapper\Client::registerUser([
+            'username'=> $username,
+            'password'=> \Gini\Util::randPassword(),
+            'name'=> $name,
+            'email'=> $email
+        ]);
 
         if (!$uid) return self::_alert(T('添加用户失败, 请重试!'));
 
-        try {
-            $bool = \Gini\Gapper\Client::getRPC()->gapper->group->addMember((int)$current, (int)$uid);
-        } catch (\Exception $e) {
-        }
-        if ($bool) {
+        if (\Gini\Gapper\Client::addGroupMember((int)$current, (int)$uid)) {
             $info = \Gini\Gapper\Client::getUserInfo($email);
             return self::_success($info);
         }

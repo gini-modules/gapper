@@ -391,6 +391,24 @@ class Client
         return $ui->save();
     }
 
+    public static function verfiyUserPassword($username, $password)
+    {
+        try {
+            return self::getRPC()->gapper->user->verify($username, $password);
+        } catch (\Exception $e) {
+        }
+        return false;
+    }
+
+    public static function registerUser($data)
+    {
+        try {
+            $uid = self::getRPC()->gapper->user->registerUser($data);
+        } catch (\Exception $e) {
+        }
+        return $uid;
+    }
+
     public static function linkIdentity($source, $ident, $username=null)
     {
         $username = $username ?: self::getUserName();
