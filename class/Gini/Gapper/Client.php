@@ -667,14 +667,7 @@ class Client
             }
         }
 
-        $members = [];
-        foreach ($result as $uid=>$udata) {
-            $user = a('gapper/user');
-            $user->setData($udata);
-            $members[$udata['id']] = $user;
-        }
-
-        return $members;
+        return $result;
     }
 
     public static function getGroupApps($groupID=null, $force=false)
