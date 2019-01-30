@@ -357,8 +357,12 @@ class Client
             $info = self::cache($cacheKey);
         }
         if (!$info) {
-            $info = self::getRPC()->Gapper->User->getUserByIdentity($source, $ident);
-            self::cache($cacheKey, $info);
+            try {
+                $info = self::getRPC()->Gapper->User->getUserByIdentity($source, $ident);
+                self::cache($cacheKey, $info);
+            } catch (\Exception $e) {
+            }
+
         }
 
         if ($hasServerAgent && $info) {
@@ -400,10 +404,14 @@ class Client
         return false;
     }
 
-    public static function registerUser($data)
+    public static function registerUser($data, $source=null, $identity=null)
     {
         try {
-            $uid = self::getRPC()->gapper->user->registerUser($data);
+            if ($source && $identity) {
+                $uid = self::getRPC()->gapper->user->registerUserWithIdentity($data, $source, $identity);
+            } else {
+                $uid = self::getRPC()->gapper->user->registerUser($data);
+            }
         } catch (\Exception $e) {
         }
         return $uid;
@@ -415,6 +423,8 @@ class Client
         if (!$username) {
             return false;
         }
+
+        // TODO 本地存储
 
         return self::getRPC()->Gapper->User->linkIdentity($username, $source, $ident);
     }
