@@ -662,8 +662,8 @@ class Client
             if ($values) {
                 $valuesStr = implode('),(', $values);
                 $db->query("insert into gapper_agent_group_user (group_id, user_id) values ({$valuesStr})");
-                $db->query("update gapper_agent_group set mstime=CURRENT_TIMESTAMP where id={$groupID}");
             }
+            $db->query("update gapper_agent_group set mstime=CURRENT_TIMESTAMP where id={$groupID}");
             $db->commit();
         }
 
