@@ -670,6 +670,27 @@ class Client
         return $result;
     }
 
+    public static function removeGroupMember($groupID, $userID)
+    {
+        $groupID = (int)$groupID;
+        $userID = (int)$userID;
+        $userInfo = self::getUserInfo($userID);
+        if (!$userInfo) return;
+        
+        try {
+            $bool = self::getRPC()->gapper->group->removeMember($groupID, $userID);
+        } catch (\Exception $e) {
+        }
+
+        if (!$bool) return;
+        if (self::hasServerAgent()) {
+            $db = a('gapper/agent/group/user')->db();
+            return $db->query("delete from gapper_agent_group_user where group_id={$groupID} and user_id={$userID}");
+        } 
+        self::getGroups($userInfo['username'], true);
+        return true;
+    }
+
     public static function getGroupApps($groupID=null, $force=false)
     {
         $groupID = $groupID ?: self::getGroupID();
