@@ -686,7 +686,7 @@ class Client
 
         if (self::hasServerAgent()) {
             $db = a('gapper/agent/group/user')->db();
-            if ($db->query('select exists(select 1 from gapper_agent_group_user where group_id={$groupID} and user_id={$userID}')->value()) return true;
+            if ($db->query("select exists(select 1 from gapper_agent_group_user where group_id={$groupID} and user_id={$userID}")->value()) return true;
             return !!($db->query("insert into gapper_agent_group_user (group_id, user_id) values({$groupID}, {$userID})"));
         } 
         self::getGroups($userInfo['username'], true);
