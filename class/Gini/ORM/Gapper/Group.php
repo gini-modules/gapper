@@ -34,16 +34,8 @@ class Group extends RObject
 
     public function getMembers()
     {
-        $start = 0;
-        $per_page = 25;
-        $result = [];
-        while (true) {
-            $members = (array) self::getRPC()->gapper->group->getMembers($this->id, null ,$start, $per_page);
-            $start += $per_page;
-            if (!count($members)) break;
-            $result = $result + $members;
-        }
-        return $result;
+        if (!$this->id) return [];
+        return \Gini\Gapper\Client::getGroupMembers((int)$this->id);
     }
 
     public function getApps()

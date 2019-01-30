@@ -617,6 +617,58 @@ class Client
         return $apps;
     }
 
+    public static function getGroupMembers($groupID)
+    {
+        $groupInfo = self::getGroupInfo((int)$group->id, false);
+        if (!$groupInfo) return;
+
+        $hasServerAgent = self::hasServerAgent();
+        if ($hasServerAgent) {
+            if ($groupInfo && $groupInfo['mstime']) {
+                $db = a('gapper/agent/group/user')->db();
+                $query = $db->query("select user_id from gapper_agent_group_user where group_id={$groupID}");
+                if ($query) {
+                    $rows = $query->rows();
+                    if (count($rows)) {
+                        foreach ($rows as $row) {
+                            $result[$row->user_id] = self::getUserInfo((int)$row->user_id);
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($result) return $result;
+
+        $start = 0;
+        $per_page = 50;
+        $result = [];
+        while (true) {
+            $members = (array) self::getRPC()->gapper->group->getMembers((int)$groupID, null ,$start, $per_page);
+            $start += $per_page;
+            if (!count($members)) break;
+            $result = $result + $members;
+        }
+
+        if ($hasServerAgent && $result) {
+            $db = a('gapper/agent/group/user')->db();
+            $db->beginTransaction();
+            $values = [];
+            foreach ($result as $userInfo) {
+                if ($db->query("select exists(select 1 from gapper_agent_group_user where group_id={$groupID} and user_id={$userInfo['id']})")->value()) continue;
+                $values[] = $db->quote([$groupID, $userInfo['id']]);
+            }
+            if ($values) {
+                $valuesStr = implode('),(', $values);
+                $db->query("insert into gapper_agent_group_user (group_id, user_id) values ({$valuesStr})");
+                $db->query("update gapper_agent_group set mstime=CURRENT_TIMESTAMP where id={$groupID}");
+            }
+            $db->commit();
+        }
+
+        return $result;
+    }
+
     public static function getGroupApps($groupID=null, $force=false)
     {
         $groupID = $groupID ?: self::getGroupID();
@@ -761,6 +813,7 @@ class Client
             'abbr'=> $group->abbr,
             'creator'=> $group->creator,
             'icon'=> $group->icon,
+            'mstime'=> $group->mstime,
         ];
     }
 
