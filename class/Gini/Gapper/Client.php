@@ -441,21 +441,30 @@ class Client
         }
 
         $result = [];
+        $userGroupIDs = [];
         foreach ($groups as $k => $g) {
             $apps = self::getGroupApps((int)$g['id'], $force);
             if (is_array($apps) && isset($apps[$client_id])) {
                 $result[$k] = $g;
             }
+            if ($hasServerAgent) {
+                foreach ($apps as $clientID=>$app) {
+                    if (self::getAgentAPPInfo($clientID)) {
+                        $userGroupIDs[] = $g['id'];
+                        break;
+                    }
+                }
+            }
         }
 
-        if ($hasServerAgent && $groups) {
-            $gids = array_keys($groups);
+        if ($hasServerAgent && $userGroupIDs) {
             $userInfo = self::getUserInfo($username);
             if ($userID = $userInfo['id']) {
                 $db = a('gapper/agent/group/user')->db();
                 $db->beginTransaction();
-                foreach ($result as $group) {
-                    $db->query("insert ignore into gapper_agent_group_user(group_id,user_id) values({$group['id']}, {$userID})");
+                foreach ($userGroupIDs as $gid) {
+                    if ($db->query("select exists(select 1 from gapper_agent_group_user where group_id={$gid} and user_id={$userID})")->value()) continue;
+                    $db->query("insert ignore into gapper_agent_group_user(group_id,user_id) values({$gid}, {$userID})");
                 }
                 $db->commit();
             }
