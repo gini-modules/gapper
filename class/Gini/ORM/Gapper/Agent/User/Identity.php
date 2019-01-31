@@ -10,6 +10,7 @@ class Identity extends \Gini\ORM\Gapper\Agent\SObject
 
     protected static $db_index = [
         'unique:identity,source',
+        'user_id,source'
     ];
 
 }

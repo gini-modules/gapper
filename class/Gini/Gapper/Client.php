@@ -417,6 +417,34 @@ class Client
         return $uid;
     }
 
+    public static function getIdentity($username, $source)
+    {
+        if (!$username) return;
+        $userInfo = self::getUserInfo($username);
+        if (!($userID=$userInfo['id'])) return;
+
+        $hasServerAgent = self::hasServerAgent();
+        if ($hasServerAgent) {
+            $ui = a('gapper/agent/user/identity', ['user_id'=> $userID, 'source'=> $source]);
+            if ($ui->id) return $ui->identity;
+        }
+
+        try {
+            $identity = self::getRPC()->Gapper->User->getIdentity($username, $source);
+        } catch (\Exception $e) {
+        }
+        if (!$identity) return false;
+
+        if ($hasServerAgent) {
+            $ui = a('gapper/agent/user/identity');
+            $ui->source = $source;
+            $ui->identity = $identity;
+            $ui->user_id = $userID;
+            $ui->save();
+        }
+        return $identity;
+    }
+
     public static function linkIdentity($source, $ident, $username=null)
     {
         $username = $username ?: self::getUserName();
@@ -424,9 +452,33 @@ class Client
             return false;
         }
 
-        // TODO 本地存储
+        $userInfo = self::getUserInfo($username);
+        if (!($userID=$userInfo['id'])) return false;
 
-        return self::getRPC()->Gapper->User->linkIdentity($username, $source, $ident);
+        $hasServerAgent = self::hasServerAgent();
+        if ($hasServerAgent) {
+            $ui = a('gapper/agent/user/identity', ['identity'=>$ident, 'source'=> $source]);
+            if ($ui->id) {
+                if ($ui->user_id == $userID) return true;
+                return false;
+            }
+        }
+
+        try {
+            $result = self::getRPC()->Gapper->User->linkIdentity($username, $source, $ident);
+        } catch (\Exception $e) {
+        }
+        if (!$result) return false;
+
+        if ($hasServerAgent) {
+            $ui = a('gapper/agent/user/identity');
+            $ui->identity = $ident;
+            $ui->source = $source;
+            $ui->user_id = $userID;
+            $ui->save();
+        }
+
+        return true;
     }
 
     public static function getGroups($username=null, $force=false)
