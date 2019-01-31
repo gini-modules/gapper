@@ -481,6 +481,15 @@ class Client
         return true;
     }
 
+    public static function createGroup($data)
+    {
+        try {
+            $groupID = self::getRPC()->gapper->group->create($data);
+        } catch (\Exception $e) {
+        }
+        return $groupID;
+    }
+
     public static function getGroups($username=null, $force=false)
     {
         $client_id = self::getId();
@@ -632,6 +641,74 @@ class Client
         }
 
         return false;
+    }
+
+    public static function installGroupAPPs(array $appIDs, $groupID)
+    {
+        $hasServerAgent = self::hasServerAgent();
+        if ($hasServerAgent) {
+            $db = a('gapper/agent/app')->db();
+            $appString = $db->quote($appIDs);
+            $query = $db->query("select client_id,name,type from gapper_agent_app where client_id in ({$appString})");
+            if (!$query) return false;
+            $rows = $query->rows();
+            if (!count($rows)) return false;
+            $appIDs = [];
+            $values = [];
+            foreach ($rows as $row) {
+                if ($row->type!='group') continue;
+                $appIDs[] = $row->client_id;
+                $appName = $row->name;
+                $bool = $db->query("select id from gapper_agent_group_app where group_id={$groupID} and app_name={$appName}")->value();
+                if (!$bool) {
+                    $values[] = '(' . $db->quote([$groupID, $appName]) . ')';
+                }
+            }
+            if ($values) {
+                $valueString = implode(',', $values);
+                $bool = $db->query("insert into gapper_agent_group_app(group_id,app_name) values {$valueString}");
+                if (!$bool) return false;
+            }
+        }
+        foreach ($appIDs as $appID) {
+            if (!$gapperRPC->gapper->app->installTo($appID, 'group', $groupID)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static function installUserAPPs(array $appIDs, $userID)
+    {
+        $hasServerAgent = self::hasServerAgent();
+        if ($hasServerAgent) {
+            $db = a('gapper/agent/app')->db();
+            $appString = $db->quote($appIDs);
+            $query = $db->query("select client_id,name,type from gapper_agent_app where client_id in ({$appString})");
+            if (!$query) return false;
+            $rows = $query->rows();
+            if (!count($rows)) return false;
+            $appIDs = [];
+            $values = [];
+            foreach ($rows as $row) {
+                if ($row->type!='user') continue;
+                $appIDs[] = $row->client_id;
+                $appName = $row->name;
+                $bool = $db->query("select id from gapper_agent_user_app where group_id={$userID} and app_name={$appName}")->value();
+                if (!$bool) {
+                    $values[] = '(' . $db->quote([$userID, $appName]) . ')';
+                }
+            }
+            if ($values) {
+                $valueString = implode(',', $values);
+                $bool = $db->query("insert into gapper_agent_user_app(user_id,app_name) values {$valueString}");
+                if (!$bool) return false;
+            }
+        }
+        foreach ($appIDs as $appID) {
+            if (!$gapperRPC->gapper->app->installTo($appID, 'user', $userID)) return false;
+        }
+        return true;
     }
 
     public static function getUserApps($username=null, $force=false)
