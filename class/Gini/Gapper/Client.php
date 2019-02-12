@@ -659,7 +659,8 @@ class Client
                 if ($row->type!='group') continue;
                 $appIDs[] = $row->client_id;
                 $appName = $row->name;
-                $bool = $db->query("select id from gapper_agent_group_app where group_id={$groupID} and app_name={$appName}")->value();
+                $qAN = $db->quote($appName);
+                $bool = $db->query("select id from gapper_agent_group_app where group_id={$groupID} and app_name={$qAN}")->value();
                 if (!$bool) {
                     $values[] = '(' . $db->quote([$groupID, $appName]) . ')';
                 }
@@ -671,7 +672,7 @@ class Client
             }
         }
         foreach ($appIDs as $appID) {
-            if (!$gapperRPC->gapper->app->installTo($appID, 'group', $groupID)) {
+            if (!self::getRPC()->gapper->app->installTo($appID, 'group', $groupID)) {
                 return false;
             }
         }
@@ -694,7 +695,8 @@ class Client
                 if ($row->type!='user') continue;
                 $appIDs[] = $row->client_id;
                 $appName = $row->name;
-                $bool = $db->query("select id from gapper_agent_user_app where group_id={$userID} and app_name={$appName}")->value();
+                $qAN = $db->quote($appName);
+                $bool = $db->query("select id from gapper_agent_user_app where group_id={$userID} and app_name={$qAN}")->value();
                 if (!$bool) {
                     $values[] = '(' . $db->quote([$userID, $appName]) . ')';
                 }
@@ -706,7 +708,7 @@ class Client
             }
         }
         foreach ($appIDs as $appID) {
-            if (!$gapperRPC->gapper->app->installTo($appID, 'user', $userID)) return false;
+            if (!self::getRPC()->gapper->app->installTo($appID, 'user', $userID)) return false;
         }
         return true;
     }
