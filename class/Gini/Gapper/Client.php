@@ -26,11 +26,8 @@ class Client
     {
         if (!is_null(self::$_has_server_agent)) return self::$_has_server_agent;
 
-        $config = \Gini\Config::get('database.gapper-server-agent-db');
-        $username = $config['username'];
-        // 如果配置了user，就认为dsn和password也配置了
-        // 如果有人配置了user，但是没有对应的dsn和password，那就是这个人配置有问题了
-        if (!$username) {
+        $config = \Gini\Config::get('gapper.gapper-client-use-agent-data');
+        if (!$config) {
             self::$_has_server_agent = false;
         } else {
             self::$_has_server_agent = true;
