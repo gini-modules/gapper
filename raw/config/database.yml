@@ -1,6 +1,6 @@
 ---
 gapper-server-agent-db:
-  dsn: mysql:dbname=${GAPPER_SERVER_AGENT_DB_NAME:=''};host=${GAPPER_SERVER_AGENT_DB_HOST:=''};port=${GAPPER_SERVER_AGENT_DB_PORT:=''}
+  dsn: mysql:dbname=${DB_PREFIX}_${GAPPER_SERVER_AGENT_DB_NAME:='admin'};host=${GAPPER_SERVER_AGENT_DB_HOST:=''};port=${GAPPER_SERVER_AGENT_DB_PORT:=''}
   username: ${GAPPER_SERVER_AGENT_DB_USER:=''}
   password: ${GAPPER_SERVER_AGENT_DB_PASSWORD:=''}
 ...
