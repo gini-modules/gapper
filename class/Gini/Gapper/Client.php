@@ -530,7 +530,7 @@ class Client
         $userGroupIDs = [];
         foreach ($groups as $k => $g) {
             $apps = self::getGroupApps((int)$g['id'], $force);
-            if (is_array($apps) && isset($apps[$client_id])) {
+            if (\Gini\Config::get('app.gapper_info_from_uniadmin') || (is_array($apps) && isset($apps[$client_id]))) {
                 $result[$k] = $g;
             }
             if ($hasServerAgent) {
@@ -617,7 +617,7 @@ class Client
         $newGroups = [];
         foreach ($groups as $k => $g) {
             $apps = self::getGroupApps((int)$g['id'], $force);
-            if (is_array($apps) && isset($apps[$client_id])) {
+            if (\Gini\Config::get('app.gapper_info_from_uniadmin') || (is_array($apps) && isset($apps[$client_id]))) {
                 $newGroups[$k] = $g;
             }
         }
@@ -631,9 +631,13 @@ class Client
         }
 
         $apps = self::getGroupApps((int)$groupID, $force);
-        if (is_array($apps) && in_array($client_id, array_keys($apps))) {
-            self::setSession(self::$keyGroupID, $groupID);
+        if (\Gini\Config::get('app.gapper_info_from_uniadmin') || (is_array($apps) && in_array($client_id, array_keys($apps)))) {
+            $autoInstallApps = (array) \Gini\Config::get('app.auto_install_apps_for_new_group');
+            if (empty($autoInstallApps)) return false;
+            if (!in_array($client_id, $autoInstallApps)) return false;
+            \Gini\Gapper\Client::installGroupAPPs($autoInstallApps, (int)$groupID);
 
+            self::setSession(self::$keyGroupID, $groupID);
             return true;
         }
 
