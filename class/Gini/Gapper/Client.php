@@ -632,7 +632,9 @@ class Client
 
         $apps = self::getGroupApps((int)$groupID, $force);
         if (($groupID && \Gini\Config::get('app.gapper_info_from_uniadmin')) || (is_array($apps) && in_array($client_id, array_keys($apps)))) {
-            \Gini\Event::trigger('app.group-auto-install-apps', $groupID);
+            if (\Gini\Event::get('app.group-auto-install-apps')) {
+                \Gini\Event::trigger('app.group-auto-install-apps', $groupID);
+            }
             self::setSession(self::$keyGroupID, $groupID);
             return true;
         }
