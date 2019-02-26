@@ -36,5 +36,17 @@ namespace Gini\Module
                 return $errors;
             }
         }
+
+        public static function groupAutoInstallApps($e, $groupID)
+        {
+            if (!$groupID) return false;
+
+            $autoInstallApps = (array) \Gini\Config::get('app.auto_install_apps_for_new_group');
+            if (empty($autoInstallApps)) return false;
+
+            $clientID = \Gini\Gapper\Client::getId();
+            if (!in_array($clientID, $autoInstallApps)) return false;
+            \Gini\Gapper\Client::installGroupAPPs($autoInstallApps, (int)$groupID);
+        }
     }
 }
