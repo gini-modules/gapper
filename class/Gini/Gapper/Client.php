@@ -988,14 +988,24 @@ class Client
     private static function replaceAgentGroupInfo($info)
     {
         $group = self::getAgentGroup((int)$info['id']);
-        if (!$group->id) $group->id = $info['id'];
+        $needInitMembers = false;
+        if (!$group->id) {
+            $group->id = $info['id'];
+            $needInitMembers = true;
+        }
         $group->name = $info['name'];
         $group->title = $info['title'];
         $group->abbr = $info['abbr'];
         $group->creator = $info['creator'];
         $group->icon = $info['icon'];
         $group->stime = date('Y-m-d H:i:s');
-        return $group->save();
+        if ($group->save()) {
+            if ($needInitMembers) {
+                self::getGroupMembers((int)$group->id);
+            }
+            return true;
+        }
+        return false;
     }
 
     private static function getAgentGroup($criteria)
