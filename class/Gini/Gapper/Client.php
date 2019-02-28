@@ -509,17 +509,21 @@ class Client
             $groups = self::getAgentUserGroups($username);
         }
 
-        if (!$groups) {
+        if ($force || !$groups) {
             $cacheKeyUserName = self::makeUserName($username);
             $cacheKey = "app#user#{$client_id}#{$cacheKeyUserName}#groups";
-            $groups = false;
+            $newgroups = false;
             if (!$force) {
-                $groups = self::cache($cacheKey);
+                $newgroups = self::cache($cacheKey);
             }
-            if (false === $groups) {
-                $groups = self::getRPC()->gapper->user->getGroups($username) ?: [];
-                self::cache($cacheKey, $groups);
+            if (false === $newgroups) {
+                try {
+                    $newgroups = self::getRPC()->gapper->user->getGroups($username) ?: [];
+                    self::cache($cacheKey, $newgroups);
+                } catch (\Exception $e) {
+                }
             }
+            if (!empty($newgroups)) $groups = $newgroups;
         }
 
         if (empty($groups)) {
@@ -598,7 +602,7 @@ class Client
             return false;
         }
 
-        $groups = self::getGroups($username, $force);
+        $groups = self::getGroups($username, true);
         if (!$groups) return false;
 
         if (!$groupID && count($groups)==1) {
