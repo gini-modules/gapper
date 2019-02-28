@@ -536,7 +536,7 @@ class Client
             if ($hasServerAgent) {
                 foreach ($apps as $clientID=>$app) {
                     if (self::getAgentAPPInfo($clientID)) {
-                        $userGroupIDs[] = $g['id'];
+                        $userGroupIDs[] = $g;
                         break;
                     }
                 }
@@ -544,16 +544,13 @@ class Client
         }
 
         if ($hasServerAgent && $userGroupIDs) {
-            $userInfo = self::getUserInfo($username);
-            if ($userID = $userInfo['id']) {
-                $db = a('gapper/agent/group/user')->db();
-                $db->beginTransaction();
-                foreach ($userGroupIDs as $gid) {
-                    if ($db->query("select exists(select 1 from gapper_agent_group_user where group_id={$gid} and user_id={$userID})")->value()) continue;
-                    $db->query("insert ignore into gapper_agent_group_user(group_id,user_id) values({$gid}, {$userID})");
-                }
-                $db->commit();
+            $db = a('gapper/agent/group/user')->db();
+            $db->beginTransaction();
+            foreach ($userGroupIDs as $g) {
+                if ($db->query("select exists(select 1 from gapper_agent_group where id={$g['id']})")->value()) continue;
+                self::replaceAgentGroupInfo($g);
             }
+            $db->commit();
         }
 
         return $result;
@@ -601,27 +598,8 @@ class Client
             return false;
         }
 
-        $cacheKeyUserName = self::makeUserName($username);
-        $cacheKey = "app#user#{$client_id}#{$cacheKeyUserName}#groups";
-        $groups = false;
-        if (!$force) {
-            $groups = self::cache($cacheKey);
-        }
-        if (false === $groups) {
-            // TODO 需要先在本地拿
-            $groups = self::getRPC()->gapper->user->getGroups($username) ?: [];
-            self::cache($cacheKey, $groups);
-        }
-        if (!is_array($groups)) return false;
-
-        $newGroups = [];
-        foreach ($groups as $k => $g) {
-            $apps = self::getGroupApps((int)$g['id'], $force);
-            if (\Gini\Config::get('app.gapper_info_from_uniadmin') || (is_array($apps) && isset($apps[$client_id]))) {
-                $newGroups[$k] = $g;
-            }
-        }
-        $groups = $newGroups;
+        $groups = self::getGroups($username, $force);
+        if (!$groups) return false;
 
         if (!$groupID && count($groups)==1) {
             $groupID = current($groups)['id'];
@@ -633,6 +611,10 @@ class Client
         $apps = self::getGroupApps((int)$groupID, $force);
         $useUniadminInfo = \Gini\Config::get('app.gapper_info_from_uniadmin');
         if (($groupID && $useUniadminInfo) || (is_array($apps) && in_array($client_id, array_keys($apps)))) {
+            // 如果有本地代理数据，需要执行一次getGroupMembers, 因为组在本地缓存的时候，没有缓存组的成员信息
+            if (self::hasServerAgent()) {
+                self::getGroupMembers((int)$groupID);
+            }
             if ($useUniadminInfo) {
                 if (\Gini\Event::get('app.group-auto-install-apps')) {
                     \Gini\Event::trigger('app.group-auto-install-apps', $groupID);
@@ -988,10 +970,8 @@ class Client
     private static function replaceAgentGroupInfo($info)
     {
         $group = self::getAgentGroup((int)$info['id']);
-        $needInitMembers = false;
         if (!$group->id) {
             $group->id = $info['id'];
-            $needInitMembers = true;
         }
         $group->name = $info['name'];
         $group->title = $info['title'];
@@ -1000,9 +980,6 @@ class Client
         $group->icon = $info['icon'];
         $group->stime = date('Y-m-d H:i:s');
         if ($group->save()) {
-            if ($needInitMembers) {
-                self::getGroupMembers((int)$group->id);
-            }
             return true;
         }
         return false;
