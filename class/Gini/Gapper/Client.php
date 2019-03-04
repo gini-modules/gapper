@@ -402,7 +402,7 @@ class Client
         return false;
     }
 
-    public static function registerWithIdentity($data, $source, $identity)
+    public static function registerUserWithIdentity($data, $source, $identity)
     {
         return self::registerUser($data, $source, $identity);
     }
