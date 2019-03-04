@@ -285,6 +285,7 @@ class Client
         }
         if (!$info) {
             $info = self::getRPC()->gapper->user->getInfo($username);
+            $info = $info ?: [];
             self::cache($cacheKey, $info);
         }
 
@@ -399,6 +400,11 @@ class Client
         } catch (\Exception $e) {
         }
         return false;
+    }
+
+    public static function registerWithIdentity($data, $source, $identity)
+    {
+        return self::registerUser($data, $source, $identity);
     }
 
     public static function registerUser($data, $source=null, $identity=null)
