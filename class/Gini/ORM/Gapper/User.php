@@ -65,13 +65,14 @@ class User extends RObject
     public function convertRPCData(array $rdata)
     {
         $data = [];
+        $initials = $rdata['initials'] ?: self::getInitials($rdata['name']);
         $data['id'] = $rdata['id'];
         $data['name'] = $rdata['name'];
-        $data['initials'] = $rdata['initials'];
+        $data['initials'] = $initials;
         $data['username'] = $rdata['username'];
         $data['email'] = $rdata['email'];
         $data['phone'] = $rdata['phone'];
-        $data['icon'] = $rdata['icon'];
+        $data['icon'] = $rdata['icon'] ?: self::getIcon($rdata['icon'], $initials);
         $data['_extra'] = J(array_diff_key($rdata, array_flip(['id', 'name', 'initials', 'username', 'email', 'phone', 'icon'])));
 
         return $data;
@@ -135,5 +136,43 @@ class User extends RObject
         }
 
         return \Gini\ImageCache::makeURL($url, $size);
+    }
+
+    public static function getIcon($userIcon, $initials='')
+    {
+        if ($userIcon) return $userIcon;
+
+        return 'initials://'.$initials;
+    }
+
+    public static function getInitials($name)
+    {
+        $pattern = "/^(?:([^\,\x{4e00}-\x{9fa5}]+)\s*)+(?:\,\s*(?:(?:JS|SR|II|III|IV|MD|PHD)|(.+)))?$/ui";
+        if (preg_match($pattern, $name, $matches)) {
+            $first = '';
+            $second = '';
+            if (isset($matches[2])) {
+                $partB = array_reverse(preg_split('/\s+/i', $matches[2]));
+                foreach ($partB as $v) {
+                    $second .= strtoupper(substr($v, 0, 1));
+                }
+            }
+
+            $partA = preg_split('/\s+/i', $matches[1]);
+            if (count($partA) === 1) {
+                $first = $second ? strtoupper(substr($partA[0], 0, 1)) : $partA[0];
+            } else {
+                $partA = array_reverse($partA);
+                foreach ($partA as $v) {
+                    $first .= strtoupper(substr($v, 0, 1));
+                }
+            }
+
+            $result = $first.($second ?: '');
+        } else {
+            $result = mb_substr($name, 0, 1, 'utf-8');
+        }
+
+        return $result;
     }
 }
