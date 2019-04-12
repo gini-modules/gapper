@@ -1086,19 +1086,31 @@ class Client
 
     public static function goLogin($redirect=null)
     {
-        $redirect = $redirect ?: '/';
+        $redirectURL = '/';
+        if ($redirect) {
+            $redirectURL = $redirect; 
+        } else {
+            $uri = parse_url($_SERVER['HTTP_REFERER']);
+            parse_str($uri['query'], $uriData);
+            if ($uriData['redirect']) {
+                $redirectURL = \Gini\URI::url($uriData['redirect']);
+            } else {
+                $pathInfo = $_SERVER['PATH_INFO'];
+                $redirectURL = $pathInfo ? \Gini\URI::url($pathInfo) : '/';
+            }
+        }
 
         if (self::getLoginStep()===self::STEP_GROUP) {
                 self::chooseGroup();
         }
 
         if (self::getLoginStep()===self::STEP_DONE) {
-            $url = \Gini\URI::url($redirect, [
+            $url = \Gini\URI::url($redirectURL, [
                 'gapper-token'=> null,
                 'gapper-group'=> null
             ]);
         } else {
-            $url = \Gini\URI::url('gapper/client/login', ['redirect' => $redirect]);
+            $url = \Gini\URI::url('gapper/client/login', ['redirect' => $redirectURL]);
         }
 
         \Gini\CGI::redirect($url);
