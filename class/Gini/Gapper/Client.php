@@ -190,6 +190,14 @@ class Client
             return self::STEP_LOGIN;
         }
 
+        $loginByOauth = \Gini\Config::get('app.node_is_login_by_oauth');
+        if ($loginByOauth) {
+            if (self::needLogout()) {
+                self::logout();
+                return self::STEP_LOGIN;
+            }
+        }
+
         if ($app['type'] === 'group' && empty(self::getGroupInfo($force))) {
             $groups = self::getGroups(self::getUserName(), $force);
             if ($groups === false) {
@@ -219,6 +227,8 @@ class Client
 
     public static function loginByUserName($username)
     {
+        // sso-logout, 用户登录时清理sso登出信息
+        self::unsetBECache($username);
         $username = self::makeUserName($username);
         return self::setUserName($username);
     }
@@ -1070,6 +1080,31 @@ class Client
         }
         return $token;
     }
+
+    public static function needLogout()
+    {
+        if (!\Gini\Config::get('app.node_is_login_by_oauth')) return false;
+        $username = self::getUserName();
+        if (!$username) return false;
+        $time = \Gini\Cache::of('sso-msg')->get('msg-sso-logout-'.md5($username));
+        if (!$time) return false;
+        return true;
+    }
+
+    public static function setBELogout($username)
+    {
+        if (!\Gini\Config::get('app.node_is_login_by_oauth')) return;
+        $username = self::makeUserName($username);
+        $defaultTimeout = ini_get('session.gc_maxlifetime') ?: 1440;
+        $bool = \Gini\Cache::of('sso-msg')->set('msg-sso-logout-'.md5($username), time(), (int)($defaultTimeout * 1.5));
+    }
+
+    public static function unsetBECache($username)
+    {
+        $username = self::makeUserName($username);
+        \Gini\Cache::of('sso-msg')->remove('msg-sso-logout-'.md5($username));
+    }
+
 
     public static function logout()
     {

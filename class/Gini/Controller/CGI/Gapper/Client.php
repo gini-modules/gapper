@@ -139,7 +139,7 @@ class Client extends \Gini\Controller\CGI\Gapper
         }
         // }
 
-        if ($group_id && (!$isSelf || $group_id!=_G('GROUP')->id)) $query['gapper-group'] = $group_id;
+        if (($app['type'] == 'group') && $group_id && (!$isSelf || $group_id!=_G('GROUP')->id)) $query['gapper-group'] = $group_id;
 
         $url = \Gini\URI::url($url, $query);
 
