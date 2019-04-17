@@ -228,7 +228,9 @@ class Client
     public static function loginByUserName($username)
     {
         // sso-logout, 用户登录时清理sso登出信息
-        self::unsetBECache($username);
+        if (\Gini\Config::get('app.node_is_login_by_oauth')) {
+            self::unsetBECache($username);
+        }
         $username = self::makeUserName($username);
         return self::setUserName($username);
     }
@@ -1124,7 +1126,7 @@ class Client
         $redirectURL = '/';
         if ($redirect) {
             $redirectURL = $redirect; 
-        } else {
+        } else if (\Gini\Config::get('app.node_is_login_by_oauth')) {
             $uri = parse_url($_SERVER['HTTP_REFERER']);
             parse_str($uri['query'], $uriData);
             if ($uriData['redirect']) {
