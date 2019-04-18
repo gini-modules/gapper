@@ -173,6 +173,8 @@ class Client
         ];
     }
 
+
+    private static $keyLoginStatusChanged = 'login-status-changed';
     public static function getLoginStep($force=false)
     {
         $client_id = self::getId();
@@ -213,6 +215,11 @@ class Client
             if (!isset($apps[$client_id])) {
                 return self::STEP_USER_401;
             }
+        }
+
+        if (self::hasSession(self::$keyLoginStatusChanged)) {
+            self::unsetSession(self::$keyLoginStatusChanged);
+            \Gini\Event::trigger('gapper.gapper-client-after-user-login');
         }
 
         return self::STEP_DONE;
@@ -260,6 +267,7 @@ class Client
             return false;
         }
         self::setSession(self::$keyUserName, $username);
+        self::setSession(self::$keyLoginStatusChanged, true);
 
         return true;
     }
@@ -639,12 +647,14 @@ class Client
                 if (\Gini\Event::get('app.group-auto-install-apps')) {
                     \Gini\Event::trigger('app.group-auto-install-apps', $groupID);
                     self::setSession(self::$keyGroupID, $groupID);
+                    self::setSession(self::$keyLoginStatusChanged, true);
                     return true;
                 }
                 return false;
             }
 
             self::setSession(self::$keyGroupID, $groupID);
+            self::setSession(self::$keyLoginStatusChanged, true);
             return true;
         }
 
