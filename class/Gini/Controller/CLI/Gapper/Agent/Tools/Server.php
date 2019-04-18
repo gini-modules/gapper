@@ -94,6 +94,9 @@ class Server extends \Gini\Controller\CLI
 
 	private static function replaceLocalApp($info)
 	{
+        if (!empty(array_diff([
+            'module_name', 'type', 'rate', 'font_icon'
+        ], array_keys($info)))) return;
         $db = \Gini\Database::db('gapper-server-agent-db');
         $values = $db->quote([
             $info['id'],
