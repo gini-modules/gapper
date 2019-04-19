@@ -8,7 +8,8 @@ class APP extends \Gini\Controller\CLI
 {
     public function actionAgentCurrentModule()
     {
-        $moduleName = APP_ID;
+        $arr = explode('/', APP_ID);
+        $moduleName = end($arr);
         list($clientID, $clientSecret) = self::getClientInfo($moduleName);
         if (!$clientID || !$clientSecret) return;
         $moduleInfo = \Gini\Config::get("{$moduleName}.module-info");
@@ -26,15 +27,24 @@ class APP extends \Gini\Controller\CLI
         if (isset($moduleInfo['name'])) {
             $info['module_name'] = $moduleInfo['name'];
         }
-        list($urlA, $urlB) = explode('||', $moduleInfo['url']);
-        list($iconUrlA, $iconUrlB) = explode('||', $moduleInfo['icon_url']);
+        list($urlA, $urlB) = $moduleInfo['url'];
+        list($iconUrlA, $iconUrlB) = $moduleInfo['icon_url'];
         $info['url'] = $urlA ?: $urlB;
         $info['icon_url'] = $iconUrlA ?: $iconUrlB;
         self::replaceLocalApp($info);
     }
 
-    private static function getNodeAppIDSecrets($moduleName)
+    private static function getClientInfo($moduleName)
     {
+        $env = APP_PATH . '/.env';
+        $rows = file($env, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $modules = [];
+        foreach ($rows as &$row) {
+            if (!$row || $row[0] == '#') {
+                continue;
+            }
+            putenv($row);
+        }
         $module = str_replace('-', '_', strtoupper($moduleName));
         $clientID = getenv("{$module}_GAPPER_ID");
         $clientSecret = getenv("{$module}_GAPPER_SECRET");
