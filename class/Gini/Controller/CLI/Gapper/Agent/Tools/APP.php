@@ -55,7 +55,7 @@ class APP extends \Gini\Controller\CLI
 	{
         $db = \Gini\Database::db('gapper-server-agent-db');
         $id = $db->query('select id from gapper_agent_app where client_id=:cid', null, [
-            ':nid'=> $info['client_id']
+            ':cid'=> $info['client_id']
         ])->value();
         if ($id) {
             $values = $db->quote([
