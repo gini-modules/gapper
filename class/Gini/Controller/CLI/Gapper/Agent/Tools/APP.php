@@ -75,7 +75,7 @@ class APP extends \Gini\Controller\CLI
                 $info['type'], $info['rate'],
                 $info['font_icon']?:'',
             ]);
-            $db->query("inset into gapper_agent_app (client_id,client_secret,name,title,short_title,url,icon_url,type,rate,font_icon) values({$values})");
+            $db->query("insert into gapper_agent_app (client_id,client_secret,name,title,short_title,url,icon_url,type,rate,font_icon) values({$values})");
         }
 	}
 
