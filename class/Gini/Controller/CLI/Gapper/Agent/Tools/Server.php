@@ -94,9 +94,6 @@ class Server extends \Gini\Controller\CLI
 
 	private static function replaceLocalApp($info)
 	{
-        if (!empty(array_diff([
-            'module_name', 'type', 'rate', 'font_icon'
-        ], array_keys($info)))) return;
         $db = \Gini\Database::db('gapper-server-agent-db');
         $values = $db->quote([
             $info['id'],
@@ -112,6 +109,9 @@ class Server extends \Gini\Controller\CLI
     private static function getAppInfo($clientID)
     {
         $rpc = \Gini\Gapper\Client::getRPC();
-        return $rpc->gapper->app->getInfo($clientID);
+        $info = $rpc->gapper->app->getInfo($clientID);
+        if (empty(array_diff([
+            'module_name', 'type', 'rate', 'font_icon'
+        ], array_keys($info)))) return $info;
     }
 }
