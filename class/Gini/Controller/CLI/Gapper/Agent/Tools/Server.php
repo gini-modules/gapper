@@ -6,6 +6,8 @@ namespace Gini\Controller\CLI\Gapper\Agent\Tools;
 
 class Server extends \Gini\Controller\CLI
 {
+    // 这个方法用来直接从gapper-server获取app信息，完善到 gapper_agent_app 的 orm 里
+    // 如果节点直接对接gateway，那么这个方法就不适用了
     public function actionSyncAppInfo()
     {
         $apps = array_merge(
