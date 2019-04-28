@@ -118,6 +118,7 @@ class Client
         $gapperGroup = $_GET['gapper-group'];
         $currentGapperGroup = self::getGroupID();
         $currentStep = self::getLoginStep();
+
         if ((!$currentGapperGroup || $gapperGroup && $gapperGroup!=$currentGapperGroup) && in_array($currentStep, [
             self::STEP_GROUP,
             self::STEP_DONE
@@ -220,6 +221,7 @@ class Client
         if (self::hasSession(self::$keyLoginStatusChanged)) {
             self::unsetSession(self::$keyLoginStatusChanged);
             \Gini\Event::trigger('gapper.gapper-client-after-user-login');
+            \Gini\Event::trigger('gapper.group-access-record');
         }
 
         return self::STEP_DONE;
@@ -560,9 +562,18 @@ class Client
         $userGroupIDs = [];
         foreach ($groups as $k => $g) {
             $apps = self::getGroupApps((int)$g['id'], $force);
-            if (\Gini\Config::get('app.gapper_info_from_uniadmin') || (is_array($apps) && isset($apps[$client_id]))) {
+
+            $groupHasApp = !!(is_array($apps) && isset($apps[$client_id]));
+            $mustInstallApps = (array)\Gini\Config::get('gapper.group_must_install_apps');
+            $groupAppsNames = array_keys($apps);
+            if (\Gini\Config::get('app.gapper_info_from_uniadmin')) {
+                if (in_array($client_id, $mustInstallApps) && !$groupHasApp) continue;
+                if (array_intersect($mustInstallApps, $groupAppsNames) && !in_array($client_id, $mustInstallApps)) continue;
+                $result[$k] = $g;
+            } else if ($groupHasApp) {
                 $result[$k] = $g;
             }
+
             if ($hasServerAgent>=20) {
                 foreach ($apps as $clientID=>$app) {
                     if (self::getAgentAPPInfo($clientID)) {
