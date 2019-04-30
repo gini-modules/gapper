@@ -234,6 +234,20 @@ class Client
         return "{$name}|{$backend}";
     }
 
+    private static function _getUserID()
+    {
+        $userInfo = self::getUserInfo();
+        if (!is_array($userInfo)) return;
+        return $userInfo['id'];
+    }
+
+    public static function loginByUserID($uid)
+    {
+        $userInfo = self::getUserInfo($uid);
+        if (!is_array($userInfo)) return;
+        return self::loginByUserName($userInfo['username']);
+    }
+
     public static function loginByUserName($username)
     {
         // sso-logout, 用户登录时清理sso登出信息
@@ -253,12 +267,12 @@ class Client
         if ($ut->client_id!=$client_id) return false;
         $tokenLifeTime = \Gini\Config::get('gapper.gapper-client-agent-token-lifetime') ?: 120;
         if ($ut->ctime+$tokenLifeTime<time()) return false;
-        $username = self::makeUserName($ut->username);
-        $currentUsername = self::getUserName();
-        if ($currentUsername && $currentUsername!=$username) {
+        $userID = $ut->user_id;
+        $currentUserID = self::_getUserID();
+        if ($currentUserID && $currentUserID!=$userID) {
             self::logout();
         }
-        return self::loginByUserName($username);
+        return self::loginByUserID($userID);
     }
 
     public static function loginByToken($token)
@@ -268,11 +282,12 @@ class Client
         }
         $user = self::getRPC()->gapper->user->authorizeByToken($token);
         if ($user && $user['username']) {
-            $myUsername = self::getUserName();
-            if ($myUsername && $user['username']!=$myUsername) {
-                \Gini\Gapper\Client::logout();
+            $myUsername = self::makeUserName(self::getUserName());
+            $username = self::makeUserName($user['username']);
+            if ($myUsername && $username!=$myUsername) {
+                self::logout();
             }
-            return self::loginByUserName($user['username']);
+            return self::loginByUserName($username);
         }
 
         return false;
@@ -1301,15 +1316,18 @@ class Client
 
     private static function _getAgentUserToken($username, $toClientID, $force)
     {
-        list($username) = explode('|', $username);
+        $userInfo = self::getUserInfo($username);
+        $userID = $userInfo['id'];
+        if (!$userID) return;
+
         $ut = a('gapper/agent/user/token', [
-            'username'=> $username,
+            'user_id'=> $userID,
             'client_id'=> $toClientID
         ]);
         $now = time();
         $tokenLifeTime = \Gini\Config::get('gapper.gapper-client-agent-token-lifetime') ?: 120;
         if (!$ut->id || $force || ($ut->ctime+$tokenLifeTime)<$now) {
-            $ut->username = $username;
+            $ut->user_id = $userID;
             $ut->client_id = $toClientID;
             $token = self::_makeAgentToken();
             $ut->token = $token;
