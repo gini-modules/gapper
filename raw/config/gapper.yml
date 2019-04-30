@@ -26,4 +26,5 @@ server_home: ${GAPPER_URL:='http://gapper.in/'}
 #         result: RESULT-KEY
 #         gapper-source: GAPPER-SOURCE 
 gapper-client-use-agent-data: ${GAPPER_CLIENT_USE_AGENT_DATA:='false'}
+gapper-client-agent-token-lifetime: ${GAPPER_CLIENT_AGENT_TOKEN_LIFETTIME:='120'}
 ...

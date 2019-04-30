@@ -244,8 +244,28 @@ class Client
         return self::setUserName($username);
     }
 
+    private static function _loginByAgentToken($token)
+    {
+        $config = (array) \Gini\Config::get('gapper.rpc');
+        $client_id = $config['client_id'];
+        $ut = a('gapper/agent/user/token', ['token'=> $token]);
+        if (!$ut->id) return false;
+        if ($ut->client_id!=$client_id) return false;
+        $tokenLifeTime = \Gini\Config::get('gapper.gapper-client-agent-token-lifetime') ?: 120;
+        if ($ut->ctime+$tokenLifeTime<time()) return false;
+        $username = self::makeUserName($ut->username);
+        $currentUsername = self::getUserName();
+        if ($currentUsername && $currentUsername!=$username) {
+            self::logout();
+        }
+        return self::loginByUserName($username);
+    }
+
     public static function loginByToken($token)
     {
+        if (self::hasServerAgent()>=1 && self::_isAgentToken($token)) {
+            return self::_loginByAgentToken($token);
+        }
         $user = self::getRPC()->gapper->user->authorizeByToken($token);
         if ($user && $user['username']) {
             $myUsername = self::getUserName();
@@ -302,6 +322,7 @@ class Client
 
         $cacheKeyUserName = is_numeric($username) ? $username : self::makeUserName($username);
         $cacheKey = "app#user#{$cacheKeyUserName}#info";
+        $needAgent = false;
         if (!$force) {
             $info = self::cache($cacheKey);
         }
@@ -309,10 +330,11 @@ class Client
             $info = self::getRPC()->gapper->user->getInfo($username);
             $info = $info ?: [];
             self::cache($cacheKey, $info);
+            $needAgent = true;
         }
 
         // 将数据本地缓存
-        if ($hasServerAgent>=1 && $info) {
+        if ($hasServerAgent>=1 && $info && $needAgent) {
             self::replaceAgentUserInfo($info);
         }
 
@@ -361,6 +383,7 @@ class Client
             'email'=> $user->email,
             'phone'=> $user->phone,
             'icon'=> $user->icon,
+            'agent_sync_groups'=> $user->agent_sync_groups
         ];
     }
 
@@ -373,6 +396,7 @@ class Client
         }
 
         $cacheKey = "app#ident#{$source}#{$ident}#info";
+        $needAgent = false;
         if (!$force) {
             $info = self::cache($cacheKey);
         }
@@ -380,12 +404,13 @@ class Client
             try {
                 $info = self::getRPC()->Gapper->User->getUserByIdentity($source, $ident);
                 self::cache($cacheKey, $info);
+                $needAgent = true;
             } catch (\Exception $e) {
             }
 
         }
 
-        if ($hasServerAgent>=1 && $info) {
+        if ($hasServerAgent>=1 && $info && $needAgent) {
             self::replaceAgentUserIdentity($source, $ident, $info);
         }
 
@@ -403,6 +428,7 @@ class Client
 
     private static function replaceAgentUserIdentity($source, $ident, $info)
     {
+        if (self::_hasAgent(['user-identity', $source, $ident, $info])) return;
         $user = a('gapper/agent/user', ['id'=> $info['id']]);
         if (!$user->id) {
             if (!self::replaceAgentUserInfo($info)) return;
@@ -412,16 +438,46 @@ class Client
         $ui->source = $source;
         $ui->identity = $ident;
         $ui->user_id = $info['id'];
-        return $ui->save();
+        $bool = $ui->save();
+        if ($bool) {
+            self::_recordAgent(['user-identity', $source, $ident, $info]);
+        }
+        return $bool;
     }
 
     public static function verfiyUserPassword($username, $password)
     {
+        $bool = false;
+        $needAgent = false;
         try {
-            return self::getRPC()->gapper->user->verify($username, $password);
+            $bool = self::getRPC()->gapper->user->verify($username, $password);
         } catch (\Exception $e) {
+            if (self::hasServerAgent()>=30) {
+                $needAgent = true;
+            }
         }
-        return false;
+        if ($bool) {
+            self::_agentUserPassword($username, $password);
+        } else if ($needAgent) {
+            $auth = a('gapper/agent/auth', ['username'=>$username]);
+            if ($hash=$auth->password) {
+                $bool = !!(crypt($password, $hash)==$hash);
+            }
+        }
+        return !!$bool;
+    }
+
+    private static function _agentUserPassword($username, $password)
+    {
+        if (self::_hasAgent(['user-passowrd', $username, $password])) return;
+        $salt = '$6$'.\Gini\Util::randPassword(8, 2).'$';
+        $password = crypt($password, $salt);
+        $auth = a('gapper/agent/auth', ['username'=>$username]);
+        if (!$auth->id) {
+            $auth->username = $username;
+        }
+        $auth->password = $password;
+        if ($auth->save()) self::_recordAgent(['user-passowrd', $username, $password]);
     }
 
     public static function registerUserWithIdentity($data, $source, $identity)
@@ -515,6 +571,46 @@ class Client
         return $groupID;
     }
 
+    private static function _getHashKey($data)
+    {
+        return hash('sha1', J($data));
+    }
+
+    private static $_agent_keys = [];
+    private static function _hasAgent($data)
+    {
+        $key = self::_getHashKey($data);
+        if (isset(self::$_agent_keys[$key])) return true;
+        return false;
+    }
+    private static function _recordAgent($data)
+    {
+        $key = self::_getHashKey($data);
+        self::$_agent_keys[$key] = true;
+    }
+
+    private static function _agentUserGroups($username, $groups)
+    {
+        if (self::_hasAgent(['user-groups', $username, $groups])) return;
+        if (empty($groups)) return;
+        $user = self::getAgentUser($username);
+        if (!$user->id) return;
+        $db = $user->db();
+        $db->beginTransaction();
+        try {
+            $user->agent_sync_groups = time();
+            if (!$user->save()) throw new \Exception();
+            foreach ($groups as $group) {
+                $bool = $db->query("INSERT IGNORE INTO gapper_agent_group_user(group_id,user_id) VALUES({$group['id']},{$user->id})");
+                if (!$bool) throw new \Exception();
+            }
+            $db->commit();
+            self::_recordAgent(['user-groups', $username, $groups]);
+        } catch (\Exception $e) {
+            $db->rollback();
+        }
+    }
+
     public static function getGroups($username=null, $force=false)
     {
         $client_id = self::getId();
@@ -533,10 +629,14 @@ class Client
         }
 
         $hasServerAgent = self::hasServerAgent();
-        if ($hasServerAgent>=20) {
-            $groups = self::getAgentUserGroups($username);
+        if ($hasServerAgent>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin')) {
+            $userInfo = self::getUserInfo($username);
+            if ($userInfo['agent_sync_groups']) {
+                $groups = self::getAgentUserGroups($userInfo);
+            }
         }
 
+        $needAgent = false;
         if ($force || !$groups) {
             $cacheKeyUserName = self::makeUserName($username);
             $cacheKey = "app#user#{$client_id}#{$cacheKeyUserName}#groups";
@@ -550,8 +650,11 @@ class Client
                     self::cache($cacheKey, $newgroups);
                 } catch (\Exception $e) {
                 }
+                $needAgent = true;
             }
-            if (!empty($newgroups)) $groups = $newgroups;
+            if (!empty($newgroups)) {
+                $groups = $newgroups;
+            }
         }
 
         if (empty($groups)) {
@@ -559,7 +662,6 @@ class Client
         }
 
         $result = [];
-        $userGroupIDs = [];
         foreach ($groups as $k => $g) {
             $apps = self::getGroupApps((int)$g['id'], $force);
 
@@ -573,36 +675,34 @@ class Client
             } else if ($groupHasApp) {
                 $result[$k] = $g;
             }
-
-            if ($hasServerAgent>=20) {
-                foreach ($apps as $clientID=>$app) {
-                    if (self::getAgentAPPInfo($clientID)) {
-                        $userGroupIDs[] = $g;
-                        break;
-                    }
-                }
-            }
         }
 
-        if ($hasServerAgent>=20 && $userGroupIDs) {
-            $db = a('gapper/agent/group/user')->db();
-            $db->beginTransaction();
-            foreach ($userGroupIDs as $g) {
-                if ($db->query("select exists(select 1 from gapper_agent_group where id={$g['id']})")->value()) continue;
-                self::replaceAgentGroupInfo($g);
-            }
-            $db->commit();
+        if ($needAgent && !empty($result)) {
+            self::_agentGroups($result);
+            self::_agentUserGroups($username, $result);
         }
 
         return $result;
     }
 
-    private static function getAgentUserGroups($username)
+    private static function _agentGroups($groups)
     {
-        $userInfo = self::getUserInfo($username);
+        if (self::_hasAgent(['groups', $groups])) return;
+        $db = a('gapper/agent/group')->db();
+        foreach ($groups as $g) {
+            if ($db->query("select exists(select 1 from gapper_agent_group where id={$g['id']})")->value()) continue;
+            self::replaceAgentGroupInfo($g);
+        }
+        self::_recordAgent(['groups', $groups]);
+    }
+
+    private static $_agent_user_groups = [];
+    private static function getAgentUserGroups($userInfo)
+    {
         if (!$userInfo) return;
         $userID = (int)$userInfo['id'];
-        if (!$userInfo) return;
+        if (!$userID) return;
+        if (isset(self::$_agent_user_groups[$userID])) return self::$_agent_user_groups[$userID];
         $db = a('gapper/agent/group/user')->db();
         $query = $db->query("select group_id from gapper_agent_group_user where user_id={$userID}");
         if (!$query) return;
@@ -612,6 +712,7 @@ class Client
         foreach ($rows as $row) {
             $result[$row->group_id] = self::_getTheGroupInfo((int)$row->group_id);
         }
+        self::$_agent_user_groups[$userID];
         return $result;
     }
 
@@ -652,10 +753,11 @@ class Client
         $apps = self::getGroupApps((int)$groupID, $force);
         $useUniadminInfo = \Gini\Config::get('app.gapper_info_from_uniadmin');
         if (($groupID && $useUniadminInfo) || (is_array($apps) && in_array($client_id, array_keys($apps)))) {
-            // 如果有本地代理数据，需要执行一次getGroupMembers, 因为组在本地缓存的时候，没有缓存组的成员信息
-            if (self::hasServerAgent()>=20) {
-                self::getGroupMembers((int)$groupID);
-            }
+            // 选组的时候不需要去拿组成员，这一步，我没想明白当初为什么这么写，但是应该是个废屁的东西
+            // // 如果有本地代理数据，需要执行一次getGroupMembers, 因为组在本地缓存的时候，没有缓存组的成员信息
+            // if (self::hasServerAgent()>=20) {
+            //     self::getGroupMembers((int)$groupID);
+            // }
             if ($useUniadminInfo) {
                 if (\Gini\Event::get('app.group-auto-install-apps')) {
                     \Gini\Event::trigger('app.group-auto-install-apps', $groupID);
@@ -693,14 +795,10 @@ class Client
                 $qAN = $db->quote($appName);
                 $bool = $db->query("select id from gapper_agent_group_app where group_id={$groupID} and app_name={$qAN}")->value();
                 if (!$bool) {
-                    $values[] = '(' . $db->quote([$groupID, $appName]) . ')';
+                    $values[] = $appName;
                 }
             }
-            if ($values) {
-                $valueString = implode(',', $values);
-                $bool = $db->query("insert into gapper_agent_group_app(group_id,app_name) values {$valueString}");
-                if (!$bool) return false;
-            }
+            self::_agentGroupAPPs($groupID, $values);
         }
         foreach ($appIDs as $appID) {
             if (!self::getRPC()->gapper->app->installTo($appID, 'group', $groupID)) {
@@ -708,6 +806,44 @@ class Client
             }
         }
         return true;
+    }
+
+    private static function _agentGroupAPPs($groupID, $appNames)
+    {
+        if (self::_hasAgent(['group-apps', $groupID, $appNames])) return;
+        if (empty($appNames)) return;
+        $db = a('gapper/agent/group/app')->db();
+        $db->beginTransaction();
+        try {
+            foreach ($appNames as $appName) {
+                $gaString = $db->quote([$groupID, $appName]);
+                $bool = $db->query("insert ignore into gapper_agent_group_app(group_id,app_name) values({$gaString})");
+                if (!$bool) throw new \Exception();
+            }
+            $db->commit();
+            self::_recordAgent(['group-apps', $groupID, $appNames]);
+        } catch (\Exception $e) {
+            $db->rollback();
+        }
+    }
+
+    private static function _agentUserAPPs($userID, $appNames)
+    {
+        if (self::_hasAgent(['user-apps', $userID, $appNames])) return;
+        if (empty($appNames)) return;
+        $db = a('gapper/agent/user/app')->db();
+        $db->beginTransaction();
+        try {
+            foreach ($appNames as $appName) {
+                $uaString = $db->quote([$userID, $appName]);
+                $bool = $db->query("insert ignore into gapper_agent_user_app(user_id,app_name) values({$uaString})");
+                if (!$bool) throw new \Exception();
+            }
+            $db->commit();
+            self::_recordAgent(['user-apps', $userID, $appNames]);
+        } catch (\Exception $e) {
+            $db->rollback();
+        }
     }
 
     public static function installUserAPPs(array $appIDs, $userID)
@@ -729,14 +865,10 @@ class Client
                 $qAN = $db->quote($appName);
                 $bool = $db->query("select id from gapper_agent_user_app where group_id={$userID} and app_name={$qAN}")->value();
                 if (!$bool) {
-                    $values[] = '(' . $db->quote([$userID, $appName]) . ')';
+                    $values[] = $appName;
                 }
             }
-            if ($values) {
-                $valueString = implode(',', $values);
-                $bool = $db->query("insert into gapper_agent_user_app(user_id,app_name) values {$valueString}");
-                if (!$bool) return false;
-            }
+            self::_agentUserAPPs($userID, $values);
         }
         foreach ($appIDs as $appID) {
             if (!self::getRPC()->gapper->app->installTo($appID, 'user', $userID)) return false;
@@ -757,15 +889,17 @@ class Client
         $cacheKeyUserName = self::makeUserName($username);
         $cacheKey = "app#user#{$cacheKeyUserName}#apps";
         $apps = false;
+        $needAgent = false;
         if (!$force) {
             $apps = self::cache($cacheKey);
         }
         if (false===$apps) {
             $apps = (array) self::getRPC()->gapper->user->getApps($username);
             self::cache($cacheKey, $apps);
+            $needAgent = true;
         }
 
-        if ($hasServerAgent>=1 && $apps) {
+        if ($hasServerAgent>=1 && $apps && $needAgent) {
             $db = a('gapper/agent/app')->db();
             $clientIDs = $db->quote(array_keys($apps));
             $query = $db->query("select client_id,name from gapper_agent_app where client_id in ({$clientIDs})");
@@ -775,15 +909,13 @@ class Client
                     $user = self::getAgentUser($username);
                     if ($userID=$user->id) {
                         $result = [];
-                        $db->beginTransaction();
+                        $values = [];
                         foreach ($rows as $row) {
                             $clientID = $row->client_id;
-                            $app_name = $row->name;
+                            $values[] = $row->name;
                             $result[$clientID] = $apps[$clientID];
-                            $uaString = $db->quote([$userID, $app_name]);
-                            $db->query("insert ignore into gapper_agent_user_app(user_id,app_name) values({$uaString})");
                         }
-                        $db->commit();
+                        self::_agentUserAPPs($userID, $values);
                         $apps = $result;
                     }
                 }
@@ -792,10 +924,12 @@ class Client
         return is_array($apps) ? $apps : [];
     }
 
+    private static $_agent_user_apps = [];
     private static function getAgentUserApps($username)
     {
         $user = self::getAgentUser($username);
         if (!($userID=$user->id)) return;
+        if (isset(self::$_agent_user_apps[$userID])) return self::$_agent_user_apps[$userID];
         $db = a('gapper/agent/user/app')->db();
         $query = $db->query("select gaa.id as id, gaa.client_id as client_id, gaa.name as name, gaa.title as title, gaa.short_title as short_title, gaa.url as url, gaa.icon_url as icon_url, gaa.type as type, gaa.rate as rate, gaa.font_icon as font_icon from gapper_agent_user_app as gua left join gapper_agent_app as gaa on gua.app_name=gaa.name where gua.user_id={$userID}");
         if (!$query) return;
@@ -804,7 +938,47 @@ class Client
         foreach ($rows as $row) {
             $apps[$row->client_id] = self::makeAgentAPPData($row);
         }
+        self::$_agent_user_apps[$userID] = $apps;
         return $apps;
+    }
+
+    /**
+        * @brief 
+        *
+        * @param $groupID
+        * @param $criteria
+        * @param $start
+        * @param $num
+        *
+        * @return  false | [] | [....]
+        * false: 表示本地没有拿到数据
+     */
+    public static function fetchGroupMembers($groupID, $criteria, $start=0, $num=25)
+    {
+        $members = self::getGroupMembers($groupID);
+        if (empty($members)) return;
+        if (!empty($criteria) && is_array($criteria)) {
+            $query=trim($criteria['query']);
+        }
+        $result = [];
+        $i = 0;
+        $end = $start+$num-1;
+        if ($query) {
+            foreach ($members as $id=>$member) {
+                if ($i<$start || $i>$end) continue;
+                $string = implode('|||', [$member['name'],$member['initials'], $member['email']]);
+                if (false===mb_strpos($string, $query)) continue;
+                $i++;
+                $result[$id] = $member;
+            }
+        } else {
+            foreach ($members as $id=>$member) {
+                if ($i<$start || $i>$end) continue;
+                $i++;
+                $result[$id] = $member;
+            }
+        }
+        return $result;
     }
 
     public static function getGroupMembers($groupID)
@@ -814,16 +988,14 @@ class Client
         if (!$groupInfo) return;
 
         $hasServerAgent = self::hasServerAgent();
-        if ($hasServerAgent>=20) {
-            if ($groupInfo && $groupInfo['mstime']) {
-                $db = a('gapper/agent/group/user')->db();
-                $query = $db->query("select user_id from gapper_agent_group_user where group_id={$groupID}");
-                if ($query) {
-                    $rows = $query->rows();
-                    if (count($rows)) {
-                        foreach ($rows as $row) {
-                            $result[$row->user_id] = self::getUserInfo((int)$row->user_id);
-                        }
+        if ($hasServerAgent>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin') && $groupInfo && $groupInfo['mstime'] && $groupInfo['agent_sync_members']) {
+            $db = a('gapper/agent/group/user')->db();
+            $query = $db->query("select user_id from gapper_agent_group_user where group_id={$groupID}");
+            if ($query) {
+                $rows = $query->rows();
+                if (count($rows)) {
+                    foreach ($rows as $row) {
+                        $result[$row->user_id] = self::getUserInfo((int)$row->user_id);
                     }
                 }
             }
@@ -840,24 +1012,43 @@ class Client
                 $result = $result + $members;
             }
 
-            if ($hasServerAgent>=20 && $result) {
-                $db = a('gapper/agent/group/user')->db();
-                $db->beginTransaction();
-                $values = [];
-                foreach ($result as $userInfo) {
-                    if ($db->query("select exists(select 1 from gapper_agent_group_user where group_id={$groupID} and user_id={$userInfo['id']})")->value()) continue;
-                    $values[] = $db->quote([$groupID, $userInfo['id']]);
-                }
-                if ($values) {
-                    $valuesStr = implode('),(', $values);
-                    $db->query("insert into gapper_agent_group_user (group_id, user_id) values ({$valuesStr})");
-                }
-                $db->query("update gapper_agent_group set mstime=CURRENT_TIMESTAMP where id={$groupID}");
-                $db->commit();
+            if ($hasServerAgent>=1 && $result) {
+                self::_agentGroupMembers($groupID, $result);
             }
         }
 
         return $result;
+    }
+
+    private static function _agentGroupMembers($groupID, $users)
+    {
+        if (self::_hasAgent(['group-members', $groupID, $users])) return;
+        if (empty($users)) return;
+        $group = self::getAgentGroup((int)$groupID);
+        $db = $group->db();
+        $db->beginTransaction();
+        try {
+            $values = [];
+            foreach ($users as $userInfo) {
+                if ($db->query("select exists(select 1 from gapper_agent_group_user where group_id={$groupID} and user_id={$userInfo['id']})")->value()) continue;
+                $values[] = $db->quote([$groupID, $userInfo['id']]);
+            }
+            if ($values) {
+                $valuesStr = implode('),(', $values);
+                $bool = $db->query("insert into gapper_agent_group_user (group_id, user_id) values ({$valuesStr})");
+                if (!$bool) throw new \Exception();
+            }
+            if ($group->id) {
+                $group->agent_sync_members = time();
+                $group->mstime = date('Y-m-d H:i:s', time());
+                $bool = $group->save();
+                if (!$bool) throw new \Exception();
+            }
+            $db->commit();
+            self::_recordAgent(['group-members', $groupID, $users]);
+        } catch (\Exception $e) {
+            $db->rollback();
+        }
     }
 
     public static function addGroupMember($groupID, $userID)
@@ -874,7 +1065,7 @@ class Client
 
         if (!$bool) return false;
 
-        if (self::hasServerAgent()>=20) {
+        if (self::hasServerAgent()>=1) {
             $db = a('gapper/agent/group/user')->db();
             if ($db->query("select exists(select 1 from gapper_agent_group_user where group_id={$groupID} and user_id={$userID})")->value()) return true;
             return !!($db->query("insert into gapper_agent_group_user (group_id, user_id) values({$groupID}, {$userID})"));
@@ -897,7 +1088,7 @@ class Client
 
         if (!$bool) return false;
 
-        if (self::hasServerAgent()>=20) {
+        if (self::hasServerAgent()>=1) {
             $db = a('gapper/agent/group/user')->db();
             return !!($db->query("delete from gapper_agent_group_user where group_id={$groupID} and user_id={$userID}"));
         } 
@@ -918,15 +1109,17 @@ class Client
 
         $cacheKey = "app#group#{$groupID}#apps";
         $apps = false;
+        $needAgent = false;
         if (!$force) {
             $apps = self::cache($cacheKey);
         }
         if (false === $apps) {
             $apps = self::getRPC()->gapper->group->getApps((int)$groupID) ?: [];
             self::cache($cacheKey, $apps);
+            $needAgent = true;
         }
 
-        if ($hasServerAgent>=1 && $apps) {
+        if ($hasServerAgent>=1 && $apps && $needAgent) {
             $db = a('gapper/agent/app')->db();
             $clientIDs = $db->quote(array_keys($apps));
             $query = $db->query("select client_id,name from gapper_agent_app where client_id in ({$clientIDs})");
@@ -934,15 +1127,13 @@ class Client
                 $rows = $query->rows();
                 if (count($rows)) {
                     $result = [];
-                    $db->beginTransaction();
+                    $values = [];
                     foreach ($rows as $row) {
                         $clientID = $row->client_id;
-                        $app_name = $row->name;
+                        $values[] = $row->name;
                         $result[$clientID] = $apps[$clientID];
-                        $gaString = $db->quote([$groupID, $app_name]);
-                        $db->query("insert ignore into gapper_agent_group_app(group_id,app_name) values({$gaString})");
                     }
-                    $db->commit();
+                    self::_agentGroupAPPs($groupID, $values);
                     $apps = $result;
                 }
             }
@@ -951,9 +1142,11 @@ class Client
         return $apps;
     }
 
+    private static $_agent_group_apps = [];
     private static function getAgentGroupApps($groupID)
     {
         $groupID = (int)$groupID;
+        if (isset(self::$_agent_group_apps[$groupID])) return self::$_agent_group_apps[$groupID];
         $db = a('gapper/agent/group/app')->db();
         $query = $db->query("select gaa.id as id, gaa.client_id as client_id, gaa.name as name, gaa.title as title, gaa.short_title as short_title, gaa.url as url, gaa.icon_url as icon_url, gaa.type as type, gaa.rate as rate, gaa.font_icon as font_icon from gapper_agent_group_app as gga left join gapper_agent_app as gaa on gga.app_name=gaa.name where gga.group_id={$groupID}");
         if (!$query) return;
@@ -962,6 +1155,7 @@ class Client
         foreach ($rows as $row) {
             $apps[$row->client_id] = self::makeAgentAPPData($row);
         }
+        self::$_agent_group_apps[$groupID] = $apps;
         return $apps;
     }
 
@@ -995,15 +1189,17 @@ class Client
             if ($info) return $info;
         }
 
+        $needAgent = false;
         if (!$force) {
             $info = self::cache($cacheKey);
         }
         if (!$info) {
             $info = self::getRPC()->gapper->group->getInfo($criteria);
             self::cache($cacheKey, $info);
+            $needAgent = true;
         }
 
-        if ($hasServerAgent>=1 && $info) {
+        if ($hasServerAgent>=1 && $info && $needAgent) {
             self::replaceAgentGroupInfo($info);
         }
 
@@ -1012,6 +1208,7 @@ class Client
 
     private static function replaceAgentGroupInfo($info)
     {
+        if (self::_hasAgent(['group-info', $info])) return;
         $group = self::getAgentGroup((int)$info['id']);
         if (!$group->id) {
             $group->id = $info['id'];
@@ -1023,6 +1220,7 @@ class Client
         $group->icon = $info['icon'];
         $group->stime = date('Y-m-d H:i:s');
         if ($group->save()) {
+            self::_recordAgent(['group-info', $info]);
             return true;
         }
         return false;
@@ -1055,6 +1253,7 @@ class Client
             'creator'=> $group->creator,
             'icon'=> $group->icon,
             'mstime'=> $group->mstime,
+            'agent_sync_members'=> $group->agent_sync_members
         ];
     }
 
@@ -1089,9 +1288,42 @@ class Client
         }
     }
 
+    private static function _isAgentToken($token)
+    {
+        if (0!==strpos($token, 'code')) return false;
+        return true;
+    }
+
+    private static function _makeAgentToken()
+    {
+        return 'code'.sha1(uniqid(microtime(true), true));
+    }
+
+    private static function _getAgentUserToken($username, $toClientID, $force)
+    {
+        list($username) = explode('|', $username);
+        $ut = a('gapper/agent/user/token', [
+            'username'=> $username,
+            'client_id'=> $toClientID
+        ]);
+        $now = time();
+        $tokenLifeTime = \Gini\Config::get('gapper.gapper-client-agent-token-lifetime') ?: 120;
+        if (!$ut->id || $force || ($ut->ctime+$tokenLifeTime)<$now) {
+            $ut->username = $username;
+            $ut->client_id = $toClientID;
+            $token = self::_makeAgentToken();
+            $ut->token = $token;
+            $ut->save();
+        }
+        return $ut->token;
+    }
+
     public static function getLoginToken($toClientID, $username=null, $force=false)
     {
         $username = $username ?: self::getUserName();
+        if (self::hasServerAgent()>=1) {
+            return self::_getAgentUserToken($username, $toClientID, $force);
+        }
         $cacheKeyUserName = self::makeUserName($username);
         $cacheKey = "app#user#{$cacheKeyUserName}#{$toClientID}#logintoken";
         if (!$force) {
