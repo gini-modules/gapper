@@ -266,7 +266,8 @@ class Client
         if (!$ut->id) return false;
         if ($ut->client_id!=$client_id) return false;
         $tokenLifeTime = \Gini\Config::get('gapper.gapper-client-agent-token-lifetime') ?: 120;
-        if ($ut->ctime+$tokenLifeTime<time()) return false;
+        $etime = date('Y-m-d H:i:s', strtotime("-{$tokenLifeTime} seconds"));
+        if ($ut->ctime<$etime) return false;
         $userID = $ut->user_id;
         $currentUserID = self::_getUserID();
         if ($currentUserID && $currentUserID!=$userID) {
@@ -1324,13 +1325,14 @@ class Client
             'user_id'=> $userID,
             'client_id'=> $toClientID
         ]);
-        $now = time();
         $tokenLifeTime = \Gini\Config::get('gapper.gapper-client-agent-token-lifetime') ?: 120;
-        if (!$ut->id || $force || ($ut->ctime+$tokenLifeTime)<$now) {
+        $etime = date('Y-m-d H:i:s', strtotime("-{$tokenLifeTime} seconds"));
+        if (!$ut->id || $force || $ut->ctime<$etime) {
             $ut->user_id = $userID;
             $ut->client_id = $toClientID;
             $token = self::_makeAgentToken();
             $ut->token = $token;
+            $ut->ctime = date('Y-m-d H:i:s');
             $ut->save();
         }
         return $ut->token;
