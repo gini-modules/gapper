@@ -1342,7 +1342,12 @@ class Client
     {
         $username = $username ?: self::getUserName();
         if (self::hasServerAgent()>=1) {
-            return self::_getAgentUserToken($username, $toClientID, $force);
+            $appInfo = self::getInfo($toClientID);
+            // TODO 目前labmai这边mall-old的功能很快会被替代掉，再去改mall-old的代码风险比较高
+            // 所以，如果是跳去mall-old，就不要用本地token了
+            if ($appInfo['module_name']!='mall-old') {
+                return self::_getAgentUserToken($username, $toClientID, $force);
+            }
         }
         $cacheKeyUserName = self::makeUserName($username);
         $cacheKey = "app#user#{$cacheKeyUserName}#{$toClientID}#logintoken";
