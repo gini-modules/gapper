@@ -221,7 +221,7 @@ class Client
         if (self::hasSession(self::$keyLoginStatusChanged)) {
             self::unsetSession(self::$keyLoginStatusChanged);
             \Gini\Event::trigger('gapper.gapper-client-after-user-login');
-            \Gini\Event::trigger('gapper.group-access-record');
+            \Gini\Event::trigger('gapper.gapper-access-record');
         }
 
         return self::STEP_DONE;
