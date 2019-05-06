@@ -663,7 +663,8 @@ class Client
             if (false === $newgroups) {
                 try {
                     $filters = [];
-                    if (strpos($app['module_name'], 'admin')!=0) {
+                    if (strpos($app['module_name'], 'admin')===0) {
+                    } else {
                         $filters['type'] = 'lab';
                     }
                     $newgroups = self::getRPC()->gapper->user->getGroups($username, $filters) ?: [];
