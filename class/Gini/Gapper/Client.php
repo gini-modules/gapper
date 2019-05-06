@@ -662,7 +662,11 @@ class Client
             }
             if (false === $newgroups) {
                 try {
-                    $newgroups = self::getRPC()->gapper->user->getGroups($username) ?: [];
+                    $filters = [];
+                    if (strpos($app['module_name'], 'admin')!=0) {
+                        $filters['type'] = 'lab';
+                    }
+                    $newgroups = self::getRPC()->gapper->user->getGroups($username, $filters) ?: [];
                     self::cache($cacheKey, $newgroups);
                 } catch (\Exception $e) {
                 }
