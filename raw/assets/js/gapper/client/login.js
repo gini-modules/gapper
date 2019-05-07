@@ -200,7 +200,11 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
         var needShowlogin = ! $(this).attr('data-just-close');
         $.get('ajax/gapper/client/logout', {
             _t: (new Date()).getTime()
-        }, function() {
+        }, function(data) {
+            if ($.isPlainObject(data) && data.redirect) {
+                window.location.href = data.redirect;
+                return;
+            }
             isWaitingLogin = false;
             if (needShowlogin) {
                 setTimeout(showLogin, 1);

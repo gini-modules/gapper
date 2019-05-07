@@ -40,6 +40,19 @@ class Client extends \Gini\Controller\CGI
     public function actionLogout()
     {
         \Gini\Gapper\Client::logout();
+        if (\Gini\Config::get('app.node_is_login_by_oauth')) {
+            // 去gateway中删除登陆
+            $clientID = \Gini\Config::get('gapper.rpc')['client_id'];
+            $gatewayLogoutURL = \Gini\Config::get('oauth.client')['servers']['gateway']['logout'];
+            $redirectURL  = \Gini\URI::url($gatewayLogoutURL, [
+                'redirect' => \Gini\URI::url('/'),
+                'client' => $clientID
+            ]);
+            $data = [
+                'redirect' => $redirectURL
+            ];
+            return \Gini\IoC::construct('\Gini\CGI\Response\JSON', $data);
+        }
         return \Gini\IoC::construct('\Gini\CGI\Response\JSON', true);
     }
 
