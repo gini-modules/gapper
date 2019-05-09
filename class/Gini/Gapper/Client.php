@@ -645,7 +645,7 @@ class Client
         }
 
         $hasServerAgent = self::hasServerAgent();
-        if ($hasServerAgent>=20 && !\Gini\Config::get('app.gapper_info_from_uniadmin')) {
+        if ($hasServerAgent>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin')) {
             $userInfo = self::getUserInfo($username);
             if ($userInfo['agent_sync_groups']) {
                 $groups = self::getAgentUserGroups($userInfo);
@@ -671,7 +671,9 @@ class Client
                     self::cache($cacheKey, $newgroups);
                 } catch (\Exception $e) {
                 }
-                $needAgent = true;
+                if (!\Gini\Config::get('app.gapper_info_from_uniadmin')) {
+                    $needAgent = true;
+                }
             }
             if (!empty($newgroups)) {
                 $groups = $newgroups;
@@ -698,9 +700,9 @@ class Client
             }
         }
 
-        if ($needAgent && !empty($result)) {
-            self::_agentGroups($result);
-            self::_agentUserGroups($username, $result);
+        if ($needAgent) {
+            self::_agentGroups($groups);
+            self::_agentUserGroups($username, $groups);
         }
 
         return $result;
@@ -1009,7 +1011,7 @@ class Client
         if (!$groupInfo) return;
 
         $hasServerAgent = self::hasServerAgent();
-        if ($hasServerAgent>=20 && !\Gini\Config::get('app.gapper_info_from_uniadmin') && $groupInfo && $groupInfo['mstime'] && $groupInfo['agent_sync_members']) {
+        if ($hasServerAgent>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin') && $groupInfo && $groupInfo['mstime'] && $groupInfo['agent_sync_members']) {
             $db = a('gapper/agent/group/user')->db();
             $query = $db->query("select user_id from gapper_agent_group_user where group_id={$groupID}");
             if ($query) {
