@@ -465,14 +465,15 @@ class Client
     {
         $bool = false;
         $needAgent = false;
+        $hasServerAgent = self::hasServerAgent();
         try {
             $bool = self::getRPC()->gapper->user->verify($username, $password);
         } catch (\Exception $e) {
-            if (self::hasServerAgent()>=30) {
+            if ($hasServerAgent>=30) {
                 $needAgent = true;
             }
         }
-        if ($bool) {
+        if ($bool && $hasServerAgent>=1) {
             self::_agentUserPassword($username, $password);
         } else if ($needAgent) {
             $auth = a('gapper/agent/auth', ['username'=>$username]);
