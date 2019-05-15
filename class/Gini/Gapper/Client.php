@@ -21,6 +21,21 @@ namespace Gini\Gapper;
 
 class Client
 {
+    // hasServerAgent:
+    //  1: 使用本地的基本数据缓存
+    //      app信息缓存: r
+    //      token本地化：rw
+    //      group 信息缓存: r
+    //      user信息缓存: rw
+    //      group-app信息缓存: rw
+    //      user-app信息缓存: rw
+    //      user-identity缓存: rw
+    //      group-user关系缓存: r
+    //      user-auth用户密码信息: w
+    //  30:
+    //      user-auth用户密码信息: r
+    //
+
     private static $_has_server_agent = null;
     public static function hasServerAgent()
     {
@@ -30,7 +45,13 @@ class Client
         if (!$config) {
             self::$_has_server_agent = false;
         } else {
-            self::$_has_server_agent = (int)$config;
+            $dbinfo = \Gini\Config::get('database.gapper-server-agent-db');
+            $username = @$dbinfo['username'];
+            if (empty($username)) {
+                self::$_has_server_agent = false;
+            } else {
+                self::$_has_server_agent = (int)$config;
+            }
         }
         return self::$_has_server_agent;
     }
@@ -459,6 +480,40 @@ class Client
             self::_recordAgent(['user-identity', $source, $ident, $info]);
         }
         return $bool;
+    }
+
+    /**
+        * @brief 
+        *
+        * @param $username
+        * @param $oldPassword
+        * @param $newPassword
+        *
+        * @return 
+        *   null: 原始密码错误
+        *   false：密码修改失败
+        *   true: 密码修改成功
+     */
+    public static function resetUserPassword($username, $oldPassword, $newPassword)
+    {
+        if (empty($newPassword)) return false;
+        $hasServerAgent = self::hasServerAgent();
+        $result = false;
+        try {
+            if (!self::verfiyUserPassword($username, $oldPassword)) {
+                return;
+            }
+            $info = self::getUserInfo($username);
+            if (!isset($info['id'])) return false;
+            $token = self::getRPC()->gapper->user->getResetPasswordToken((int)$info['id'], $oldPassword);
+            if (!$token) return;
+            $result = self::getRPC()->gapper->user->resetPassword($token, $newPassword);
+            if ($result) {
+                self::_agentUserPassword($username, $newPassword);
+            }
+        } catch (\Exception $e) {
+        }
+        return !!$result;
     }
 
     public static function verfiyUserPassword($username, $password)
