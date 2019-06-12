@@ -520,9 +520,13 @@ class Client
     {
         $bool = false;
         $needAgent = false;
+        $needCleanAgentPassword = false;
         $hasServerAgent = self::hasServerAgent();
         try {
             $bool = self::getRPC()->gapper->user->verify($username, $password);
+            if (!$bool && $hasServerAgent>=1) {
+                $needCleanAgentPassword = true;
+            }
         } catch (\Exception $e) {
             if ($hasServerAgent>=30) {
                 $needAgent = true;
@@ -534,6 +538,15 @@ class Client
             $auth = a('gapper/agent/auth', ['username'=>$username]);
             if ($hash=$auth->password) {
                 $bool = !!(crypt($password, $hash)==$hash);
+            }
+        }
+        if ($needCleanAgentPassword) {
+            $auth = a('gapper/agent/auth', ['username'=>$username]);
+            if ($hash=$auth->password) {
+                $checked = !!(crypt($password, $hash)==$hash);
+                if ($checked) {
+                    $auth->delete();
+                }
             }
         }
         return !!$bool;
