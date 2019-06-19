@@ -1276,7 +1276,7 @@ class Client
     private static function _getGroupInfo($cacheKey, $criteria, $force=false)
     {
         $hasServerAgent = self::hasServerAgent();
-        if ($hasServerAgent>=1) {
+        if ($hasServerAgent>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin')) {
             $info = self::getAgentGroupInfo($criteria);
             if ($info) return $info;
         }
