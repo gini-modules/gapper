@@ -483,13 +483,13 @@ class Client
     }
 
     /**
-        * @brief 
+        * @brief
         *
         * @param $username
         * @param $oldPassword
         * @param $newPassword
         *
-        * @return 
+        * @return
         *   null: 原始密码错误
         *   false：密码修改失败
         *   true: 密码修改成功
@@ -1035,7 +1035,7 @@ class Client
     }
 
     /**
-        * @brief 
+        * @brief
         *
         * @param $groupID
         * @param $criteria
@@ -1161,7 +1161,7 @@ class Client
             $db = a('gapper/agent/group/user')->db();
             if ($db->query("select exists(select 1 from gapper_agent_group_user where group_id={$groupID} and user_id={$userID})")->value()) return true;
             return !!($db->query("insert into gapper_agent_group_user (group_id, user_id) values({$groupID}, {$userID})"));
-        } 
+        }
         self::getGroups($userInfo['username'], true);
         return true;
     }
@@ -1172,7 +1172,7 @@ class Client
         $userID = (int)$userID;
         $userInfo = self::getUserInfo($userID);
         if (!$userInfo) return false;
-        
+
         try {
             $bool = self::getRPC()->gapper->group->removeMember($groupID, $userID);
         } catch (\Exception $e) {
@@ -1183,7 +1183,7 @@ class Client
         if (self::hasServerAgent()>=1) {
             $db = a('gapper/agent/group/user')->db();
             return !!($db->query("delete from gapper_agent_group_user where group_id={$groupID} and user_id={$userID}"));
-        } 
+        }
         self::getGroups($userInfo['username'], true);
         return true;
     }
@@ -1195,6 +1195,15 @@ class Client
 
         $hasServerAgent = self::hasServerAgent();
         if ($hasServerAgent>=1) {
+            $db = a('gapper/agent/app')->db();
+            // 如果groupID 在黑名单 则不需要查询了
+            $query = $db->query("select * from gapper_agent_useless_group where group_id = {$groupID}");
+            if ($query) {
+                $rows = $query->rows();
+                if (count($rows)) {
+                    return [];
+                }
+            }
             $apps = self::getAgentGroupApps((int)$groupID);
             if ($apps) return $apps;
         }
@@ -1211,23 +1220,28 @@ class Client
             $needAgent = true;
         }
 
-        if ($hasServerAgent>=1 && $apps && $needAgent) {
-            $db = a('gapper/agent/app')->db();
-            $clientIDs = $db->quote(array_keys($apps));
-            $query = $db->query("select client_id,name from gapper_agent_app where client_id in ({$clientIDs})");
-            if ($query) {
-                $rows = $query->rows();
-                if (count($rows)) {
-                    $result = [];
-                    $values = [];
-                    foreach ($rows as $row) {
-                        $clientID = $row->client_id;
-                        $values[] = $row->name;
-                        $result[$clientID] = $apps[$clientID];
+        if ($hasServerAgent>=1 && $needAgent) {
+            if ($apps) {
+                $clientIDs = $db->quote(array_keys($apps));
+                $query = $db->query("select client_id,name from gapper_agent_app where client_id in ({$clientIDs})");
+                if ($query) {
+                    $rows = $query->rows();
+                    if ($appCount = count($rows)) {
+                        $result = [];
+                        $values = [];
+                        foreach ($rows as $row) {
+                            $clientID = $row->client_id;
+                            $values[] = $row->name;
+                            $result[$clientID] = $apps[$clientID];
+                        }
+                        self::_agentGroupAPPs($groupID, $values);
+                        $apps = $result;
                     }
-                    self::_agentGroupAPPs($groupID, $values);
-                    $apps = $result;
                 }
+            }
+            if (!$apps || !$appCount) {
+                $gString = $db->quote([$groupID]);
+                $db->query("insert ignore into gapper_agent_useless_group(group_id) values({$gString})");
             }
         }
 
@@ -1479,7 +1493,7 @@ class Client
     {
         $redirectURL = '/';
         if ($redirect) {
-            $redirectURL = $redirect; 
+            $redirectURL = $redirect;
         } else if (\Gini\Config::get('app.node_is_login_by_oauth')) {
             $uri = parse_url($_SERVER['HTTP_REFERER']);
             parse_str($uri['query'], $uriData);
