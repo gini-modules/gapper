@@ -155,7 +155,7 @@ class Client extends \Gini\Controller\CGI\Gapper
                 $node = \Gini\Config::get('app.node');
                 $appID = explode('/', APP_ID);
                 $appInfo = \Gini\Gapper\Client::getInfo($node . '-' . $appID[1]);
-                $redirect = $appInfo['url'];
+                $redirect = \Gini\URI::url($appInfo['url'].$redirect);
             }
             $redirect = $this->_checkUrl("http://{$host}/", $redirect) ? $redirect : '/';
 
