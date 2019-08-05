@@ -151,6 +151,12 @@ class Client extends \Gini\Controller\CGI\Gapper
         $redirect = $_GET['redirect'];
         if (\Gini\Gapper\Client::getLoginStep() === \Gini\Gapper\Client::STEP_DONE) {
             $host = $_SERVER['HTTP_HOST'];
+            if (0===strpos($redirect, '/')) {
+                $node = \Gini\Config::get('app.node');
+                $appID = explode('/', APP_ID);
+                $appInfo = \Gini\Gapper\Client::getInfo($node . '-' . $appID[1]);
+                $redirect = $appInfo['url'];
+            }
             $redirect = $this->_checkUrl("http://{$host}/", $redirect) ? $redirect : '/';
 
             return $this->redirect($redirect);
