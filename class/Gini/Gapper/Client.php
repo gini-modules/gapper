@@ -1238,10 +1238,10 @@ class Client
                         $apps = $result;
                     }
                 }
-            }
-            if (!$apps || !$appCount) {
-                $gString = $db->quote([$groupID]);
-                $db->query("insert ignore into gapper_agent_useless_group(group_id) values({$gString})");
+                if (!$appCount) {
+                    $gString = $db->quote([$groupID]);
+                    $db->query("insert ignore into gapper_agent_useless_group(group_id) values({$gString})");
+                }
             }
         }
 
