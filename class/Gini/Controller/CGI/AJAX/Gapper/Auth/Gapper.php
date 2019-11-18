@@ -60,6 +60,15 @@ class Gapper extends \Gini\Controller\CGI
         $form = $this->form('post');
         $username = $form['username'];
         $password = $form['password'];
+        $captcha = $form['captcha'];
+
+        if (!$captcha) {
+            return $this->_showJSON('captcha required! ');
+        }
+
+        if ($captcha !== $_SESSION['gapper_authcode']) {
+            return $this->_showJSON('captcha wrong! Please try again');
+        }
 
         if (\Gini\Gapper\Client::verfiyUserPassword($username, $password)) {
             $result = \Gini\Gapper\Client::loginByUserName($username);

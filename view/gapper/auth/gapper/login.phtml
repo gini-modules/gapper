@@ -28,6 +28,15 @@
                             </a>
                         </div>
                     </div>
+                    <div class="gapper-auth-login-form-li  row form-inline">
+                        <div class="col-md-6">
+                            <input class="form-control" type="text" name="captcha" placeholder="<?= H(T('captcha')) ?>" />
+                        </div>
+                        <div class="col-md-6">
+                            <img id="captcha_img" border="1" src="<?= \Gini\URI::url('/gapper/client/create-captcha') ?>" width=100 height=30>
+                        </div>
+                    </div>
+                    <br>
                     <div class="gapper-auth-login-form-li form-group">
                         <input class="form-control btn btn-primary" type="submit" value="<?=H(T('Log In'))?>"/>
                     </div>
