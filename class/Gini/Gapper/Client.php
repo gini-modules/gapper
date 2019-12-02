@@ -686,6 +686,7 @@ class Client
             $user->agent_sync_groups = time();
             if (!$user->save()) throw new \Exception();
             foreach ($groups as $group) {
+                if (!$group['id']) continue;
                 $bool = $db->query("INSERT IGNORE INTO gapper_agent_group_user(group_id,user_id) VALUES({$group['id']},{$user->id})");
                 if (!$bool) throw new \Exception();
             }
@@ -755,6 +756,7 @@ class Client
 
         $result = [];
         foreach ($groups as $k => $g) {
+            if (!$g['id']) continue;
             $apps = self::getGroupApps((int)$g['id'], $force);
 
             $groupHasApp = !!(is_array($apps) && isset($apps[$client_id]));
@@ -782,6 +784,7 @@ class Client
         if (self::_hasAgent(['groups', $groups])) return;
         $db = a('gapper/agent/group')->db();
         foreach ($groups as $g) {
+            if (!$g['id']) continue;
             if ($db->query("select exists(select 1 from gapper_agent_group where id={$g['id']})")->value()) continue;
             self::replaceAgentGroupInfo($g);
         }
