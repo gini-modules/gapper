@@ -143,7 +143,11 @@ class Step extends \Gini\Controller\CGI
         $referer = parse_url(\Gini\URI::url($_SERVER['HTTP_REFERER']));
         $query = $referer['query'];
         parse_str($query, $params);
-        $redirectURL = \Gini\URI::url($params['redirect']?:'/', [
+        $redirect = $params['redirect'];
+        if (0===strpos($redirect, '/')) {
+            $redirect = 'http://'.$referer['host'].$redirect;
+        }
+        $redirectURL = \Gini\URI::url($redirect?:'/', [
             'gapper-token'=> '',
             'gapper-group'=> ''
         ]);
