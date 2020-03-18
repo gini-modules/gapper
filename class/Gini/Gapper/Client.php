@@ -1125,7 +1125,8 @@ class Client
         try {
             $values = [];
             foreach ($users as $userInfo) {
-                if ($db->query("select exists(select 1 from gapper_agent_group_user where group_id={$groupID} and user_id={$userInfo['id']})")->value()) continue;
+                $query = $db->query("select exists(select 1 from gapper_agent_group_user where group_id={$groupID} and user_id={$userInfo['id']})");
+                if (!$query) continue;
                 $values[] = $db->quote([$groupID, $userInfo['id']]);
             }
             if ($values) {
