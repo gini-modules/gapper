@@ -39,48 +39,108 @@ class Client
     private static $_has_server_agent = null;
     public static function hasServerAgent()
     {
-        if (!is_null(self::$_has_server_agent)) return self::$_has_server_agent;
+        if (false===self::$_has_server_agent) return self::$_has_server_agent;
 
-        $config = \Gini\Config::get('gapper.gapper-client-use-agent-data');
-        if (!$config) {
-            self::$_has_server_agent = false;
-        } else {
+        if (is_null(self::$_has_server_agent)) {
             $dbinfo = \Gini\Config::get('database.gapper-server-agent-db');
             $username = @$dbinfo['username'];
             if (empty($username)) {
-                self::$_has_server_agent = false;
-            } else {
-                self::$_has_server_agent = (int)$config;
+                return self::$_has_server_agent = false;
             }
         }
-        return self::$_has_server_agent;
+
+        $config = \Gini\Config::get('gapper.gapper-client-use-agent-data');
+        if (!$config) return false;
+        return (int)$config;
     }
 
-    private static $_RPC;
+    private static $_RPC = null;
     public static function getRPC()
     {
-        if (self::$_RPC) return self::$_RPC;
-
+        // 如果对接了上海gapper，则不存在失联的情况
+        if (\Gini\Config::get('app.gapper_info_from_uniadmin')) {
+            $autoUseAgentData = false;
+        } else {
+            // 需要手动开启gapper.in失联的降级策略
+            // 默认不开启
+            $autoUseAgentData = !!\Gini\Config::get('gapper.gapper-client-agent-auto-use-agent-data');
+        }
         $config = (array) \Gini\Config::get('gapper.rpc');
         $api = $config['url'];
+        if (!is_null(self::$_RPC)) {
+            $rpc = self::$_RPC;
+        } else {
+            $rpc = \Gini\IoC::construct('\Gini\RPC', $api);
+        }
+
+        if (!$rpc) {
+            if ($autoUseAgentData) {
+                return self::_get_rpc_failed();
+            }
+            $rpc = \Gini\IoC::construct('\Gini\RPC', $api);
+        } 
+
         $client_id = $config['client_id'];
         $client_secret = $config['client_secret'];
+
+        $sessionID = session_id();
+        $networkFailedKey = "app#client#{$client_id}#networkfailed#{$sessionID}";
+        if ($autoUseAgentData && self::cache($networkFailedKey)) return self::_get_rpc_failed();
+
         $cacheKey = "app#client#{$client_id}#session_id";
         $token = self::cache($cacheKey);
-        $rpc = \Gini\IoC::construct('\Gini\RPC', $api);
         if ($token) {
             $rpc->setHeader(['X-Gini-Session' => $token]);
+            self::$_RPC = $rpc;
         } else {
-            $token = $rpc->gapper->app->authorize($client_id, $client_secret);
+            try {
+                $token = $rpc->gapper->app->authorize($client_id, $client_secret);
+            } catch (\Exception $e) {
+            }
             if (!$token) {
                 \Gini\Logger::of('gapper')->error('Your app was not registered in gapper server!');
+                self::cache($networkFailedKey, 1, 10);
+                if ($autoUseAgentData) self::$_RPC = false;
             } else {
                 self::cache($cacheKey, $token, 720);
+                $rpc->setHeader(['X-Gini-Session' => $token]);
                 self::$_RPC = $rpc;
             }
         }
 
-        return $rpc;
+        if ($autoUseAgentData && !self::$_RPC) return self::_get_rpc_failed();
+
+        return self::$_RPC;
+    }
+
+    private static function _get_rpc_failed()
+    {
+        $config = \Gini\Config::get('gapper.gapper-client-use-agent-data');
+        if ($config && (int)$config<30) {
+            if (!\Gini\Config::get('app.gapper_info_from_uniadmin')) {
+                \Gini\Config::set('gapper.gapper-client-use-agent-data', 30);
+                error_log('到gapper.in的链接异常，将使用本地暂存数据暂时保证系统功能正常');
+            }
+        }
+        throw new \Gini\RPC\Exception();
+    }
+
+    public static function authorize($clientID, $clientSecret)
+    {
+        if (self::hasServerAgent()>=1) {
+            $db = a('gapper/agent/app')->db();
+            $qClientID = $db->quote($clientID);
+            $qClientSecret = $db->quote($clientSecret);
+            $id = $db->query("select id from gapper_agent_app where client_id={$qClientID} and client_secret={$qClientSecret}")->value();
+            if ($id) return true;
+            return false;
+        }
+        try {
+            $token = self::getRPC()->gapper->app->authorize($clientID, $clientSecret);
+            if ($token) return true;
+        } catch (\Exception $e) {
+        }
+        return false;
     }
 
     const STEP_LOGIN = 0;
@@ -159,6 +219,12 @@ class Client
     {
         $client_id = $client_id ?: self::getId();
         if (!$client_id) return [];
+
+        try {
+            self::getRPC();
+        } catch (\Exception $e) {
+        }
+
         if (self::hasServerAgent()>=1) {
             return self::getAgentAPPInfo($client_id);
         }
@@ -172,11 +238,13 @@ class Client
         return $info;
     }
 
+    private static $_agentAPPInfos = [];
     private static function getAgentAPPInfo($client_id)
     {
+        if (isset(self::$_agentAPPInfos[$client_id])) return self::$_agentAPPInfos[$client_id];
         $app = a('gapper/agent/app', ['client_id'=>$client_id]);
         if (!$app->id) return [];
-        return self::makeAgentAPPData($app);
+        return self::$_agentAPPInfos[$client_id] = self::makeAgentAPPData($app);
     }
 
     private static function makeAgentAPPData($app)
@@ -294,11 +362,19 @@ class Client
         if ($currentUserID && $currentUserID!=$userID) {
             self::logout();
         }
-        return self::loginByUserID($userID);
+        if ($userID && $currentUserID!=$userID) {
+            return self::loginByUserID($userID);
+        }
+        return true;
     }
 
     public static function loginByToken($token)
     {
+        try {
+            self::getRPC();
+        } catch (\Exception $e) {
+        }
+
         if (self::hasServerAgent()>=1 && self::_isAgentToken($token)) {
             return self::_loginByAgentToken($token);
         }
@@ -350,9 +426,13 @@ class Client
             return;
         }
 
-        $hasServerAgent = self::hasServerAgent();
+        try {
+            self::getRPC();
+        } catch (\Exception $e) {
+        }
+
         // 先检查本地缓存的数据时有没有
-        if ($hasServerAgent>=1) {
+        if (self::hasServerAgent()>=1) {
             $info = self::getAgentUserInfo($username);
             if ($info) return $info;
         }
@@ -364,14 +444,17 @@ class Client
             $info = self::cache($cacheKey);
         }
         if (!$info) {
-            $info = self::getRPC()->gapper->user->getInfo($username);
-            $info = $info ?: [];
-            self::cache($cacheKey, $info);
-            $needAgent = true;
+            try {
+                $info = self::getRPC()->gapper->user->getInfo($username);
+                $info = $info ?: [];
+                self::cache($cacheKey, $info);
+                $needAgent = true;
+            } catch (\Exception $e) {
+            }
         }
 
         // 将数据本地缓存
-        if ($hasServerAgent>=1 && $info && $needAgent) {
+        if (self::hasServerAgent()>=1 && $info && $needAgent) {
             self::replaceAgentUserInfo($info);
         }
 
@@ -426,8 +509,12 @@ class Client
 
     public static function getUserByIdentity($source, $ident, $force=false)
     {
-        $hasServerAgent = self::hasServerAgent();
-        if ($hasServerAgent>=1) {
+        try {
+            self::getRPC();
+        } catch (\Exception $e) {
+        }
+
+        if (self::hasServerAgent()>=1) {
             $info = self::getAgentUserByIdentity($source, $ident);
             if ($info) return $info;
         }
@@ -447,7 +534,7 @@ class Client
 
         }
 
-        if ($hasServerAgent>=1 && $info && $needAgent) {
+        if (self::hasServerAgent()>=1 && $info && $needAgent) {
             self::replaceAgentUserIdentity($source, $ident, $info);
         }
 
@@ -497,7 +584,6 @@ class Client
     public static function resetUserPassword($username, $oldPassword, $newPassword)
     {
         if (empty($newPassword)) return false;
-        $hasServerAgent = self::hasServerAgent();
         $result = false;
         try {
             if (!self::verfiyUserPassword($username, $oldPassword)) {
@@ -521,18 +607,17 @@ class Client
         $bool = false;
         $needAgent = false;
         $needCleanAgentPassword = false;
-        $hasServerAgent = self::hasServerAgent();
         try {
             $bool = self::getRPC()->gapper->user->verify($username, $password);
-            if (!$bool && $hasServerAgent>=1) {
+            if (!$bool && self::hasServerAgent()>=1) {
                 $needCleanAgentPassword = true;
             }
         } catch (\Exception $e) {
-            if ($hasServerAgent>=30) {
+            if (self::hasServerAgent()>=30) {
                 $needAgent = true;
             }
         }
-        if ($bool && $hasServerAgent>=1) {
+        if ($bool && self::hasServerAgent()>=1) {
             self::_agentUserPassword($username, $password);
         } else if ($needAgent) {
             $auth = a('gapper/agent/auth', ['username'=>$username]);
@@ -589,8 +674,12 @@ class Client
         $userInfo = self::getUserInfo($username);
         if (!($userID=$userInfo['id'])) return;
 
-        $hasServerAgent = self::hasServerAgent();
-        if ($hasServerAgent>=1) {
+        try {
+            self::getRPC();
+        } catch (\Exception $e) {
+        }
+
+        if (self::hasServerAgent()>=1) {
             $ui = a('gapper/agent/user/identity', ['user_id'=> $userID, 'source'=> $source]);
             if ($ui->id) return $ui->identity;
         }
@@ -601,7 +690,7 @@ class Client
         }
         if (!$identity) return false;
 
-        if ($hasServerAgent>=1) {
+        if (self::hasServerAgent()>=1) {
             $ui = a('gapper/agent/user/identity');
             $ui->source = $source;
             $ui->identity = $identity;
@@ -621,8 +710,12 @@ class Client
         $userInfo = self::getUserInfo($username);
         if (!($userID=$userInfo['id'])) return false;
 
-        $hasServerAgent = self::hasServerAgent();
-        if ($hasServerAgent>=1) {
+        try {
+            self::getRPC();
+        } catch (\Exception $e) {
+        }
+
+        if (self::hasServerAgent()>=1) {
             $ui = a('gapper/agent/user/identity', ['identity'=>$ident, 'source'=> $source]);
             if ($ui->id) {
                 if ($ui->user_id == $userID) return true;
@@ -636,7 +729,7 @@ class Client
         }
         if (!$result) return false;
 
-        if ($hasServerAgent>=1) {
+        if (self::hasServerAgent()>=1) {
             $ui = a('gapper/agent/user/identity');
             $ui->identity = $ident;
             $ui->source = $source;
@@ -714,8 +807,12 @@ class Client
             return false;
         }
 
-        $hasServerAgent = self::hasServerAgent();
-        if ($hasServerAgent>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin')) {
+        try {
+            self::getRPC();
+        } catch (\Exception $e) {
+        }
+
+        if (self::hasServerAgent()>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin')) {
             $userInfo = self::getUserInfo($username);
             if ($userInfo['agent_sync_groups']) {
                 $groups = self::getAgentUserGroups($userInfo);
@@ -731,6 +828,9 @@ class Client
                 $newgroups = self::cache($cacheKey);
             }
             if (false === $newgroups) {
+                if (!\Gini\Config::get('app.gapper_info_from_uniadmin')) {
+                    $needAgent = true;
+                }
                 try {
                     $filters = [];
                     // if (strpos($app['module_name'], 'admin')===0) {
@@ -740,9 +840,7 @@ class Client
                     $newgroups = self::getRPC()->gapper->user->getGroups($username, $filters) ?: [];
                     self::cache($cacheKey, $newgroups);
                 } catch (\Exception $e) {
-                }
-                if (!\Gini\Config::get('app.gapper_info_from_uniadmin')) {
-                    $needAgent = true;
+                    $needAgent = false;
                 }
             }
             if (!empty($newgroups)) {
@@ -758,6 +856,10 @@ class Client
         foreach ($groups as $k => $g) {
             if (!$g['id']) continue;
             $apps = self::getGroupApps((int)$g['id'], $force);
+            if (!is_array($apps)) {
+                $needAgent = false;
+                continue;
+            }
 
             $groupHasApp = !!(is_array($apps) && isset($apps[$client_id]));
             $mustInstallApps = (array)\Gini\Config::get('gapper.group_must_install_apps');
@@ -873,8 +975,7 @@ class Client
 
     public static function installGroupAPPs(array $appIDs, $groupID)
     {
-        $hasServerAgent = self::hasServerAgent();
-        if ($hasServerAgent>=1) {
+        if (self::hasServerAgent()>=1) {
             $db = a('gapper/agent/app')->db();
             $appString = $db->quote($appIDs);
             $query = $db->query("select client_id,name,type from gapper_agent_app where client_id in ({$appString})");
@@ -943,8 +1044,7 @@ class Client
 
     public static function installUserAPPs(array $appIDs, $userID)
     {
-        $hasServerAgent = self::hasServerAgent();
-        if ($hasServerAgent>=1) {
+        if (self::hasServerAgent()>=1) {
             $db = a('gapper/agent/app')->db();
             $appString = $db->quote($appIDs);
             $query = $db->query("select client_id,name,type from gapper_agent_app where client_id in ({$appString})");
@@ -975,8 +1075,11 @@ class Client
     {
         $username = $username ?: self::getUserName();
 
-        $hasServerAgent = self::hasServerAgent();
-        if ($hasServerAgent>=1) {
+        try {
+            self::getRPC();
+        } catch (\Exception $e) {
+        }
+        if (self::hasServerAgent()>=1) {
             $apps = self::getAgentUserApps($username);
             if ($apps) return $apps;
         }
@@ -989,12 +1092,15 @@ class Client
             $apps = self::cache($cacheKey);
         }
         if (false===$apps) {
-            $apps = (array) self::getRPC()->gapper->user->getApps($username);
-            self::cache($cacheKey, $apps);
-            $needAgent = true;
+            try {
+                $apps = (array) self::getRPC()->gapper->user->getApps($username);
+                self::cache($cacheKey, $apps);
+                $needAgent = true;
+            } catch (\Exception $e) {
+            }
         }
 
-        if ($hasServerAgent>=1 && $apps && $needAgent) {
+        if (self::hasServerAgent()>=1 && $apps && $needAgent) {
             $db = a('gapper/agent/app')->db();
             $clientIDs = $db->quote(array_keys($apps));
             $query = $db->query("select client_id,name from gapper_agent_app where client_id in ({$clientIDs})");
@@ -1082,8 +1188,12 @@ class Client
         $groupInfo = self::getGroupInfo($groupID, false);
         if (!$groupInfo) return;
 
-        $hasServerAgent = self::hasServerAgent();
-        if ($hasServerAgent>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin') && $groupInfo && $groupInfo['mstime'] && $groupInfo['agent_sync_members']) {
+        try {
+            self::getRPC();
+        } catch (\Exception $e) {
+        }
+
+        if (self::hasServerAgent()>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin') && $groupInfo['mstime'] && $groupInfo['agent_sync_members']) {
             $db = a('gapper/agent/group/user')->db();
             $query = $db->query("select user_id from gapper_agent_group_user where group_id={$groupID}");
             if ($query) {
@@ -1107,7 +1217,7 @@ class Client
                 $result = $result + $members;
             }
 
-            if ($hasServerAgent>=1 && $result) {
+            if (self::hasServerAgent()>=1 && $result) {
                 self::_agentGroupMembers($groupID, $result);
             }
         }
@@ -1197,8 +1307,11 @@ class Client
         $groupID = $groupID ?: self::getGroupID();
         if (!$groupID) return;
 
-        $hasServerAgent = self::hasServerAgent();
-        if ($hasServerAgent>=1) {
+        try {
+            self::getRPC();
+        } catch (\Exception $e) {
+        }
+        if (self::hasServerAgent()>=1) {
             $db = a('gapper/agent/app')->db();
             // 如果groupID 在黑名单 则不需要查询了
             $query = $db->query("select * from gapper_agent_useless_group where group_id = {$groupID}");
@@ -1219,13 +1332,16 @@ class Client
             $apps = self::cache($cacheKey);
         }
         if (false === $apps) {
-            $apps = self::getRPC()->gapper->group->getApps((int)$groupID) ?: [];
-            self::cache($cacheKey, $apps);
-            $needAgent = true;
+            try {
+                $apps = self::getRPC()->gapper->group->getApps((int)$groupID) ?: [];
+                self::cache($cacheKey, $apps);
+                $needAgent = true;
+            } catch (\Exception $e) {
+            }
         }
 
-        if ($hasServerAgent>=1 && $needAgent) {
-            if ($apps) {
+        if (self::hasServerAgent()>=1 && $needAgent) {
+            if (!empty($apps)) {
                 $clientIDs = $db->quote(array_keys($apps));
                 $query = $db->query("select client_id,name from gapper_agent_app where client_id in ({$clientIDs})");
                 if ($query) {
@@ -1293,8 +1409,11 @@ class Client
 
     private static function _getGroupInfo($cacheKey, $criteria, $force=false)
     {
-        $hasServerAgent = self::hasServerAgent();
-        if ($hasServerAgent>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin')) {
+        try {
+            self::getRPC();
+        } catch (\Exception $e) {
+        }
+        if (self::hasServerAgent()>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin')) {
             $info = self::getAgentGroupInfo($criteria);
             if ($info) return $info;
         }
@@ -1304,12 +1423,15 @@ class Client
             $info = self::cache($cacheKey);
         }
         if (!$info) {
-            $info = self::getRPC()->gapper->group->getInfo($criteria);
-            self::cache($cacheKey, $info);
-            $needAgent = true;
+            try {
+                $info = self::getRPC()->gapper->group->getInfo($criteria);
+                self::cache($cacheKey, $info);
+                $needAgent = true;
+            } catch (\Exception $e) {
+            }
         }
 
-        if ($hasServerAgent>=1 && $info && $needAgent) {
+        if (self::hasServerAgent()>=1 && $info && $needAgent) {
             self::replaceAgentGroupInfo($info);
         }
 
@@ -1420,6 +1542,7 @@ class Client
             'client_id'=> $toClientID
         ]);
         $tokenLifeTime = \Gini\Config::get('gapper.gapper-client-agent-token-lifetime') ?: 120;
+        $tokenLifeTime -= 40;
         $etime = date('Y-m-d H:i:s', strtotime("-{$tokenLifeTime} seconds"));
         if (!$ut->id || $force || $ut->ctime<$etime) {
             $ut->user_id = $userID;
@@ -1435,6 +1558,10 @@ class Client
     public static function getLoginToken($toClientID, $username=null, $force=false)
     {
         $username = $username ?: self::getUserName();
+        try {
+            self::getRPC();
+        } catch (\Exception $e) {
+        }
         if (self::hasServerAgent()>=1) {
             $appInfo = self::getInfo($toClientID);
             // TODO 目前labmai这边mall-old的功能很快会被替代掉，再去改mall-old的代码风险比较高

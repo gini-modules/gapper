@@ -27,6 +27,7 @@ server_home: ${GAPPER_URL:='http://gapper.in/'}
 #         gapper-source: GAPPER-SOURCE 
 gapper-client-use-agent-data: ${GAPPER_CLIENT_USE_AGENT_DATA:='false'}
 gapper-client-agent-token-lifetime: ${GAPPER_CLIENT_AGENT_TOKEN_LIFETTIME:='120'}
+gapper-client-agent-auto-use-agent-data: ${GAPPER_CLIENT_AGENT_AUTO_USE_AGENT_DATA:=''}
 gapper-uniadmin-register-mode-url:
   create-groups:
     url: ${GAPPER_UNIADMIN_CREATE_GROUPS_URL:=''}
