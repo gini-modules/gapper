@@ -78,7 +78,7 @@ class Client
                 return self::_get_rpc_failed();
             }
             $rpc = \Gini\IoC::construct('\Gini\RPC', $api);
-        } 
+        }
 
         $client_id = $config['client_id'];
         $client_secret = $config['client_secret'];
@@ -445,6 +445,11 @@ class Client
         }
         if (!$info) {
             try {
+                // 判断是否是邮箱 如果是邮箱 ['email'=>$username] 避免混淆 username 和 email
+                $pattern = '/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/';
+                if (preg_match($pattern, $username)) {
+                    $username = ['email'=>$username];
+                }
                 $info = self::getRPC()->gapper->user->getInfo($username);
                 $info = $info ?: [];
                 self::cache($cacheKey, $info);
