@@ -22,6 +22,27 @@ class Gapper extends \Gini\Controller\CGI
     {
         return \Gini\IoC::construct('\Gini\CGI\Response\HTML', V($view, $data));
     }
+    private function loginByAccessToken($accessToken)
+    {
+        $rest = new \Gini\HTTP();
+        $rest->header('X-Gapper-OAuth-Token', $accessToken);
+        $config = \Gini\Config::get('api.uniadmin-access-agent-config');
+        $responseData = $rest->get($config['url']. '/v1/current-user', []);
+        $userInfo = @json_decode($responseData, true);
+        $userID = $userInfo['global_id'] ?: $userInfo['id'];
+        if ($userID) {
+            \Gini\Gapper\Client::loginByUserID($userID);
+        }
+        return $userID?true:false;
+    }
+
+    public function actionLoginByAccessToken()
+    {
+        $form = $this->form();
+        $accessToken = $form['accessToken'];
+        $ret = $this->loginByAccessToken($accessToken);
+        return \Gini\IoC::construct('\Gini\CGI\Response\JSON', $ret);
+    }
 
     /**
      * @brief 展示登录表单
@@ -253,7 +274,7 @@ class Gapper extends \Gini\Controller\CGI
                     'name'=> $name,
                     'email'=> $email,
                     'error'=> [
-                        'email'=> 'Email已经被占用, 请换一个试试'
+                        'email'=> 'Email已经被占用, 请换一个试试!'
                     ]
                 ]);
             }

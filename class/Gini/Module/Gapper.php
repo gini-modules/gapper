@@ -12,6 +12,10 @@ namespace Gini\Module
             class_exists('\Gini\ThoseIndexed');
 
             isset($_GET['locale']) and $_SESSION['locale'] = $_GET['locale'];
+
+            if (\Gini\Config::get('gapper.enable-uno-mode')) {
+                _G('UNO', true);
+            }
             isset($_SESSION['locale']) and \Gini\Config::set('system.locale', $_SESSION['locale']);
             \Gini\I18N::setup();
 

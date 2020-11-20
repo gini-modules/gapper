@@ -1,6 +1,47 @@
 <div class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
+            <?php
+                if ($enable_uno_mode) {
+            ?>
+            <div class="modal-header">
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body ">
+                <ul class="gapper-client-checkbox list-unstyled list-inline text-center">
+                   <p>登录中 请稍等....</p>
+                </ul>
+                <div class="text-right"></div>
+            </div>
+            <?php
+                $uno_url = $uno_conf['url'];
+                $gpui_path = $uno_conf['path']['gpui'];
+                $gpui_url = $uno_url.$gpui_path;
+            ?>
+
+            <script data-ajax="true">
+            var accessToken = '';
+            var updateLocation = '';
+            var gpuiUrl = '<?= $gpui_url ?>';
+            var interval = setInterval(function(){
+                require.config({
+                    paths: { gpui: gpuiUrl }
+                });
+                require(['gpui'], function(data) {
+                    accessToken = data.params.accessToken;
+                    // updateLocation = data.root.updateLocation;
+                });
+                if(accessToken){
+                    $.post('ajax/gapper/auth/gapper/login-by-access-token', {'accessToken':accessToken}, function(response){
+                        window.location.reload();
+                    });
+                    clearInterval(interval);
+                }
+            }, 500);
+            </script>
+            <?php
+                } else {
+            ?>
             <div class="modal-header">
                 <h4 class="modal-title"><?=H('请选择登录方式:')?></h4>
             </div>
@@ -23,6 +64,7 @@
                 </ul>
                 <div class="text-right"><a href="<?= \Gini\URI::url('gapper/client/gohome')?>"><?= H(T('返回首页'))?></a></div>
             </div>
+            <?php } ?>
         </div>
     </div>
 </div>

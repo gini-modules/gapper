@@ -38,7 +38,15 @@ class Step extends \Gini\Controller\CGI
     public function login()
     {
         $conf = (array) \Gini\Config::get('gapper.auth');
+        $enable_uno_mode = \Gini\Config::get('gapper.enable-uno-mode');
         $sources = [];
+        if ($enable_uno_mode) {
+            return $this->_showHTML('gapper/client/checkauth', [
+                'sources' => $sources,
+                'enable_uno_mode'=>$enable_uno_mode,
+                'uno_conf' => \Gini\Config::get('gapper.uno')
+            ]);
+        }
         foreach ($conf as $key => $info) {
             $key = strtolower($key);
             if ($info['show']===false) continue;
@@ -143,6 +151,7 @@ class Step extends \Gini\Controller\CGI
         $referer = parse_url(\Gini\URI::url($_SERVER['HTTP_REFERER']));
         $query = $referer['query'];
         parse_str($query, $params);
+
         $redirectURL = \Gini\URI::url($params['redirect']?:'/', [
             'gapper-token'=> '',
             'gapper-group'=> ''
