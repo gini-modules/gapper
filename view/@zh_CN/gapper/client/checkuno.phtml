@@ -1,0 +1,31 @@
+            <?php
+                $uno_url = $uno_conf['url'];
+                $gpui_path = $uno_conf['path']['gpui'];
+                $gpui_url = $uno_url.$gpui_path;
+            ?>
+
+            <div class="loading text-center">
+                <i class="fa fa-2x fa-spinner fa-spin"></i>
+            </div>
+            <script data-ajax="true">
+            var toUrl = '<?= $url?>'; 
+            var accessToken = '';
+            var updateLocation = '';
+            var gpuiUrl = '<?= $gpui_url ?>';
+	    var oldAccessToken = '<?= $accessToken ?>';
+            var orderHistory = setInterval(function(){
+                require.config({
+                    paths: { gpui: gpuiUrl }
+                });
+                require(['gpui'], function(data) {
+                    accessToken = data.params.accessToken;
+                });
+		if (accessToken) {
+                    if(accessToken != oldAccessToken){
+			toUrl=toUrl+"?logout=true"
+		    }
+                    clearInterval(orderHistory);
+                    window.location.href=toUrl;
+		}
+            }, 500);
+            </script>

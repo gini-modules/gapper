@@ -267,6 +267,12 @@ class Client
     private static $keyLoginStatusChanged = 'login-status-changed';
     public static function getLoginStep($force=false)
     {
+
+        if (\Gini\Config::get('gapper.enable-uno-mode') && $_GET['logout'] == true) {
+	    \Gini\Gapper\Client::logout();
+	    return self::STEP_LOGIN;
+	}
+
         $client_id = self::getId();
         if (!$client_id) {
             return self::STEP_LOGIN;
