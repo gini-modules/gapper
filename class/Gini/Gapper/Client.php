@@ -754,6 +754,15 @@ class Client
         return $groupID;
     }
 
+    public static function updateGroup($id, $data)
+    {
+        try {
+            $groupID = self::getRPC()->gapper->group->update($id, $data);
+        } catch (\Exception $e) {
+        }
+        return $groupID;
+    }
+
     private static function _getHashKey($data)
     {
         return hash('sha1', J($data));
