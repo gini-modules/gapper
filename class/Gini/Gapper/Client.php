@@ -369,7 +369,7 @@ class Client
             self::logout();
         }
         if ($userID && $currentUserID!=$userID) {
-            return self::loginByUserID($userID);
+            return self::loginByUserID((int)$userID);
         }
         return true;
     }
