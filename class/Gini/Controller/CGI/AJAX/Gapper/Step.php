@@ -38,6 +38,9 @@ class Step extends \Gini\Controller\CGI
     public function login()
     {
         $conf = (array) \Gini\Config::get('gapper.auth');
+        if (strpos($_SERVER['HTTP_REFERER'], 'fromUno=true') !== false) {
+            \Gini\Config::set('gapper.enable-uno-mode', true);
+        }
         $enable_uno_mode = \Gini\Config::get('gapper.enable-uno-mode');
         $sources = [];
         if ($enable_uno_mode) {

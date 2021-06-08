@@ -269,9 +269,9 @@ class Client
     {
 
         if (\Gini\Config::get('gapper.enable-uno-mode') && $_GET['logout'] == true) {
-	    \Gini\Gapper\Client::logout();
-	    return self::STEP_LOGIN;
-	}
+            \Gini\Gapper\Client::logout();
+            return self::STEP_LOGIN;
+        }
 
         $client_id = self::getId();
         if (!$client_id) {
@@ -1640,7 +1640,7 @@ class Client
         return true;
     }
 
-    public static function goLogin($redirect=null)
+    public static function goLogin($redirect=null, $fromUno = false)
     {
         $redirectURL = '/';
         if ($redirect) {
@@ -1666,7 +1666,7 @@ class Client
                 'gapper-group'=> null
             ]);
         } else {
-            $url = \Gini\URI::url('gapper/client/login', ['redirect' => $redirectURL]);
+            $url = \Gini\URI::url('gapper/client/login', ['redirect' => $redirectURL, 'fromUno' => $fromUno]);
         }
 
         \Gini\CGI::redirect($url);
