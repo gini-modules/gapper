@@ -1640,7 +1640,7 @@ class Client
         return true;
     }
 
-    public static function goLogin($redirect=null, $fromUno = false)
+    public static function goLogin($redirect=null)
     {
         $redirectURL = '/';
         if ($redirect) {
@@ -1666,7 +1666,7 @@ class Client
                 'gapper-group'=> null
             ]);
         } else {
-            $url = \Gini\URI::url('gapper/client/login', ['redirect' => $redirectURL, 'fromUno' => $fromUno]);
+            $url = \Gini\URI::url('gapper/client/login', ['redirect' => $redirectURL]);
         }
 
         \Gini\CGI::redirect($url);

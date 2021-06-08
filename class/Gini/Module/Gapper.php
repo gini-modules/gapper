@@ -13,9 +13,18 @@ namespace Gini\Module
 
             isset($_GET['locale']) and $_SESSION['locale'] = $_GET['locale'];
 
+            if ($_GET['from_uno'] || (strpos($_SERVER['HTTP_REFERER'], 'from_uno=true') !== false)) {
+                $_SESSION['from_uno'] = true;
+            }
+
+            if ($_SESSION['from_uno']) {
+                \Gini\Config::set('gapper.enable-uno-mode', true);
+            }
+
             if (\Gini\Config::get('gapper.enable-uno-mode')) {
                 _G('UNO', true);
             }
+
             isset($_SESSION['locale']) and \Gini\Config::set('system.locale', $_SESSION['locale']);
             \Gini\I18N::setup();
 
