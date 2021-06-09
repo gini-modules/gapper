@@ -763,8 +763,16 @@ class Client
     public static function updateGroup($id, $data)
     {
         try {
+            $g = a('gapper/agent/group', $id);
+            if (!$g->id) {
+                return false;
+            }
+            $g->title = $data['title'];
+            $g->save();
+            
             $groupID = self::getRPC()->gapper->group->update($id, $data);
         } catch (\Exception $e) {
+
         }
         return $groupID;
     }
