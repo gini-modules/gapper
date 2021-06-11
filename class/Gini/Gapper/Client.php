@@ -764,7 +764,7 @@ class Client
     {
         try {
             $g = a('gapper/agent/group', $id);
-            if (!$g->id) {
+            if (!$g->id || !$data['title']) {
                 return false;
             }
             $g->title = $data['title'];
