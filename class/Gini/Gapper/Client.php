@@ -768,6 +768,7 @@ class Client
                 return false;
             }
             $g->title = $data['title'];
+            $g->abbr = $data['title'];
             $g->save();
             
             $groupID = self::getRPC()->gapper->group->update($id, $data);
