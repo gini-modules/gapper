@@ -40,4 +40,5 @@ uno:
   url: ${GAPPER_UNO_URL:=''}
   path:
     gpui: ${GAPPER_UNO_GPUI_PATH:='/uno/gpui.webview.js'}
+not_use_group_app: ${NOT_USE_GROUP_APP:=false}
 ...

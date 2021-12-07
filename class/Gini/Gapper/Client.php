@@ -770,7 +770,7 @@ class Client
             $g->title = $data['title'];
             $g->abbr = $data['title'];
             $g->save();
-            
+
             $groupID = self::getRPC()->gapper->group->update($id, $data);
         } catch (\Exception $e) {
 
@@ -905,6 +905,17 @@ class Client
         if ($needAgent) {
             self::_agentGroups($groups);
             self::_agentUserGroups($username, $groups);
+        }
+
+
+	if (\Gini\Config::get('gapper.not_use_group_app')) {
+            $labApps = (array)\Gini\Config::get('gapper.lab_group_must_install_apps');
+            $admin = those('gapper/agent/group/admin')->get('group_id');
+            if (in_array($client_id, $labApps)) {
+                foreach ($admin as $adm) {
+                    unset($result[$adm]);
+                }
+            }
         }
 
         return $result;
@@ -1333,68 +1344,113 @@ class Client
 
     public static function getGroupApps($groupID=null, $force=false)
     {
-        $groupID = $groupID ?: self::getGroupID();
-        if (!$groupID) return;
+        if (\Gini\Config::get('gapper.not_use_group_app')) {
+            $client_id = $client_id ?: self::getId();
 
-        try {
-            self::getRPC();
-        } catch (\Exception $e) {
-        }
-        if (self::hasServerAgent()>=1) {
+            $groupID = $groupID ?: self::getGroupID();
+            if (!$groupID) return;
+
             $db = a('gapper/agent/app')->db();
-            // 如果groupID 在黑名单 则不需要查询了
-            $query = $db->query("select * from gapper_agent_useless_group where group_id = {$groupID}");
-            if ($query) {
-                $rows = $query->rows();
-                if (count($rows)) {
-                    return [];
-                }
-            }
-            $apps = self::getAgentGroupApps((int)$groupID);
-            if ($apps) return $apps;
-        }
 
-        $cacheKey = "app#group#{$groupID}#apps";
-        $apps = false;
-        $needAgent = false;
-        if (!$force) {
-            $apps = self::cache($cacheKey);
-        }
-        if (false === $apps) {
-            try {
-                $apps = self::getRPC()->gapper->group->getApps((int)$groupID) ?: [];
-                self::cache($cacheKey, $apps);
-                $needAgent = true;
-            } catch (\Exception $e) {
-            }
-        }
+            $admin = those('gapper/agent/group/admin')->get('group_id');
 
-        if (self::hasServerAgent()>=1 && $needAgent) {
-            if (!empty($apps)) {
-                $clientIDs = $db->quote(array_keys($apps));
-                $query = $db->query("select client_id,name from gapper_agent_app where client_id in ({$clientIDs})");
-                if ($query) {
-                    $rows = $query->rows();
-                    if ($appCount = count($rows)) {
-                        $result = [];
-                        $values = [];
+            if (in_array($groupID, $admin)) {
+                $adminApps = (array)\Gini\Config::get('gapper.group_must_install_apps');
+                $apps = [];
+                foreach ($adminApps as $aapp) {
+                    if (self::hasServerAgent() >= 1) {
+                        $query = $db->query("SELECT id,client_id,name,title,short_title,url,icon_url,TYPE,rate,font_icon FROM gapper_agent_app WHERE client_id='{$aapp}'");
+                        if (!$query) return;
+                        $rows = $query->rows();
                         foreach ($rows as $row) {
-                            $clientID = $row->client_id;
-                            $values[] = $row->name;
-                            $result[$clientID] = $apps[$clientID];
+                            $apps[$row->client_id] = self::makeAgentAPPData($row);
                         }
-                        self::_agentGroupAPPs($groupID, $values);
-                        $apps = $result;
+                    } else {
+                        $apps = self::getRPC()->gapper->group->getApps((int)$groupID) ?: [];
                     }
                 }
-                if (!$appCount) {
-                    $gString = $db->quote([$groupID]);
-                    $db->query("insert ignore into gapper_agent_useless_group(group_id) values({$gString})");
+            } else {
+                $labApps = (array)\Gini\Config::get('gapper.lab_group_must_install_apps');
+                $apps = [];
+                foreach ($labApps as $lapp) {
+                    if (self::hasServerAgent() >= 1) {
+                        $query = $db->query("SELECT id,client_id,name,title,short_title,url,icon_url,TYPE,rate,font_icon FROM gapper_agent_app WHERE client_id='{$lapp}'");
+                        if (!$query) return;
+                        $rows = $query->rows();
+                        foreach ($rows as $row) {
+                            $apps[$row->client_id] = self::makeAgentAPPData($row);
+                        }
+                    } else {
+                        $apps = self::getRPC()->gapper->group->getApps((int)$groupID) ?: [];
+                    }
                 }
             }
-        }
 
-        return $apps;
+            return $apps;
+        } else {
+            $groupID = $groupID ?: self::getGroupID();
+            if (!$groupID) return;
+
+            try {
+                self::getRPC();
+            } catch (\Exception $e) {
+            }
+            if (self::hasServerAgent()>=1) {
+                $db = a('gapper/agent/app')->db();
+                // 如果groupID 在黑名单 则不需要查询了
+                $query = $db->query("select * from gapper_agent_useless_group where group_id = {$groupID}");
+                if ($query) {
+                    $rows = $query->rows();
+                    if (count($rows)) {
+                        return [];
+                    }
+                }
+                $apps = self::getAgentGroupApps((int)$groupID);
+                if ($apps) return $apps;
+            }
+
+            $cacheKey = "app#group#{$groupID}#apps";
+            $apps = false;
+            $needAgent = false;
+            if (!$force) {
+                $apps = self::cache($cacheKey);
+            }
+            if (false === $apps) {
+                try {
+                    $apps = self::getRPC()->gapper->group->getApps((int)$groupID) ?: [];
+                    self::cache($cacheKey, $apps);
+                    $needAgent = true;
+                } catch (\Exception $e) {
+                }
+            }
+
+            if (self::hasServerAgent()>=1 && $needAgent) {
+                if (!empty($apps)) {
+                    $clientIDs = $db->quote(array_keys($apps));
+                    $query = $db->query("select client_id,name from gapper_agent_app where client_id in ({$clientIDs})");
+                    if ($query) {
+                        $rows = $query->rows();
+                        if ($appCount = count($rows)) {
+                            $result = [];
+                            $values = [];
+                            foreach ($rows as $row) {
+                                $clientID = $row->client_id;
+                                $values[] = $row->name;
+                                $result[$clientID] = $apps[$clientID];
+                            }
+                            self::_agentGroupAPPs($groupID, $values);
+                            $apps = $result;
+                        }
+                    }
+                    if (!$appCount) {
+                        $gString = $db->quote([$groupID]);
+                        $db->query("insert ignore into gapper_agent_useless_group(group_id) values({$gString})");
+                    }
+                }
+            }
+
+            return $apps;
+        }
     }
 
     private static $_agent_group_apps = [];
