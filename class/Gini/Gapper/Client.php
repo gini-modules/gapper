@@ -525,7 +525,7 @@ class Client
         } catch (\Exception $e) {
         }
 
-        if (self::hasServerAgent()>=1) {
+        if (self::hasServerAgent()>=1 && !$force) {
             $info = self::getAgentUserByIdentity($source, $ident);
             if ($info) return $info;
         }
@@ -711,7 +711,7 @@ class Client
         return $identity;
     }
 
-    public static function linkIdentity($source, $ident, $username=null)
+    public static function linkIdentity($source, $ident, $username=null, $force=false)
     {
         $username = $username ?: self::getUserName();
         if (!$username) {
@@ -726,7 +726,7 @@ class Client
         } catch (\Exception $e) {
         }
 
-        if (self::hasServerAgent()>=1) {
+        if (self::hasServerAgent()>=1 && !$force) {
             $ui = a('gapper/agent/user/identity', ['identity'=>$ident, 'source'=> $source]);
             if ($ui->id) {
                 if ($ui->user_id == $userID) return true;
@@ -741,9 +741,11 @@ class Client
         if (!$result) return false;
 
         if (self::hasServerAgent()>=1) {
-            $ui = a('gapper/agent/user/identity');
-            $ui->identity = $ident;
-            $ui->source = $source;
+            $ui = a('gapper/agent/user/identity', ['identity'=>$ident, 'source'=> $source]);
+            if (!$ui->id) {
+                $ui->identity = $ident;
+                $ui->source = $source;
+            }
             $ui->user_id = $userID;
             $ui->save();
         }

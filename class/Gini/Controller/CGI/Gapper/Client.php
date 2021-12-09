@@ -4,6 +4,7 @@ namespace Gini\Controller\CGI\Gapper;
 
 class Client extends \Gini\Controller\CGI\Gapper
 {
+    protected static $redirect_session_key = 'APP#LOGIN#GOTO';
     private function _checkUrl($base, &$to)
     {
         if (empty($base) || empty($to)) {
@@ -200,6 +201,7 @@ class Client extends \Gini\Controller\CGI\Gapper
             return $this->redirect($redirect);
         }
 
+        $_SESSION[self::$redirect_session_key] = $redirect;
         $view = \Gini\Config::get('gapper.login_view') ?: 'gapper/client/login';
         $this->view->body = VV($view);
     }
