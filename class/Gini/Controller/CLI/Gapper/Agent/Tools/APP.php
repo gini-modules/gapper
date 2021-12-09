@@ -79,4 +79,29 @@ class APP extends \Gini\Controller\CLI
         }
 	}
 
+    public function actionSetGroupAdmin()
+    {
+        $apps = those('gapper/agent/group/app')->totalCount();
+        $groups = those('gapper/agent/group');
+        foreach ($groups as $group) {
+            if ($apps) {
+                $labApp = a('gapper/agent/group/app', ['group_id' => $group->id, 'app_name' => 'lab-orders']);
+                $adminApp = a('gapper/agent/group/app', ['group_id' => $group->id, 'app_name' => 'admin-home']);
+                if (!$labApp->id && !$adminApp->id) {
+                    $group->delete();
+                }
+            }
+        }
+
+        $admin = those('gapper/agent/group/app')->whose('app_name')->is('admin-home')->get('group_id');
+        $admin = array_unique($admin);
+
+        foreach ($admin as $adm) {
+            $a = a('gapper/agent/group/admin', ['group_id' => $adm]);
+            if (!$a->id) {
+                $a->group_id = $adm;
+                $a->save();
+            }
+        }
+    }
 }
