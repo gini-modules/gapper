@@ -201,7 +201,9 @@ class Client extends \Gini\Controller\CGI\Gapper
             return $this->redirect($redirect);
         }
 
-        $_SESSION[self::$redirect_session_key] = $redirect;
+        if ($redirect) {
+            $_SESSION[self::$redirect_session_key] = $redirect;
+        }
         $view = \Gini\Config::get('gapper.login_view') ?: 'gapper/client/login';
         $this->view->body = VV($view);
     }
