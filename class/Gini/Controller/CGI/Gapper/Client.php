@@ -221,4 +221,9 @@ class Client extends \Gini\Controller\CGI\Gapper
         }
     }
 
+    public function actionUnoLogin()
+    {
+
+    }
+
 }
