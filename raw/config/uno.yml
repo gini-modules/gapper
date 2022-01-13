@@ -1,142 +1,87 @@
 ---
-server:
-  url: ${GATEWAY_API}/v1/
-  refresh_url: ${GATEWAY_URL}/oauth/server/token
-  params:
-    client_id: ${HOME_GAPPER_ID}
-    client_secret: ${HOME_GAPPER_SECRET}
-application:
-  client_id: ${HOME_GAPPER_ID}
-  client_secret: ${HOME_GAPPER_SECRET}
-  name: 来买商城
-  shortName: Labmai
-  url: ${HOME_URL}
-entries_url: ${HOME_URL}/uno-auth/?gpui=/uno/gpui.webview.js&&login=${HOME_URL}/lab/orders/gapper/client/unologin
-entries:
-  order-list:
-    redirect: ${HOME_URL}/lab/orders/order/history?first_login=true
-    title: 订单列表
-  payment-list:
-    redirect: ${HOME_URL}/lab/orders/payment/history?first_login=true
-    title: 付款管理
-  bid-list:
-    redirect: ${HOME_URL}/lab/fe/bid
-    title: 竞价管理
-  quote-list:
-    redirect: ${HOME_URL}/lab/orders/quote/lists?first_login=true
-    title: 议价管理
-  my-cart:
-    redirect: ${HOME_URL}/lab/orders/cart/detail?first_login=true
-    title: 我的购物车
-  my-mall:
-    redirect: ${HOME_URL}/labmai/cloudbean
-    title: 我要采购
-  my-access:
-    redirect: ${HOME_URL}/lab/orders/settings/access?first_login=true
-    title: 权限管理
-  my-bucket:
-    redirect: ${HOME_URL}/lab/orders/payment/bucket?first_login=true
-    title: 付款夹
-  inventory-list:
-    redirect: ${HOME_URL}/lab/inventory/home?first_login=true
-    title: 库存列表
-  storage:
-    redirect: ${HOME_URL}/lab/inventory/storage?first_login=true
-    title: 位置管理
-  dispense:
-    redirect: ${HOME_URL}/lab/inventory/dispense?first_login=true
-    title: 调剂准去
-  my-dispense:
-    redirect: ${HOME_URL}/lab/inventory/dispense/list?first_login=true
-    title: 我的调剂
-  my-dispense-apply:
-    redirect: ${HOME_URL}/lab/inventory/dispense/apply?first_login=true
-    title: 我的领用
-  my-grant:
-    redirect: ${HOME_URL}/lab/grants/home?first_login=true
-    title: 自有经费
-  my-accredit:
-    redirect: ${HOME_URL}/lab/grants/accredit-lists?first_login=true
-    title: 授权经费
-  waste-bottle-list:
-    redirect: ${HOME_URL}/lab/fe/bottles
-    title: 废瓶回收
-  waste-list:
-    redirect: ${HOME_URL}/lab/fe/waste
-    title: 废瓶回收
-  admin-access-list:
-    redirect: ${HOME_URL}/admin/access
-    title: 权限管理
-  admin-access-access:
-    redirect: ${HOME_URL}/admin/access/access
-    title: 权限设置
-  admin-access-access-manager:
-    redirect: ${HOME_URL}/admin/access/access/manager
-    title: 设置-管理员
-  admin-order-review-authority:
-    redirect: ${HOME_URL}/admin/access/access/manager
-    title: "多级审批 - 管理员"
-  admin-order-review:
-    redirect: ${HOME_URL}/admin/fe/order/review
-    title: 多级审批
-  admin-order-stat:
-    redirect: ${HOME_URL}/admin/order-stat/order/purchase-detail
-    title: 订单管理
-  admin-chemical-limits:
-    redirect: ${HOME_URL}/admin/chemical-limits
-    title: 存量上限
-  admin-chemical-limits-inventory-reagents:
-    redirect: ${HOME_URL}/admin/chemical-limits/inventory/reagents
-    title: 上限设置
-  admin-chemical-limits-inventory-requests:
-    redirect: ${HOME_URL}/admin/chemical-limits/inventory/requests
-    title: 调整申请
-  admin-chemical-limits-inventory-approved:
-    redirect: ${HOME_URL}/admin/chemical-limits/inventory/approved
-    title: 历史申请
-  admin-chemical-stat:
-    redirect: ${HOME_URL}/admin/chemical-stat/inventory/stat?t=chemical
-    title: 存量统计
-  admin-chemical-stat-stock-account:
-    redirect: ${HOME_URL}/admin/chemical-stat/inventory/stock-account
-    title: 库存台帐
-  admin-chemical-stat-used-account:
-    redirect: ${HOME_URL}/admin/chemical-stat/inventory/used-account
-    title: 领用台帐
-  admin-chemical-stat-return-account:
-    redirect: ${HOME_URL}/admin/chemical-stat/inventory/return-account
-    title: 归还台帐
-  admin-chemical-stat-purchased-account:
-    redirect: ${HOME_URL}/admin/chemical-stat/inventory/purchased-account
-    title: 采购台帐
-  admin-chemical-stat-received-account:
-    redirect: ${HOME_URL}/admin/chemical-stat/inventory/received-account
-    title: 收货台帐
-  admin-chemical-stat-maintain-stat:
-    redirect: ${HOME_URL}/admin/chemical-stat/inventory/maintain-stat
-    title: 维护统计
-  admin-chemical-stat-recycle-stat:
-    redirect: ${HOME_URL}/admin/chemical-stat/inventory/recycle-stat
-    title: 空瓶台账
-  admin-payment:
-    redirect: ${HOME_URL}/admin/fe/payment
-    title: 付款管理
-  admin-billing:
-    redirect: ${HOME_URL}/admin/fe/billing
-    title: 结算管理
-  billing-history:
-    redirect: ${HOME_URL}/admin/fe/billing/history
-    title: 结算历史
-  admin-products:
-    redirect: ${HOME_URL}/admin/fe/aicces
-    title: 商品准入
-  admin-vendor:
-    redirect: ${HOME_URL}/admin/fe/vendor
-    title: 供应商管理
-  admin-waste-bottle:
-    redirect: ${HOME_URL}/admin/fe/bottles
-    title: 空瓶回收
-  admin-waste:
-    redirect: ${HOME_URL}/admin/waste
-    title: 危废处置
+redirect:
+  admin-access-list: ${HOME_URL}/admin/access
+  admin-access-access: ${HOME_URL}/admin/access/access
+  admin-access-access-manager: ${HOME_URL}/admin/access/access/manager
+  admin-order-review-authority: ${HOME_URL}/admin/fe/order/review/authority
+  admin-billing: ${HOME_URL}/admin/fe/billing
+  billing-history: ${HOME_URL}/admin/fe/billing/history
+  admin-chemical-limits: ${HOME_URL}/admin/chemical-limits
+  admin-chemical-limits-inventory-reagents: ${HOME_URL}/admin/chemical-limits/inventory/reagents
+  admin-chemical-limits-inventory-requests: ${HOME_URL}/admin/chemical-limits/inventory/requests
+  admin-chemical-limits-inventory-approved: ${HOME_URL}/admin/chemical-limits/inventory/approved
+  admin-chemical-stat: ${HOME_URL}/admin/chemical-stat/inventory/stat?t=chemical
+  admin-chemical-stat-stock-account: ${HOME_URL}/admin/chemical-stat/inventory/stock-account
+  admin-chemical-stat-used-account: ${HOME_URL}/admin/chemical-stat/inventory/used-account
+  admin-chemical-stat-return-account: ${HOME_URL}/admin/chemical-stat/inventory/return-account
+  admin-chemical-stat-purchased-account: ${HOME_URL}/admin/chemical-stat/inventory/purchased-account
+  admin-chemical-stat-received-account: ${HOME_URL}/admin/chemical-stat/inventory/received-account
+  admin-chemical-stat-maintain-stat: ${HOME_URL}/admin/chemical-stat/inventory/maintain-stat
+  admin-chemical-stat-recycle-stat: ${HOME_URL}/admin/chemical-stat/inventory/recycle-stat
+  admin-order-review: ${HOME_URL}/admin/fe/order/review
+  admin-order-stat: ${HOME_URL}/admin/order-stat/order/purchase-detail
+  admin-payment: ${HOME_URL}/admin/fe/payment
+  admin-products: ${HOME_URL}/admin/fe/aicces
+  admin-vendor: ${HOME_URL}/admin/fe/vendor
+  admin-waste: ${HOME_URL}/admin/waste
+  admin-waste-bottle: ${HOME_URL}/admin/fe/bottles
+  my-grant: ${HOME_URL}/lab/grants/home?first_login=true
+  my-accredit: ${HOME_URL}/lab/grants/accredit-lists?first_login=true
+  inventory-list: ${HOME_URL}/lab/inventory/home?first_login=true
+  storage: ${HOME_URL}/lab/inventory/storage?first_login=true
+  dispense: ${HOME_URL}/lab/inventory/dispense?first_login=true
+  my-dispense: ${HOME_URL}/lab/inventory/dispense/list?first_login=true
+  my-dispense-apply: ${HOME_URL}/lab/inventory/dispense/apply?first_login=true
+  order-list: ${HOME_URL}/lab/orders/order/history?first_login=true
+  payment-list: ${HOME_URL}/lab/orders/payment/history?first_login=true
+  bid-list: ${HOME_URL}/lab/fe/bid
+  quote-list: ${HOME_URL}/lab/orders/quote/lists?first_login=true
+  my-cart: ${HOME_URL}/lab/orders/cart/detail?first_login=true
+  my-mall: ${HOME_URL}/labmai/cloudbean
+  my-access: ${HOME_URL}/lab/orders/settings/access?first_login=true
+  my-bucket: ${HOME_URL}/lab/orders/payment/bucket?first_login=true
+  waste-list: ${HOME_URL}/lab/fe/waste
+  waste-bottle-list: ${HOME_URL}/lab/fe/bottles
+  my-room: ${HOME_URL}/labmai/inspection/fe/room/mine
+  manage-room: ${HOME_URL}/labmai/inspection/fe/room/manage
+  charge-room: ${HOME_URL}/labmai/inspection/fe/room/charge
+  confirm-room: ${HOME_URL}/labmai/inspection/fe/room/confirm
+  clauses: ${HOME_URL}/labmai/inspection/fe/clauses
+  project-daily-list: ${HOME_URL}/labmai/inspection/fe/project/daily
+  project-special-list: ${HOME_URL}/labmai/inspection/fe/project/special
+  project-self-list: ${HOME_URL}/labmai/inspection/fe/project/self
+  record-list: ${HOME_URL}/labmai/inspection/fe/record/list
+  reform: ${HOME_URL}/labmai/inspection/fe/reform
+  danger: ${HOME_URL}/labmai/inspection/fe/danger
+  app-login: ${HOME_URL}/labmai/inspection/fe/app/login
+  permission: ${HOME_URL}/labmai/inspection/fe/permission
+  home: ${HOME_URL}/labmai/exam/fe/home
+  cms-notice: ${HOME_URL}/labmai/exam/fe/cms/notice
+  cms-essay: ${HOME_URL}/labmai/exam/fe/cms/essay
+  cms-vedio: ${HOME_URL}/labmai/exam/fe/cms/vedio
+  learn-types: ${HOME_URL}/labmai/exam/fe/cms/classify
+  learn-opentime: ${HOME_URL}/labmai/exam/fe/cms/opentime
+  cms-rule: ${HOME_URL}/labmai/exam/fe/cms/rule
+  cms-sign: ${HOME_URL}/labmai/exam/fe/cms/signs
+  pool-pool: ${HOME_URL}/labmai/exam/fe/pool/pool
+  pool-knowledge: ${HOME_URL}/labmai/exam/fe/pool/knowledge
+  paper: ${HOME_URL}/labmai/exam/fe/paper
+  exam: ${HOME_URL}/labmai/exam/fe/exam
+  my-mock: ${HOME_URL}/labmai/exam/fe/my-mock
+  my-exam-public: ${HOME_URL}/labmai/exam/fe/my-exam/public
+  my-exam-pending: ${HOME_URL}/labmai/exam/fe/my-exam/pending
+  my-exam-finished: ${HOME_URL}/labmai/exam/fe/my-exam/finished
+  collect-pool-item: ${HOME_URL}/labmai/exam/fe/collect/pool-item
+  collect-learn-material: ${HOME_URL}/labmai/exam/fe/collect/learn-material
+  collect-rule-regulation: ${HOME_URL}/labmai/exam/fe/collect/rule-regulation
+  collect-pictrue: ${HOME_URL}/labmai/exam/fe/collect/picture
+  study-pool: ${HOME_URL}/labmai/exam/fe/study/pool
+  study-knowledge: ${HOME_URL}/labmai/exam/fe/study/knowledge
+  redirect-to-godiva:
+  permission: ${HOME_URL}/labmai/exam/fe/permission
+  cms-base: ${HOME_URL}/labmai/exam/fe/cms/base
+  material-bg: ${HOME_URL}/labmai/exam/fe/material/bg
+  material-guarantee: ${HOME_URL}/labmai/exam/fe/material/guarantee
+  material-certification: ${HOME_URL}/labmai/exam/fe/material/certification
+  base: ${HOME_URL}/labmai/exam/fe/cms/base
 ...

@@ -223,7 +223,29 @@ class Client extends \Gini\Controller\CGI\Gapper
 
     public function actionUnoLogin()
     {
+        $content = file_get_contents('php://input');
+        $data = @json_decode($content, true);
 
+        $accessToken = $data['accessToken'];
+        $state = $data['state'];
+
+        $rest = new \Gini\HTTP();
+        $rest->header('X-Gapper-OAuth-Token', $accessToken);
+        $config = \Gini\Config::get('gapper.rpc');
+        $responseData = $rest->get($config['url']. '/v1/current-user', []);
+        $userInfo = @json_decode($responseData, true);
+
+	    $uno = _G('UNO');
+        $userID = $userInfo['global_id'] && !$uno ?: $userInfo['id'];
+        if ($userID) {
+            $res = [];
+	        $_SESSION['uno_token'] = $accessToken;
+            \Gini\Gapper\Client::loginByUserID($userID);
+            $redirect = \Gini\Config::get('uno.redirect');
+            $res["redirect"] = $redirect[$state];
+            echo J($res);
+        }
+
+        exit;
     }
-
 }
