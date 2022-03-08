@@ -24,6 +24,7 @@ namespace Gini\Module
             if (\Gini\Config::get('gapper.enable-uno-mode')) {
                 _G('UNO', true);
             }
+	   isset($_GET['login_by_mobile']) and $_SESSION['login_by_mobile'] = true;
 
             isset($_SESSION['locale']) and \Gini\Config::set('system.locale', $_SESSION['locale']);
             \Gini\I18N::setup();
