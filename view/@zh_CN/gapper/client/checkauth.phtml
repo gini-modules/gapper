@@ -33,7 +33,20 @@
                 });
                 if(accessToken){
                     $.post('ajax/gapper/auth/gapper/login-by-access-token', {'accessToken':accessToken}, function(response){
-                        window.location.reload();
+                        // window.location.reload();
+                        var getCurrentGroupID = setInterval(function(){
+                            require.config({
+                                paths: { gpui: gpuiUrl }
+                            });
+                            require(['gpui'], function(data) {
+                                lab_id = data.params.lab_id;
+                            });
+                            if (lab_id){
+                                $.post('ajax/gapper/auth/gapper/change-group', {'group_id':lab_id}, function(response){
+                                    window.location.reload();
+                                });
+                            }
+                        }, 1500);
                     });
                     clearInterval(interval);
                 }

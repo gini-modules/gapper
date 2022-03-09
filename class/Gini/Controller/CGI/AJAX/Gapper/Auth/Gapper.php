@@ -119,6 +119,39 @@ class Gapper extends \Gini\Controller\CGI
         return $this->_showJSON(T('Login failed! Please try again.'));
     }
 
+    public function actionChangeGroup()
+    {
+        $form = $this->form();
+        $group_id = $form['group_id'];
+        $choose_group = a('group', $group_id);
+        $me = _G('ME');
+        $current_group = _G('GROUP');
+        if (!$choose_group->id) {
+            return \Gini\IoC::construct('\Gini\CGI\Response\JSON', ['result'=>false, 'msg'=>'请选择有效的课题组']);
+        }
+        if ($current_group->id == $choose_group->id) {
+            return \Gini\IoC::construct('\Gini\CGI\Response\JSON', ['result'=>true, 'msg'=>'课题组切换成功']);
+        }
+        $members = $choose_group->getMembers();
+        $is_member = false;
+        foreach ($members as $member) {
+            if ($member['id'] == $me->id) {
+                $is_member = true;
+                break;
+            }
+        }
+        if (!$is_member) {
+            return \Gini\IoC::construct('\Gini\CGI\Response\JSON', ['result'=>false, 'msg'=>'您不在所选课题组内']);
+        }
+        $ret = \Gini\Gapper\Client::chooseGroup($group_id);
+        if ($ret) {
+            return \Gini\IoC::construct('\Gini\CGI\Response\JSON', ['result'=>true, 'msg'=>'课题组切换成功']);
+        }
+        else {
+            return \Gini\IoC::construct('\Gini\CGI\Response\JSON', ['result'=>false, 'msg'=>'课题组切换失败']);
+        }
+    }
+
     /**
      * @brief 选择组
      *
