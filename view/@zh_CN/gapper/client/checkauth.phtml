@@ -39,7 +39,7 @@
                                 paths: { gpui: gpuiUrl }
                             });
                             require(['gpui'], function(data) {
-                                lab_id = data.params.lab_id;
+                                lab_id = data.params.labId;
                             });
                             if (lab_id){
                                 $.post('ajax/gapper/auth/gapper/change-group', {'group_id':lab_id}, function(response){
