@@ -30,11 +30,10 @@
                 });
                 require(['gpui'], function(data) {
                     accessToken = data.params.accessToken;
-                    // updateLocation = data.root.updateLocation;
                 });
                 if(accessToken){
                     $.post('ajax/gapper/auth/gapper/login-by-access-token', {'accessToken':accessToken}, function(response){
-                        // window.location.reload();
+                        var getCurrentGroupIDCount = 0;
                         var getCurrentGroupID = setInterval(function(){
                             require.config({
                                 paths: { gpui: gpuiUrl }
@@ -42,15 +41,16 @@
                             require(['gpui'], function(data) {
                                 lab_id = data.params.labId;
                             });
+                            getCurrentGroupIDCount++;
                             if (lab_id){
                                 $.post('ajax/gapper/auth/gapper/change-group', {'group_id':lab_id}, function(response){
                                     window.location.reload();
                                 });
                             }
-                            else {
+                            if (getCurrentGroupIDCount > 4) {
                                 window.location.reload();
                             }
-                        }, 1500);
+                        }, 1000);
                     });
                     clearInterval(interval);
                 }
