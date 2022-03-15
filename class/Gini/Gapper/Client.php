@@ -864,10 +864,10 @@ class Client
                 }
                 try {
                     $filters = [];
-                    // if (strpos($app['module_name'], 'admin')===0) {
-                    // } else {
+                    if (strpos($app['module_name'], 'admin')===0) {
+                    } else {
                         $filters['type'] = 'lab';
-                    //}
+                    }
                     $newgroups = self::getRPC()->gapper->user->getGroups($username, $filters) ?: [];
                     self::cache($cacheKey, $newgroups);
                 } catch (\Exception $e) {
