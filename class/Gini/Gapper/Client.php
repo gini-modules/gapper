@@ -1253,7 +1253,9 @@ class Client
             $per_page = 50;
             $result = [];
             while (true) {
-                $members = (array) self::getRPC()->gapper->group->getMembers((int)$groupID, null ,$start, $per_page);
+                $members = self::getRPC()->gapper->group->getMembers((int)$groupID, null ,$start, $per_page);
+                if (!$members) break;
+                $members = (array)$members;
                 $start += $per_page;
                 if (!count($members)) break;
                 $result = $result + $members;
