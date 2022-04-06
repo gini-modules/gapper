@@ -1358,7 +1358,7 @@ class Client
 
             $admin = those('gapper/agent/group/admin')->get('group_id');
 
-            if (in_array($groupID, $admin)) {
+            if ($groupID == 'admin' || in_array($groupID, $admin)) {
                 $adminApps = (array)\Gini\Config::get('gapper.group_must_install_apps');
                 $apps = [];
                 foreach ($adminApps as $aapp) {
