@@ -757,6 +757,47 @@ class Client
     {
         try {
             $groupID = self::getRPC()->gapper->group->create($data);
+            if($groupID && _G('UNO')) {
+                $userName = $data['username'];
+                $userInfo = self::getUserInfo($userName);
+                $userID = $userInfo['id'];
+                $rest = new \Gini\HTTP();
+
+                $config            = \Gini\Config::get('api.uniadmin-access-agent-config');
+                $gapper_conf       = \Gini\Config::get('gapper.rpc');
+
+                $url               = $config['url'];
+                $app_client_id     = $gapper_conf['client_id'];
+                $app_client_secret = $gapper_conf['client_secret'];
+
+                $result = $rest->post($url.'/v1/auth/app-token', [
+                    'client_id'     => $app_client_id,
+                    'client_secret' => $app_client_secret
+                ]);
+                $re = json_decode($result, true);
+                $access_token = $re['access_token'];
+                if ($access_token) {
+                    $rest->header('X-Gapper-OAuth-Token', $access_token);
+                    $resp = $rest->get($url . '/v1/roles', []);
+                    $res = @json_decode($resp->body, true);
+                    $raw = $res['items'];
+                    $params = [];
+                    foreach ($raw as $role) {
+                        if ($role['key'] == 'lab_master') {
+                            $roleId = $role['id'];
+                            $params[] = [
+                                'gid' => $groupID,
+                                'rid' => $roleId
+                            ];
+                            $path = sprintf($url.'/v1/user/%d/group-roles', $userID);
+                            $response = $rest->post($path, $params);
+                            $body = json_decode($response->body, true);
+                            break;
+                        }
+                    }
+                }
+
+            }
         } catch (\Exception $e) {
         }
         return $groupID;
