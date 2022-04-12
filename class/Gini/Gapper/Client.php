@@ -1253,7 +1253,9 @@ class Client
             $per_page = 50;
             $result = [];
             while (true) {
-                $members = (array) self::getRPC()->gapper->group->getMembers((int)$groupID, null ,$start, $per_page);
+                $members = self::getRPC()->gapper->group->getMembers((int)$groupID, null ,$start, $per_page);
+                if (!$members) break;
+                $members = (array)$members;
                 $start += $per_page;
                 if (!count($members)) break;
                 $result = $result + $members;
@@ -1356,7 +1358,7 @@ class Client
 
             $admin = those('gapper/agent/group/admin')->get('group_id');
 
-            if (in_array($groupID, $admin)) {
+            if ($groupID == 'admin' || in_array($groupID, $admin)) {
                 $adminApps = (array)\Gini\Config::get('gapper.group_must_install_apps');
                 $apps = [];
                 foreach ($adminApps as $aapp) {
