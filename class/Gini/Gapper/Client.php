@@ -283,6 +283,49 @@ class Client
             return self::STEP_LOGIN;
         }
 
+	//管理方登录跳过选组+权限检查
+	if(strstr($app['module_name'], 'admin-') !== false && \Gini\Config::Get('app.node_use_uniadmin_access_data')){
+            $app['type'] = 'user';
+            $rest = new \Gini\HTTP();
+            $config = \Gini\Config::get('api.uniadmin-access-agent-config');
+            $gapper_conf = \Gini\Config::get('gapper.rpc');
+            $url = $config['url'];
+            $app_client_id = $gapper_conf['client_id'];
+            $app_client_secret = $gapper_conf['client_secret'];
+            $path = $config['app_auth_verify_path'];
+            $result = $rest->post($url . $path, [
+                'client_id' => $app_client_id,
+                'client_secret' => $app_client_secret
+            ]);
+            $re = json_decode($result, true);
+            $access_token = $re['access_token'];
+            $hasPerm = false;
+            if ($access_token) {
+                $userInfo = self::getUserInfo();
+                $rest->header('X-Gapper-OAuth-Token', $access_token);
+                $userID = $userInfo['id'];
+                $path = sprintf($config['url'] . '/v1/user/%d/permissions', $userID);
+                $permsResponse = $rest->get($path, []);
+                $permisons = @json_decode($permsResponse, true);
+                $hasPerm = false;
+                if (!empty($permisons['permissions'])) {
+                    foreach ($permisons['permissions'] as $perm) {
+                        if (false === strstr($perm['key'], 'labmai_admin')) {
+                            continue;
+                        }
+                        if (!(in_array('system', $perm['group_type']) || in_array('organization', $perm['group_type']))) {
+                            continue;
+                        }
+                        $hasPerm = true;
+                        break;
+                    }
+                }
+            }
+            if( !$hasPerm){
+                return self::STEP_LOGIN;
+            }
+        }
+
         $username = self::getUserName();
         if (!$username) {
             return self::STEP_LOGIN;
