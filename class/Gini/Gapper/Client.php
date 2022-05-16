@@ -200,7 +200,9 @@ class Client
         $currentGapperGroup = self::getGroupID();
         $currentStep = self::getLoginStep();
 
-        if ((!$currentGapperGroup || $gapperGroup && $gapperGroup!=$currentGapperGroup) && in_array($currentStep, [
+        $client_id = self::getId();
+        $app = self::getInfo($client_id);
+        if ($app['type'] == 'group' && (!$currentGapperGroup || $gapperGroup && $gapperGroup!=$currentGapperGroup) && in_array($currentStep, [
             self::STEP_GROUP,
             self::STEP_DONE
         ])) {
