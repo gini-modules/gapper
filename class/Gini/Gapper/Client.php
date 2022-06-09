@@ -1579,7 +1579,7 @@ class Client
         }
         $group->name = $info['name'];
         $group->title = $info['title'];
-        $group->abbr = $info['abbr'];
+        $group->abbr = $info['title'];
         $group->creator = $info['creator'];
         $group->icon = $info['icon'];
         $group->stime = date('Y-m-d H:i:s');
