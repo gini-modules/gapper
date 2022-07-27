@@ -1,6 +1,53 @@
 <div class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
+            <?php
+                if ($enable_uno_mode) {
+            ?>
+            <div class="modal-header">
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body ">
+                <ul class="gapper-client-checkbox list-unstyled list-inline text-center">
+                   <p>登录中 请稍后....</p>
+                </ul>
+                <div class="text-right"></div>
+            </div>
+            <?php
+                $uno_url = $uno_conf['url'];
+                $gpui_path = $uno_conf['path']['gpui'];
+                $gpui_url = $uno_url.$gpui_path;
+            ?>
+
+            <script data-ajax="true">
+                require(['jquery', 'bootbox'], function($, bootbox){
+                    var updateLocation = '';
+                    var gpuiUrl = '<?= $gpui_url ?>';
+                    var lab_id = '';
+                    var getCurrentGroupIDCount = 0;
+                    var getCurrentGroupID = setInterval(function(){
+                        require.config({
+                            paths: { gpui: gpuiUrl }
+                        });
+                        require(['gpui'], function(data) {
+                            lab_id = data.params.labId;
+                        });
+                        getCurrentGroupIDCount++;
+                        if (lab_id){
+                            $.post('ajax/gapper/auth/gapper/change-group', {'group_id':lab_id}, function(response){
+                                window.location.reload();
+                            });
+                        }
+                        if (getCurrentGroupIDCount > 3) {
+                            bootbox.alert('未找到"当前分组"组件. 请联系系统管理员');
+                            clearInterval(getCurrentGroupID);
+                        }
+                    }, 1000);
+                });
+            </script>
+            <?php
+                } else {
+            ?>
             <div class="modal-header">
                 <button class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
                 <h4 class="modal-title"><?=H('请选择分组:')?></h4>
@@ -19,6 +66,7 @@
                 </div></li>
             <?php }?>
             </ul>
+            <?php } ?>
         </div>
     </div>
 </div>

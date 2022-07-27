@@ -39,7 +39,7 @@ class Step extends \Gini\Controller\CGI
     {
         $conf = (array) \Gini\Config::get('gapper.auth');
         $enable_uno_mode = \Gini\Config::get('gapper.enable-uno-mode');
-	$login_by_mobile = $_SESSION['login_by_mobile'];
+	    $login_by_mobile = $_SESSION['login_by_mobile'];
         $sources = [];
         if ($enable_uno_mode && !$login_by_mobile) {
             return $this->_showHTML('gapper/client/checkauth', [
@@ -95,7 +95,9 @@ class Step extends \Gini\Controller\CGI
             }
         }
 
-        $data['groups'] = $groups;
+        $data['groups']          = $groups;
+        $data['enable_uno_mode'] = \Gini\Config::get('gapper.enable-uno-mode');
+        $data['uno_conf']        = \Gini\Config::get('gapper.uno');
 
         return $this->_showHTML('gapper/client/checkgroup', $data);
     }
