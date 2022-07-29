@@ -2,7 +2,7 @@
 
 namespace Gini\ORM\Gapper\Agent;
 
-abstract class SObject extends \Gini\ORM\Object
+abstract class SObject extends \Gini\ORM\Base
 {
     // 将gapper-server的数据缓存到本地
     protected static $db_name = 'gapper-server-agent-db';

@@ -5,7 +5,7 @@ namespace Gini\ORM\Gapper;
 /**
  * Robject 是用于数据获取的特殊类：用于数据模型对象远程rpc获取相应信息的底层支持类.
  **/
-abstract class RObject extends \Gini\ORM\Object
+abstract class RObject extends \Gini\ORM\Base
 {
     //缓存时间
     protected $cacheTimeout = 300;
