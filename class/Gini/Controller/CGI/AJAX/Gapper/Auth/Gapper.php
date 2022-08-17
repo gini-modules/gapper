@@ -29,10 +29,10 @@ class Gapper extends \Gini\Controller\CGI
         $config = \Gini\Config::get('api.uniadmin-access-agent-config');
         $responseData = $rest->get($config['url']. '/v1/current-user', []);
         $userInfo = @json_decode($responseData, true);
-	$uno = _G('UNO');
+	    $uno = _G('UNO');
         $userID = $userInfo['global_id'] && !$uno ?: $userInfo['id'];
         if ($userID) {
-	    $_SESSION['uno_token'] = $accessToken;
+	       $_SESSION['uno_token'] = $accessToken;
             \Gini\Gapper\Client::loginByUserID($userID);
         }
 	
@@ -81,10 +81,11 @@ class Gapper extends \Gini\Controller\CGI
             return $this->_showJSON(true);
         }
 
-        $form = $this->form('post');
+        $form     = $this->form('post');
         $username = $form['username'];
         $password = $form['password'];
-        $captcha = $form['captcha'];
+        $captcha  = $form['captcha'];
+        $password = base64_decode($password);
 
         if (!$captcha) {
             return $this->_showJSON('captcha required! ');

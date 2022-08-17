@@ -147,6 +147,20 @@ define('gapper/client/login', ['jquery', 'bootbox', 'css!../../../css/gapper-cho
         var $that = $(this).parents(classForm);
         var url = $that.attr('action');
         var data = $that.serialize();
+
+        var values, index;
+
+        dataArr = $that.serializeArray();
+
+        for (index = 0; index < dataArr.length; ++index) {
+            if (dataArr[index].name == "password") {
+                dataArr[index].value = window.btoa(dataArr[index].value);
+            }
+        }
+
+        data = jQuery.param(dataArr);
+
+
         showLoadingDialog();
         $.post(url, data, function(pData) {
             if (true === pData) {
