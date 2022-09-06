@@ -99,8 +99,8 @@ class Server extends \Gini\Controller\CLI
         $db = \Gini\Database::db('gapper-server-agent-db');
         $values = $db->quote([
             $info['id'],
-            $info['client_id'], $info['client_secret'],
-            $info['module_name'], $info['title'], $info['short_title'],
+            trim($info['client_id']), $info['client_secret'],
+            trim($info['client_id']), $info['title'], $info['short_title'],
             $info['url'], $info['icon_url'],
             $info['type'], $info['rate'],
             $info['font_icon']?:'',
@@ -112,8 +112,6 @@ class Server extends \Gini\Controller\CLI
     {
         $rpc = \Gini\Gapper\Client::getRPC();
         $info = $rpc->gapper->app->getInfo($clientID);
-        if (empty(array_diff([
-            'module_name', 'type', 'rate', 'font_icon'
-        ], array_keys($info)))) return $info;
+        return $info;
     }
 }
