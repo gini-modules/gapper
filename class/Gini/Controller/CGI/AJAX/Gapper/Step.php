@@ -98,6 +98,7 @@ class Step extends \Gini\Controller\CGI
         $data['groups']          = $groups;
         $data['enable_uno_mode'] = \Gini\Config::get('gapper.enable-uno-mode');
         $data['uno_conf']        = \Gini\Config::get('gapper.uno');
+        $data['login_by_mobile'] = $_SESSION['login_by_mobile'];
 
         return $this->_showHTML('gapper/client/checkgroup', $data);
     }
