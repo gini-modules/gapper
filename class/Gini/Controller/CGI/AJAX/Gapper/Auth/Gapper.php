@@ -153,6 +153,38 @@ class Gapper extends \Gini\Controller\CGI
         }
     }
 
+    public function actionLoginWithGroup()
+    {
+        $form = $this->form();
+        $group_id = $form['group_id'];
+        $accessToken = $form['accessToken'];
+        $rest = new \Gini\HTTP();
+        $rest->header('X-Gapper-OAuth-Token', $accessToken);
+        $config = \Gini\Config::get('api.uniadmin-access-agent-config');
+        $responseData = $rest->get($config['url']. '/v1/current-user', []);
+        $userInfo = @json_decode($responseData, true);
+        if ($userID = $userInfo['id']) {
+            $_SESSION['uno_token'] = $accessToken;
+            \Gini\Gapper\Client::loginByUserID($userID);
+            $choose_group = a('group', $group_id);
+            $me = _G('ME');
+            $current_group = _G('GROUP');
+            if (!$choose_group->id) {
+                return \Gini\IoC::construct('\Gini\CGI\Response\JSON', ['result'=>false, 'msg'=>'请选择有效的课题组']);
+            }
+            if ($current_group->id == $choose_group->id) {
+                return \Gini\IoC::construct('\Gini\CGI\Response\JSON', ['result'=>true, 'msg'=>'课题组切换成功']);
+            }
+            $ret = \Gini\Gapper\Client::chooseGroup($group_id);
+            if ($ret) {
+                return \Gini\IoC::construct('\Gini\CGI\Response\JSON', ['result'=>true, 'msg'=>'课题组切换成功']);
+            }
+            else {
+                return \Gini\IoC::construct('\Gini\CGI\Response\JSON', ['result'=>false, 'msg'=>'课题组切换失败']);
+            }
+        }
+    }
+
     /**
      * @brief 选择组
      *

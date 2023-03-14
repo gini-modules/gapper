@@ -21,40 +21,29 @@
 
             <script data-ajax="true">
             var accessToken = '';
-            var updateLocation = '';
             var gpuiUrl = '<?= $gpui_url ?>';
             var lab_id = '';
+            require.config({
+                paths: { gpui: gpuiUrl }
+            });
             var interval = setInterval(function(){
-                require.config({
-                    paths: { gpui: gpuiUrl }
-                });
                 require(['gpui'], function(data) {
                     accessToken = data.params.accessToken;
-                });
-                if(accessToken){
-                    $.post('ajax/gapper/auth/gapper/login-by-access-token', {'accessToken':accessToken}, function(response){
-                        var getCurrentGroupIDCount = 0;
-                        var getCurrentGroupID = setInterval(function(){
-                            require.config({
-                                paths: { gpui: gpuiUrl }
-                            });
-                            require(['gpui'], function(data) {
-                                lab_id = data.params.labId;
-                            });
-                            getCurrentGroupIDCount++;
-                            if (lab_id){
-                                $.post('ajax/gapper/auth/gapper/change-group', {'group_id':lab_id}, function(response){
-                                    window.location.reload();
-                                });
-                            }
-                            if (getCurrentGroupIDCount > 4) {
+                    lab_id = data.params.labId;
+                    if (accessToken && lab_id) {
+                        $.post('ajax/gapper/auth/gapper/loginWithGroup', {'accessToken':accessToken ,'group_id':lab_id}, function(response){
+                            if (response.result) {
+                                clearInterval(interval);
                                 window.location.reload();
                             }
-                        }, 3000);
-                    });
-                    clearInterval(interval);
-                }
-            }, 500);
+                            else {
+                                clearInterval(interval);
+                                alert(response.msg)
+                            }
+                        });
+                    }
+                });
+            }, 1000);
             </script>
             <?php
                 } else {
