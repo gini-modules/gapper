@@ -1040,6 +1040,9 @@ class Client
             // if (self::hasServerAgent()>=20) {
             //     self::getGroupMembers((int)$groupID);
             // }
+            if (\Gini\Event::get('gapper.before-choose-group')) {
+                \Gini\Event::trigger('gapper.before-choose-group', $groupID);
+            }
             if ($useUniadminInfo) {
                 if (\Gini\Event::get('app.group-auto-install-apps')) {
                     \Gini\Event::trigger('app.group-auto-install-apps', $groupID);

@@ -5,16 +5,15 @@
                 $gpui_path = $uno_conf['path']['gpui'];
                 $gpui_url = $uno_url.$gpui_path;
             ?>
-
-            <div class="loading text-center">
-                <i class="fa fa-2x fa-spinner fa-spin"></i>
+            <div style="position: absolute;top: 50%;left: 50%;height: auto;width: auto;transform: translate(-50%, -50%);">
+                <i class="fa fa-2x fa-spinner fa-spin" style="font-size:40px"></i>
             </div>
             <script data-ajax="true">
-            var toUrl = '<?= $url?>'; 
+            var toUrl = '<?= $url?>';
             var accessToken = '';
             var updateLocation = '';
             var gpuiUrl = '<?= $gpui_url ?>';
-	    var oldAccessToken = '<?= $accessToken ?>';
+	        var oldAccessToken = '<?= $accessToken ?>';
             var orderHistory = setInterval(function(){
                 require.config({
                     paths: { gpui: gpuiUrl }
