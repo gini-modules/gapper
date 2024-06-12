@@ -61,6 +61,21 @@ class Gapper extends \Gini\Controller\CGI
             'hasMultiLogType' => !!(count(array_keys($conf)) > 1)
         ]);
     }
+
+    public function actionGetGroups()
+    {
+        $me = _G('ME');
+        if(!$me->id) {
+            return $this->_showJSON();
+        }
+
+        $groups = \Gini\Gapper\Client::getGroups($me->username);
+        if (!$groups) {
+            return $this->_showJSON();
+        }
+        return $this->_showJSON($groups);
+    }
+
     public function actionGetGroupAccount()
     {
         return $this->_showHTML('gapper/auth/gapper/group-account');
@@ -124,16 +139,24 @@ class Gapper extends \Gini\Controller\CGI
     {
         $form = $this->form();
         $group_id = $form['group_id'];
-        $choose_group = a('group', $group_id);
+
+        // $choose_group = a('group', $group_id);
+        $groupInfo = \Gini\Gapper\Client::getGroupInfo($group_id, true);
+
+        if (isset($groupInfo['id'])) {
+            $choose_group_id = $groupInfo['id'];
+        }
+
         $me = _G('ME');
         $current_group = _G('GROUP');
-        if (!$choose_group->id) {
+        if (!$choose_group_id) {
             return \Gini\IoC::construct('\Gini\CGI\Response\JSON', ['result'=>false, 'msg'=>'请选择有效的课题组']);
         }
-        if ($current_group->id == $choose_group->id) {
+        if ($current_group->id == $choose_group_id) {
             return \Gini\IoC::construct('\Gini\CGI\Response\JSON', ['result'=>true, 'msg'=>'课题组切换成功']);
         }
-        $members = $choose_group->getMembers();
+
+        $members = \Gini\Gapper\Client::getGroupMembers($group_id, true);
         $is_member = false;
         foreach ($members as $member) {
             if ($member['id'] == $me->id) {

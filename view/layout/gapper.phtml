@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <?php /*360浏览器的极速模式*/ ?>
+    <meta name="renderer" content="webkit">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="gini-locale" content="<?=H(\Gini\Config::get('system.locale'))?>"/>
+    <title><?= H(\Gini\Config::get('page.title') ?: \Gini\Config::get('app.title')) ?></title>
+    <base href="<?= H(URL('/')) ?>">
+    <?= V('layout/head-css') ?>
+    <?= V('layout/head-js') ?>
+    <link href="<?= H(RURL('gapper-uno.css', 'css')) ?>" rel="stylesheet">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/icon/apple-touch-icon-144.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/icon/apple-touch-icon-114.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/icon/apple-touch-icon-72.png">
+    <link rel="shortcut icon" href="assets/icon/favicon.png">
+    <?php if ($uno) { ?>
+    <script type="text/javascript">
+        require(['@genee/react', '@genee/uno-webview','@genee/theme-vars', 'jquery'], ({ useReact, useEffect,  }, { useUnoParams, useUno},{setVars}, $) => {
+            useReact(() => {
+                const uno = useUno();
+                const { accessToken, labId, colors } = useUnoParams();
+            });
+        });
+    </script>
+    <?php } ?>
+</head>
+<body class="<?= H($layout_class) ?>" data-require="board">
+        <div id="body" class="clearfix">
+            <?= $body ?>
+        </div>
+</body>
+</html>

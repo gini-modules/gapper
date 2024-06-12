@@ -1,0 +1,41 @@
+<div class="gapper-uno text-center">
+    <?php if ($icon) {  ?>
+    <img src="assets/icon/group401/<?= $icon ?>.png">
+    <?php } ?>
+    <p><span class="text-title"><b><?= H($title) ?></b></span></p>
+    <?php foreach ($descriptions as $description) { ?>
+    <p><span class="text-description"><?= H($description) ?></span></p>
+    <?php } ?>
+    <?php if ($enable_operate) { ?>
+    <a class="btn btn-default btn-sm btn-join-group"><?= H(T('申请/加入课题组')) ?></a>
+    <?php } ?>
+</div>
+<script type="text/javascript">
+    require(['@genee/react', '@genee/uno-webview','jquery'], ({ useReact, useEffect }, { useUnoParams, useUno}, $) => {
+        useReact(() => {
+            let ready = false;
+            const uno = useUno();
+            uno.whenReady().then(() => {
+                if (ready) return;
+                ready = true;
+                $('.btn-join-group').on('click', function(){
+                    uno.openWindow({
+                      "title": "申请入组",
+                      "entry": "@entry:uno/join-group",
+                      "params": {
+                        "schema": {
+                          "lab": {
+                        "title": "课题组",
+                        "required": true,
+                        "description": "请选择要加入的课题组"
+                          }
+                        }
+                      },
+                      "width": "800px",
+                      "uno": "modal"
+                    });
+                });
+            });
+        });
+    });
+</script>

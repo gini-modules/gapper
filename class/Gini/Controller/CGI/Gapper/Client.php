@@ -201,6 +201,12 @@ class Client extends \Gini\Controller\CGI\Gapper
             return $this->redirect($redirect);
         }
 
+        if ( (\Gini\Gapper\Client::getLoginStep(true) == \Gini\Gapper\Client::STEP_GROUP_401)
+            && class_exists('Gini\Controller\CGI\Gapper\Uno')
+        ) {
+            return $this->redirect('gapper/uno/group401');
+        }
+
         if ($redirect) {
             $_SESSION[self::$redirect_session_key] = $redirect;
         }
@@ -247,6 +253,9 @@ class Client extends \Gini\Controller\CGI\Gapper
             \Gini\Gapper\Client::loginByUserID($userID);
             $redirect = \Gini\Config::get('uno.redirect');
             $res["redirect"] = $redirect[$state];
+            if (\Gini\Event::get('gapper.after-uno-login')) {
+                \Gini\Event::trigger('gapper.after-uno-login');
+            }
             echo J($res);
         }
 

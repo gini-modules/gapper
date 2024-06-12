@@ -267,7 +267,7 @@ class Client
 
 
     private static $keyLoginStatusChanged = 'login-status-changed';
-    public static function getLoginStep($force=false)
+    public static function getLoginStep($force=true)
     {
 
         if (\Gini\Config::get('gapper.enable-uno-mode') && $_GET['logout'] == true) {
@@ -886,10 +886,12 @@ class Client
         } catch (\Exception $e) {
         }
 
-        if (self::hasServerAgent()>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin')) {
-            $userInfo = self::getUserInfo($username);
-            if ($userInfo['agent_sync_groups']) {
-                $groups = self::getAgentUserGroups($userInfo);
+        if (!$force) {
+            if (self::hasServerAgent()>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin')) {
+                $userInfo = self::getUserInfo($username);
+                if ($userInfo['agent_sync_groups']) {
+                    $groups = self::getAgentUserGroups($userInfo);
+                }
             }
         }
 
@@ -902,9 +904,6 @@ class Client
                 $newgroups = self::cache($cacheKey);
             }
             if (false === $newgroups) {
-                if (!\Gini\Config::get('app.gapper_info_from_uniadmin')) {
-                    $needAgent = true;
-                }
                 try {
                     $filters = [];
                     if (strpos($app['module_name'], 'admin')===0) {
@@ -914,11 +913,11 @@ class Client
                     $newgroups = self::getRPC()->gapper->user->getGroups($username, $filters) ?: [];
                     self::cache($cacheKey, $newgroups);
                 } catch (\Exception $e) {
-                    $needAgent = false;
                 }
             }
             if (!empty($newgroups)) {
                 $groups = $newgroups;
+                $needAgent = true;
             }
         }
 
@@ -947,13 +946,12 @@ class Client
             }
         }
 
-        if ($needAgent) {
+        if ($force || $needAgent) {
             self::_agentGroups($groups);
             self::_agentUserGroups($username, $groups);
         }
 
-
-	if (\Gini\Config::get('gapper.not_use_group_app')) {
+	   if (\Gini\Config::get('gapper.not_use_group_app')) {
             $labApps = (array)\Gini\Config::get('gapper.lab_group_must_install_apps');
             $admin = those('gapper/agent/group/admin')->get('group_id');
             if (in_array($client_id, $labApps)) {
@@ -1031,15 +1029,12 @@ class Client
         if (!in_array($groupID, array_keys($groups))) {
             return false;
         }
+        // 同步一下分组的人员信息
+        self::getGroupMembers((int)$groupID);
 
         $apps = self::getGroupApps((int)$groupID, $force);
         $useUniadminInfo = \Gini\Config::get('app.gapper_info_from_uniadmin');
         if (($groupID && $useUniadminInfo) || (is_array($apps) && in_array($client_id, array_keys($apps)))) {
-            // 选组的时候不需要去拿组成员，这一步，我没想明白当初为什么这么写，但是应该是个废屁的东西
-            // // 如果有本地代理数据，需要执行一次getGroupMembers, 因为组在本地缓存的时候，没有缓存组的成员信息
-            // if (self::hasServerAgent()>=20) {
-            //     self::getGroupMembers((int)$groupID);
-            // }
             if (\Gini\Event::get('gapper.before-choose-group')) {
                 \Gini\Event::trigger('gapper.before-choose-group', $groupID);
             }
@@ -1548,9 +1543,12 @@ class Client
             self::getRPC();
         } catch (\Exception $e) {
         }
-        if (self::hasServerAgent()>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin')) {
-            $info = self::getAgentGroupInfo($criteria);
-            if ($info) return $info;
+
+        if (!$force) {
+            if (self::hasServerAgent()>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin')) {
+                $info = self::getAgentGroupInfo($criteria);
+                if ($info) return $info;
+            }
         }
 
         $needAgent = false;
