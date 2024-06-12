@@ -140,19 +140,15 @@ class Gapper extends \Gini\Controller\CGI
         $form = $this->form();
         $group_id = $form['group_id'];
 
-        // $choose_group = a('group', $group_id);
+        $choose_group = a('group', $group_id);
         $groupInfo = \Gini\Gapper\Client::getGroupInfo($group_id, true);
-
-        if (isset($groupInfo['id'])) {
-            $choose_group_id = $groupInfo['id'];
-        }
 
         $me = _G('ME');
         $current_group = _G('GROUP');
-        if (!$choose_group_id) {
+        if (!$choose_group->id) {
             return \Gini\IoC::construct('\Gini\CGI\Response\JSON', ['result'=>false, 'msg'=>'请选择有效的课题组']);
         }
-        if ($current_group->id == $choose_group_id) {
+        if ($current_group->id == $choose_group->id) {
             return \Gini\IoC::construct('\Gini\CGI\Response\JSON', ['result'=>true, 'msg'=>'课题组切换成功']);
         }
 

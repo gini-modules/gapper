@@ -267,7 +267,7 @@ class Client
 
 
     private static $keyLoginStatusChanged = 'login-status-changed';
-    public static function getLoginStep($force=true)
+    public static function getLoginStep($force=false)
     {
 
         if (\Gini\Config::get('gapper.enable-uno-mode') && $_GET['logout'] == true) {
@@ -970,7 +970,6 @@ class Client
         $db = a('gapper/agent/group')->db();
         foreach ($groups as $g) {
             if (!$g['id']) continue;
-            if ($db->query("select exists(select 1 from gapper_agent_group where id={$g['id']})")->value()) continue;
             self::replaceAgentGroupInfo($g);
         }
         self::_recordAgent(['groups', $groups]);
@@ -1030,7 +1029,7 @@ class Client
             return false;
         }
         // 同步一下分组的人员信息
-        self::getGroupMembers((int)$groupID);
+        // self::getGroupMembers((int)$groupID);
 
         $apps = self::getGroupApps((int)$groupID, $force);
         $useUniadminInfo = \Gini\Config::get('app.gapper_info_from_uniadmin');
