@@ -1028,8 +1028,6 @@ class Client
         if (!in_array($groupID, array_keys($groups))) {
             return false;
         }
-        // 同步一下分组的人员信息
-        // self::getGroupMembers((int)$groupID);
 
         $apps = self::getGroupApps((int)$groupID, $force);
         $useUniadminInfo = \Gini\Config::get('app.gapper_info_from_uniadmin');
@@ -1264,7 +1262,7 @@ class Client
         return $result;
     }
 
-    public static function getGroupMembers($groupID)
+    public static function getGroupMembers($groupID, $force = false)
     {
         $groupID = (int)$groupID;
         $groupInfo = self::getGroupInfo($groupID, false);
@@ -1274,19 +1272,22 @@ class Client
             self::getRPC();
         } catch (\Exception $e) {
         }
-
-        if (self::hasServerAgent()>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin') && $groupInfo['mstime'] && $groupInfo['agent_sync_members']) {
-            $db = a('gapper/agent/group/user')->db();
-            $query = $db->query("select user_id from gapper_agent_group_user where group_id={$groupID}");
-            if ($query) {
-                $rows = $query->rows();
-                if (count($rows)) {
-                    foreach ($rows as $row) {
-                        $result[$row->user_id] = self::getUserInfo((int)$row->user_id);
+        $result = [];
+        if (!$force) {
+            if (self::hasServerAgent()>=1 && !\Gini\Config::get('app.gapper_info_from_uniadmin') && $groupInfo['mstime'] && $groupInfo['agent_sync_members']) {
+                $db = a('gapper/agent/group/user')->db();
+                $query = $db->query("select user_id from gapper_agent_group_user where group_id={$groupID}");
+                if ($query) {
+                    $rows = $query->rows();
+                    if (count($rows)) {
+                        foreach ($rows as $row) {
+                            $result[$row->user_id] = self::getUserInfo((int)$row->user_id);
+                        }
                     }
                 }
             }
         }
+
 
         if (!$result) {
             $start = 0;
