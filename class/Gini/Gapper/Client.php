@@ -1022,12 +1022,15 @@ class Client
         $groups = self::getGroups($username, true);
         if (!$groups) return false;
 
+
         if (!$groupID && count($groups)==1) {
             $groupID = current($groups)['id'];
         }
         if (!in_array($groupID, array_keys($groups))) {
             return false;
         }
+
+        $members = self::getGroupMembers($groupID, true);
 
         $apps = self::getGroupApps((int)$groupID, $force);
         $useUniadminInfo = \Gini\Config::get('app.gapper_info_from_uniadmin');
@@ -1320,9 +1323,11 @@ class Client
         try {
             $values = [];
             foreach ($users as $userInfo) {
-                $query = $db->query("select exists(select 1 from gapper_agent_group_user where group_id={$groupID} and user_id={$userInfo['id']})");
-                if (!$query) continue;
-                $values[] = $db->quote([$groupID, $userInfo['id']]);
+                $bool = $db->value("select id from gapper_agent_group_user where group_id={$groupID} and user_id={$userInfo['id']}");
+                if (!$bool) {
+                    self::replaceAgentUserInfo($userInfo);
+                    $values[] = $db->quote([$groupID, $userInfo['id']]);
+                }
             }
             if ($values) {
                 $valuesStr = implode('),(', $values);
