@@ -2,7 +2,7 @@
     "id": "gapper",
     "name": "Gapper",
     "description": "Gapper API",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "dependencies": {
         "gini": ">=1.5.2",
         "cache": "*",
