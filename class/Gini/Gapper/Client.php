@@ -967,7 +967,6 @@ class Client
     private static function _agentGroups($groups)
     {
         if (self::_hasAgent(['groups', $groups])) return;
-        $db = a('gapper/agent/group')->db();
         foreach ($groups as $g) {
             if (!$g['id']) continue;
             self::replaceAgentGroupInfo($g);

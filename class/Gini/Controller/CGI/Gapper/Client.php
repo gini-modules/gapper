@@ -201,7 +201,9 @@ class Client extends \Gini\Controller\CGI\Gapper
             return $this->redirect($redirect);
         }
 
-        if ( (\Gini\Gapper\Client::getLoginStep(true) == \Gini\Gapper\Client::STEP_GROUP_401)
+        if (
+            _G('UNO')
+            && (\Gini\Gapper\Client::getLoginStep(true) == \Gini\Gapper\Client::STEP_GROUP_401)
             && class_exists('Gini\Controller\CGI\Gapper\Uno')
         ) {
             return $this->redirect('gapper/uno/group401');
